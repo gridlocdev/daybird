@@ -3,6 +3,7 @@
 ## Unreleased
 
 - The mini month marks the visible days as one rounded band, squared off where it wraps to the next row.
+- Fixed: a drag could stay stuck to the pointer after you let go, when the event was drawn again mid-drag (just after it was made, for example). Every release now drops the event, and Escape or leaving the window cancels the drag.
 
 ## 1.0.0 - 2026-11-17
 

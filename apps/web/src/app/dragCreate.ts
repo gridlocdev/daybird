@@ -3,7 +3,7 @@
  * all-day strip or Month cells for an all-day one. A press without a drag selects nothing, a double-click makes
  * an event there, and Escape mid-drag cancels.
  */
-import { useRef, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import {
   MINUTES_PER_DAY,
   SNAP_MINUTES,
@@ -16,6 +16,7 @@ import {
 import type { AppController } from './controller.ts';
 import type { MoveTarget } from '@daybird/core';
 import { newEventAt } from './eventActions.ts';
+import { cancelPress, trackPress } from './pointerTrack.ts';
 
 /** How far the pointer moves before a press counts as a drag, in px. */
 const SLOP = 4;
@@ -30,10 +31,18 @@ interface Press {
 const onEmpty = (e: Event): boolean => !(e.target as Element).closest('button, a, input, select, textarea');
 const begins = (e: PointerEvent): boolean => e.button === 0 && onEmpty(e);
 
-function capture(e: PointerEvent): void {
+/** Takes the pointer and the keyboard (for Escape) to the pressed element, and returns it. */
+function capture(e: PointerEvent): HTMLElement {
   const el = e.currentTarget as HTMLElement;
   el.setPointerCapture?.(e.pointerId);
   el.focus({ preventScroll: true });
+  return el;
+}
+
+function cancelOnEscape(e: KeyboardEvent): void {
+  if (e.key !== 'Escape' || !cancelPress()) return;
+  e.preventDefault();
+  e.stopPropagation();
 }
 
 function movedFar(p: Press, e: PointerEvent): boolean {
@@ -44,47 +53,36 @@ function movedFar(p: Press, e: PointerEvent): boolean {
 /** The timed drag in one day's column: the draft is minutes after midnight, the end past the last quarter. */
 export function useTimeDrag(app: AppController, hourHeight: number) {
   const [draft, setDraft] = useState<{ day: PlainDate; from: number; to: number } | null>(null);
-  const press = useRef<(Press & { day: PlainDate; at: number }) | null>(null);
-  const minuteAt = (e: MouseEvent): number => {
-    const top = (e.currentTarget as HTMLElement).getBoundingClientRect().top;
-    const m = snapDown(((e.clientY - top) / hourHeight) * 60);
+  const minuteAt = (column: HTMLElement, e: MouseEvent): number => {
+    const m = snapDown(((e.clientY - column.getBoundingClientRect().top) / hourHeight) * 60);
     return Math.max(0, Math.min(MINUTES_PER_DAY - SNAP_MINUTES, m));
   };
   const span = (at: number, m: number) => ({ from: Math.min(at, m), to: Math.max(at, m) + SNAP_MINUTES });
-  const cancel = () => {
-    press.current = null;
-    setDraft(null);
-  };
   return {
     draft,
     handlers: (day: PlainDate) => ({
       onPointerDown: (e: PointerEvent) => {
         if (!begins(e)) return;
-        capture(e);
-        press.current = { day, at: minuteAt(e), x: e.clientX, y: e.clientY, moved: false };
+        const column = capture(e);
+        const at = minuteAt(column, e);
+        const p: Press = { x: e.clientX, y: e.clientY, moved: false };
+        trackPress(e, {
+          move: (m) => {
+            if (movedFar(p, m)) setDraft({ day, ...span(at, minuteAt(column, m)) });
+          },
+          up: (u) => {
+            setDraft(null);
+            if (!p.moved) return app.select(null);
+            const { from, to } = span(at, minuteAt(column, u));
+            newEventAt(app, timedTimes(day, from, to, app.displayZone));
+          },
+          cancel: () => setDraft(null),
+        });
       },
-      onPointerMove: (e: PointerEvent) => {
-        const p = press.current;
-        if (p && movedFar(p, e)) setDraft({ day: p.day, ...span(p.at, minuteAt(e)) });
-      },
-      onPointerUp: (e: PointerEvent) => {
-        const p = press.current;
-        cancel();
-        if (!p) return;
-        if (!p.moved) return app.select(null);
-        const { from, to } = span(p.at, minuteAt(e));
-        newEventAt(app, timedTimes(p.day, from, to, app.displayZone));
-      },
-      onPointerCancel: cancel,
-      onKeyDown: (e: KeyboardEvent) => {
-        if (e.key !== 'Escape' || !press.current) return;
-        e.preventDefault();
-        e.stopPropagation();
-        cancel();
-      },
+      onKeyDown: cancelOnEscape,
       onDblClick: (e: MouseEvent) => {
         if (!onEmpty(e)) return;
-        const m = minuteAt(e);
+        const m = minuteAt(e.currentTarget as HTMLElement, e);
         newEventAt(app, timedTimes(day, m, m + app.settings.peek().eventMinutes, app.displayZone));
       },
     }),
@@ -108,12 +106,7 @@ export function dateAtPoint(e: MouseEvent): PlainDate | null {
 /** The all-day drag across days; `dayAt` says which day the pointer is over. */
 export function useDayDrag(app: AppController, dayAt: (e: MouseEvent) => PlainDate | null) {
   const [draft, setDraft] = useState<{ first: PlainDate; last: PlainDate } | null>(null);
-  const press = useRef<(Press & { day: PlainDate }) | null>(null);
   const span = (a: PlainDate, b: PlainDate) => (a <= b ? { first: a, last: b } : { first: b, last: a });
-  const cancel = () => {
-    press.current = null;
-    setDraft(null);
-  };
   return {
     draft,
     handlers: {
@@ -121,27 +114,21 @@ export function useDayDrag(app: AppController, dayAt: (e: MouseEvent) => PlainDa
         const day = begins(e) ? dayAt(e) : null;
         if (!day) return;
         capture(e);
-        press.current = { day, x: e.clientX, y: e.clientY, moved: false };
+        const p: Press = { x: e.clientX, y: e.clientY, moved: false };
+        trackPress(e, {
+          move: (m) => {
+            if (movedFar(p, m)) setDraft(span(day, dayAt(m) ?? day));
+          },
+          up: (u) => {
+            setDraft(null);
+            if (!p.moved) return app.select(null);
+            const { first, last } = span(day, dayAt(u) ?? day);
+            newEventAt(app, allDayTimes(first, last));
+          },
+          cancel: () => setDraft(null),
+        });
       },
-      onPointerMove: (e: PointerEvent) => {
-        const p = press.current;
-        if (p && movedFar(p, e)) setDraft(span(p.day, dayAt(e) ?? p.day));
-      },
-      onPointerUp: (e: PointerEvent) => {
-        const p = press.current;
-        cancel();
-        if (!p) return;
-        if (!p.moved) return app.select(null);
-        const { first, last } = span(p.day, dayAt(e) ?? p.day);
-        newEventAt(app, allDayTimes(first, last));
-      },
-      onPointerCancel: cancel,
-      onKeyDown: (e: KeyboardEvent) => {
-        if (e.key !== 'Escape' || !press.current) return;
-        e.preventDefault();
-        e.stopPropagation();
-        cancel();
-      },
+      onKeyDown: cancelOnEscape,
       onDblClick: (e: MouseEvent) => {
         const day = onEmpty(e) ? dayAt(e) : null;
         if (day) newEventAt(app, allDayTimes(day, day));

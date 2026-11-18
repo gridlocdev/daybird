@@ -51,6 +51,25 @@ test.describe('Moving and copying events', () => {
     ).toBeVisible();
   });
 
+  test('a drag still drops when the dragged event is drawn again mid-drag', async ({ page }) => {
+    const standup = event(page, 'Standup');
+    await standup.scrollIntoViewIfNeeded();
+    const box = (await standup.boundingBox())!;
+    const to = await at(page, 'Thursday, November 19', 11);
+    await page.mouse.move(box.x + box.width / 2, box.y + 4);
+    await page.mouse.down();
+    await page.mouse.move((box.x + to.x) / 2, (box.y + to.y) / 2, { steps: 4 });
+    await expect(page.locator('.db-drag-ghost')).toBeVisible();
+    // A re-draw (a new event saved, its popover closed) swaps the element and takes its pointer capture with it.
+    await standup.evaluate((el) => el.remove());
+    await page.mouse.move(to.x, to.y + 4, { steps: 4 });
+    await page.mouse.up();
+    await expect(page.locator('.db-drag-ghost')).toHaveCount(0);
+    await expect(
+      column(page, 'Thursday, November 19').getByRole('button', { name: /^Standup, 11:00 AM/ }),
+    ).toBeVisible();
+  });
+
   test('dragging the bottom edge changes the end, and Option-drag copies', async ({ page }) => {
     const standup = event(page, 'Standup');
     await standup.scrollIntoViewIfNeeded();

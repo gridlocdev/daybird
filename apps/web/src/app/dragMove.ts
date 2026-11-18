@@ -1,8 +1,7 @@
 /**
  * Dragging an event (PRD §7.3): move it in the time grid (15-minute snap, across days, into or out of the
  * all-day strip), by days in Month, drag its bottom edge to change the end, Shift-drag its top edge to change the
- * start, Option-drag to copy. A ghost shows where it would land; Escape cancels. One drag at a time, so the press
- * lives here rather than in a component.
+ * start, Option-drag to copy. A ghost shows where it would land; Escape cancels. The press is followed through the window, so a release always ends it. One drag at a time.
  */
 import {
   MINUTES_PER_DAY,
@@ -23,6 +22,7 @@ import {
 import type { AppController, DragGhost } from './controller.ts';
 import { dateAtPoint } from './dragCreate.ts';
 import { canChange, detailsOf, dropEvent } from './moveActions.ts';
+import { cancelPress, trackPress } from './pointerTrack.ts';
 
 type Times = { start: TimeValue; end: TimeValue };
 type Mode = 'move' | 'end' | 'start';
@@ -32,7 +32,6 @@ const SLOP = 4;
 const EDGE = 6;
 
 interface Press {
-  readonly pointer: number;
   readonly x: number;
   readonly y: number;
   readonly mode: Mode;
@@ -46,7 +45,6 @@ interface Press {
   target: Times | null;
 }
 
-let press: Press | null = null;
 /** When the last drag ended: the click that follows it must not select or open the event. */
 let droppedAt = -Infinity;
 
@@ -132,13 +130,6 @@ function landing(app: AppController, p: Press, e: PointerEvent): { times: Times;
   };
 }
 
-function end(app: AppController): Press | null {
-  const p = press;
-  press = null;
-  app.dragGhost.value = null;
-  return p;
-}
-
 /** The pointer and key handlers that let an event be dragged, for every view that draws one. */
 export function dragHandlers(app: AppController, o: Occurrence, colour: string) {
   const ref = { calendarId: o.calendarId, uid: o.uid, key: o.key };
@@ -152,8 +143,7 @@ export function dragHandlers(app: AppController, o: Occurrence, colour: string) 
       const hour = (el.closest('.db-column')?.getBoundingClientRect().height ?? 24 * 48) / 24;
       const day = o.allDay ? dateAtPoint(e) : null;
       el.setPointerCapture?.(e.pointerId);
-      press = {
-        pointer: e.pointerId,
+      const p: Press = {
         x: e.clientX,
         y: e.clientY,
         mode: modeAt(e, el, o.allDay),
@@ -166,28 +156,30 @@ export function dragHandlers(app: AppController, o: Occurrence, colour: string) 
         moved: false,
         target: null,
       };
+      trackPress(e, {
+        move: (m) => {
+          if (!p.moved && Math.hypot(m.clientX - p.x, m.clientY - p.y) < SLOP) return;
+          p.moved = true;
+          const l = landing(app, p, m);
+          p.target = l?.times ?? null;
+          app.dragGhost.value = l?.ghost ?? null;
+        },
+        up: (u) => {
+          app.dragGhost.value = null;
+          if (!p.moved) return;
+          droppedAt = performance.now();
+          if (p.target) dropEvent(app, ref, p.target, u.altKey && p.mode === 'move');
+        },
+        cancel: () => {
+          app.dragGhost.value = null;
+          if (p.moved) droppedAt = performance.now();
+        },
+      });
     },
-    onPointerMove: (e: PointerEvent) => {
-      const p = press;
-      if (!p || p.pointer !== e.pointerId) return;
-      if (!p.moved && Math.hypot(e.clientX - p.x, e.clientY - p.y) < SLOP) return;
-      p.moved = true;
-      const l = landing(app, p, e);
-      p.target = l?.times ?? null;
-      app.dragGhost.value = l?.ghost ?? null;
-    },
-    onPointerUp: (e: PointerEvent) => {
-      const p = end(app);
-      if (!p?.moved) return;
-      droppedAt = performance.now();
-      if (p.target) dropEvent(app, ref, p.target, e.altKey && p.mode === 'move');
-    },
-    onPointerCancel: () => void end(app),
     onKeyDown: (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || !press) return;
+      if (e.key !== 'Escape' || !cancelPress()) return;
       e.preventDefault();
       e.stopPropagation();
-      if (end(app)?.moved) droppedAt = performance.now();
     },
   };
 }
