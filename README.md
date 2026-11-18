@@ -2,7 +2,7 @@
 
 Daybird is a calendar you can run almost entirely from the keyboard, on Linux, macOS or Windows. Each calendar is a plain `.ics` file in a folder you choose, so the desktop app, a browser, your NAS and the `daybird` command line all work on the same files.
 
-![Daybird's week view of 15 to 21 November 2026. A sidebar on the left has a mini month with this week shaded and today circled in blue, and two calendars, Home in green and Work in blue. The main grid shows seven days from 8 AM to 8 PM with timed events such as Team standup each weekday morning, Quarterly planning on Thursday and Choir practice on Wednesday evening, all-day events for Release day and Café brunch along the top, and a red line marking the time now on Tuesday.](docs/images/week-view.webp)
+![Daybird's week view of 15 to 21 November 2026. A sidebar on the left has a mini month with this week marked by a rounded grey band and today circled in blue, and two calendars, Home in green and Work in blue. The main grid shows seven days from 8 AM to 8 PM with timed events such as Team standup each weekday morning, Quarterly planning on Thursday and Choir practice on Wednesday evening, all-day events for Release day and Café brunch along the top, and a red line marking the time now on Tuesday.](docs/images/week-view.webp)
 
 - **Keyboard first.** One key per view (**D**, **W**, **M**, **Y**, **A**), **J** and **K** to move through time, **N** for a new event, arrow keys to move it, and **Ctrl+K** (**⌘K** on a Mac) to run any command by name.
 - **A real desktop app on Linux.** An AppImage for Linux, with the same menus, shortcuts and system notifications for reminders as on macOS and Windows.
