@@ -219,6 +219,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 - Option-drag copies.
 - Arrow keys on a selected event: ↑/↓ move it 15 minutes (Shift: 1 hour) in Day and Week; ←/→ a day. In Month ↑/↓ move a week.
 - Moving a repeating event asks (§8.2).
+- A move that takes the event out of the shown range moves the view with it, so it stays in sight. Events in calendars that can't be changed don't move.
 
 ### §7.4 Selecting
 
@@ -226,7 +227,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ### §7.5 Copy, cut, paste, duplicate
 
-- ⌘C copies the selected event (as iCalendar text too, so it pastes into other apps). ⌘X cuts (to Trash, one undo step). ⌘V pastes at the same time on the anchor day, or at the hovered time in Day/Week. ⌘D duplicates in place, one day later in Month.
+- ⌘C copies the selected event (as iCalendar text too, so it pastes into other apps). ⌘X cuts (to Trash, one undo step). ⌘V pastes at the same clock time on the anchor day; Paste from the right-click menu on empty grid pastes at the place clicked. A paste goes to the copied event's calendar, or the default when that one can't be changed. ⌘D duplicates in place, one day later in Month. A copy is always a single event, without the repeat.
 
 ### §7.6 Undo
 
@@ -300,7 +301,7 @@ Every action is a command in one catalog feeding the keyboard, ⌘K, context men
 | ⌘O                | Open Calendar Folder… (desktop)                      |
 | ⇧⌘I               | Import…                                              |
 
-Context menus: an event (Open, Cut, Copy, Duplicate, Calendar ▸, Delete); empty grid (New Event Here, Paste); a calendar row (Rename, Colour ▸, Set as Default, Show Only This Calendar, Export, Delete Calendar); the Trash row (Empty Trash).
+Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar changes in the popover); empty grid (New Event Here, Paste); a calendar row (Rename, Colour ▸, Set as Default, Show Only This Calendar, Export, Delete Calendar); the Trash row (Empty Trash).
 
 ## §13 Settings
 

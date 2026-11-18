@@ -14,6 +14,7 @@ import {
   type PlainDate,
 } from '@daybird/core';
 import type { AppController } from './controller.ts';
+import type { MoveTarget } from '@daybird/core';
 import { newEventAt } from './eventActions.ts';
 
 /** How far the pointer moves before a press counts as a drag, in px. */
@@ -147,4 +148,25 @@ export function useDayDrag(app: AppController, dayAt: (e: MouseEvent) => PlainDa
       },
     },
   };
+}
+
+/** The quarter hour under the pointer in a day's column. */
+export function timeTarget(e: MouseEvent, date: PlainDate): MoveTarget {
+  const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+  const m = snapDown(((e.clientY - r.top) / (r.height / 24)) * 60);
+  return { kind: 'time', date, minute: Math.max(0, Math.min(MINUTES_PER_DAY - SNAP_MINUTES, m)) };
+}
+
+/** The day under the pointer in the all-day strip or a Month week. */
+export function dayTarget(e: MouseEvent): MoveTarget | null {
+  const date = dateAtPoint(e);
+  return date ? { kind: 'day', date } : null;
+}
+
+/** The right-click menu on empty grid: New Event Here and Paste, at that place (§12). */
+export function emptyMenu(app: AppController, e: MouseEvent, target: () => MoveTarget | null): void {
+  if (!onEmpty(e)) return;
+  e.preventDefault();
+  const t = target();
+  if (t) app.eventMenu.value = { x: e.clientX, y: e.clientY, onEvent: false, target: t };
 }

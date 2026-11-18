@@ -13,7 +13,7 @@ import {
   type PlainDate,
 } from '@daybird/core';
 import { sameOccurrence, type AppController } from './controller.ts';
-import { dateAtPoint, useDayDrag } from './dragCreate.ts';
+import { dateAtPoint, dayTarget, emptyMenu, useDayDrag } from './dragCreate.ts';
 import { AllDayBar, HOUR12, colourOf, describe, pickEvent } from './eventParts.tsx';
 
 /** The day number's row and each lane, in px; the CSS takes them from here. */
@@ -78,6 +78,7 @@ export function MonthView({ app }: { readonly app: AppController }) {
               data-week={days[0]}
               data-days={7}
               tabIndex={-1}
+              onContextMenu={(e) => emptyMenu(app, e, () => dayTarget(e))}
               {...drag.handlers}
             >
               {days.map((d, i) => {

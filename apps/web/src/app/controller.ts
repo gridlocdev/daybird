@@ -17,6 +17,8 @@ import {
   type Calendar,
   type DateRange,
   type EventPatch,
+  type MoveTarget,
+  type NewEventFields,
   type Occurrence,
   type PlainDate,
   type RangeTitle,
@@ -47,6 +49,16 @@ export const sameOccurrence = (a: OccurrenceRef | null, b: OccurrenceRef | null)
   !!a && !!b && a.calendarId === b.calendarId && a.uid === b.uid && a.key === b.key;
 
 export type DialogKind = 'commands' | 'shortcuts' | 'settings';
+
+/** The box drawn where a dragged event would land, in window pixels (§7.3). */
+export interface DragGhost {
+  readonly left: number;
+  readonly top: number;
+  readonly width: number;
+  readonly height: number;
+  readonly label: string;
+  readonly colour: string;
+}
 
 /** The event popover (PRD §7.2). */
 export interface EditorState {
@@ -172,6 +184,17 @@ export class AppController {
   /** How many one-line entries fit in a Month cell, measured from the window (§6.2). */
   readonly monthLanes = signal(3);
   readonly editor = signal<EditorState | null>(null);
+  /** The copied event (§7.5), and the calendar it came from. */
+  readonly clipboard = signal<{ readonly fields: NewEventFields; readonly calendarId: string } | null>(null);
+  /** A right-click menu on an event or on empty grid; `target` is where New Event Here and Paste go (§12). */
+  readonly eventMenu = signal<{
+    readonly x: number;
+    readonly y: number;
+    readonly onEvent: boolean;
+    readonly target: MoveTarget | null;
+  } | null>(null);
+  /** Where a dragged event would land, drawn over the view (§7.3). */
+  readonly dragGhost = signal<DragGhost | null>(null);
   readonly scopeQuestion = signal<ScopeQuestion | null>(null);
   /** The day whose "N more" list is open in Month view (§6.2). */
   readonly dayList = signal<PlainDate | null>(null);
@@ -304,6 +327,7 @@ export class AppController {
       this.dayList.peek() !== null ||
       this.calendarDialog.peek() !== null ||
       this.calendarMenu.peek() !== null ||
+      this.eventMenu.peek() !== null ||
       this.editor.peek() !== null ||
       this.scopeQuestion.peek() !== null ||
       this.folderQuestion.peek()

@@ -1,6 +1,7 @@
 /** Pieces every view draws events with (PRD §6): the words for an event, and a bar across days. */
 import { textOn, timeLabel, type Bar, type Calendar, type Occurrence } from '@daybird/core';
 import { sameOccurrence, type AppController, type OccurrenceRef } from './controller.ts';
+import { dragHandlers, justDragged } from './dragMove.ts';
 import { openEditor } from './eventActions.ts';
 
 /** How an occurrence is marked in the page, for the popover to sit beside it. */
@@ -18,10 +19,22 @@ export const colourOf = (calendar: Calendar | undefined): string => calendar?.co
  */
 export function pickEvent(app: AppController, o: Occurrence) {
   const ref = { calendarId: o.calendarId, uid: o.uid, key: o.key };
+  const calendar = app.calendars.peek().find((c) => c.id === o.calendarId);
   return {
     'data-occurrence': occurrenceKey(ref),
-    onClick: () => (sameOccurrence(app.selected.peek(), ref) ? openEditor(app, ref) : app.select(ref)),
+    onClick: () => {
+      if (justDragged()) return;
+      if (sameOccurrence(app.selected.peek(), ref)) openEditor(app, ref);
+      else app.select(ref);
+    },
     onDblClick: () => openEditor(app, ref),
+    onContextMenu: (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      app.select(ref);
+      app.eventMenu.value = { x: e.clientX, y: e.clientY, onEvent: true, target: null };
+    },
+    ...dragHandlers(app, o, colourOf(calendar)),
   };
 }
 

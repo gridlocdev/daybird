@@ -19,6 +19,15 @@ Single-letter keys only work when you aren't typing in a box.
 | Edit the selected event | **↩** or double-click | **Enter** or double-click |
 | Delete the selected event | **⌦** or **⌫** | **Delete** or **Backspace** |
 | Clear the selection | **Esc** | **Esc** |
+| Move the selected event 15 minutes (a week in Month) | **↑** or **↓** | **Up** or **Down** |
+| Move the selected event an hour | **⇧↑** or **⇧↓** | **Shift+Up** or **Shift+Down** |
+| Move the selected event a day | **←** or **→** | **Left** or **Right** |
+| Move an event | Drag it | Drag it |
+| Change when it ends, or starts | Drag its bottom edge, or Shift-drag its top edge | Drag its bottom edge, or Shift-drag its top edge |
+| Copy it as you drag | Option-drag | Alt-drag |
+| Cut, copy, paste | **⌘X**, **⌘C**, **⌘V** | **Ctrl+X**, **Ctrl+C**, **Ctrl+V** |
+| Duplicate | **⌘D** | **Ctrl+D** |
+| Event menu, or New Event Here and Paste on empty grid | Right-click | Right-click |
 | Close the popover | **Return** in the title, **Esc**, or click outside | **Enter** in the title, **Esc**, or click outside |
 
 | Action | macOS | Windows / Linux |

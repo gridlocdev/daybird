@@ -16,4 +16,5 @@
 - The desktop app keeps calendars in a folder you choose, Documents/Daybird by default, and Open Calendar Folder… switches to another. Saves are atomic and take turns with other programs saving the same file.
 - In a browser without folder access, calendars are kept in the browser's own storage.
 - Events are made by dragging on the grid, double-clicking, or ⌘N, and edited in a popover beside them that saves as you type; a whole visit to the popover undoes in one step, and Escape takes back a new event you haven't touched.
+- Events move by dragging, in Month by days, and with the arrow keys; dragging an edge changes when one starts or ends, and Option-drag copies. Cut, copy, paste and duplicate work on the selected event, and right-clicking an event or empty grid opens a menu.
 - The NAS server serves the web client, and the `daybird` command prints its help and version.

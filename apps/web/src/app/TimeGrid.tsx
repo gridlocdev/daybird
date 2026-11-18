@@ -20,7 +20,7 @@ import {
   type Placed,
 } from '@daybird/core';
 import { sameOccurrence, type AppController } from './controller.ts';
-import { dateAtPoint, useDayDrag, useTimeDrag } from './dragCreate.ts';
+import { dateAtPoint, dayTarget, emptyMenu, timeTarget, useDayDrag, useTimeDrag } from './dragCreate.ts';
 import { AllDayBar, HOUR12, describe, pickEvent } from './eventParts.tsx';
 
 /** The all-day strip shows this many rows before "+N more" (§6.1). */
@@ -103,6 +103,8 @@ export function TimeGrid({ app }: { readonly app: AppController }) {
               role="group"
               aria-label={formatPlainDate(d, app.locale, { weekday: 'long', month: 'long', day: 'numeric' })}
               tabIndex={-1}
+              data-date={d}
+              onContextMenu={(e) => emptyMenu(app, e, () => timeTarget(e, d))}
               {...drag.handlers(d)}
             >
               {perDay[i]!.map((p) => (
@@ -233,7 +235,9 @@ function AllDayStrip({
         aria-label="All-day events"
         data-week={days[0]}
         data-days={days.length}
+        data-all-day
         tabIndex={-1}
+        onContextMenu={(e) => emptyMenu(app, e, () => dayTarget(e))}
         {...drag.handlers}
       >
         {draft && (

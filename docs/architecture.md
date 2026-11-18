@@ -99,6 +99,7 @@ stateDiagram-v2
 - `main.tsx` wires the controller to the page: the theme and accent on `<html>`, the key listener, a 30-second tick that notices midnight, and, in the desktop app, the native bridge.
 - `eventActions.ts` is everything creating, editing and deleting an event does; the popover, the drags in `dragCreate.ts` and the commands call it. A visit to the popover is one undo group: the session joins steps of one group, and `retract` drops the group's step with no redo, for Escape on an untouched new event.
 - In core, `eventTimes.ts` turns drags and the popover's fields into start and end values, and `details.ts` gives the popover an occurrence in its own frame with its repeat in words.
+- `moveActions.ts` moves, copies and pastes events; `dragMove.ts` turns a drag on any event into a target under the pointer (a `.db-column[data-date]` for a time, a `[data-week]` row for a day) and draws the ghost there; `eventCommands.ts` holds the commands on the selected event, before Previous and Next so the arrow keys move a selected event. In core, `eventMoves.ts` works out the new times and writes one event as a calendar file for the clipboard.
 
 ## Desktop (`apps/desktop`)
 

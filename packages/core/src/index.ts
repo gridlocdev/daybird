@@ -267,4 +267,15 @@ export {
   zoneDateTime,
   type WhenFields,
 } from './model/eventTimes.ts';
+export {
+  copyFields,
+  eventAsText,
+  movedTimes,
+  onDate,
+  sameTimes,
+  shiftedTimes,
+  withEndAt,
+  withStartAt,
+  type MoveTarget,
+} from './model/eventMoves.ts';
 export { occurrenceDetails, type OccurrenceDetails } from './model/details.ts';

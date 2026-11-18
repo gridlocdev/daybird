@@ -12,7 +12,8 @@ import {
   targetCalendar,
   toggleCalendar,
 } from './calendarActions.ts';
-import { deleteEvent, newEventNow, openEditor } from './eventActions.ts';
+import { eventCommands } from './eventCommands.ts';
+import { newEventNow } from './eventActions.ts';
 
 const VIEW_COMMANDS: readonly { view: View; title: string; key: string; n: number }[] = [
   { view: 'day', title: 'Day', key: 'd', n: 1 },
@@ -162,42 +163,7 @@ export function buildCommands(app: AppController): CommandCatalog {
       enabled: () => app.canRedo.value,
       run: () => app.redo(),
     },
-    {
-      id: 'event.open',
-      title: 'Open Event',
-      description: 'Open the selected event’s details to change them.',
-      group: 'Edit',
-      shortcuts: ['enter'],
-      keywords: 'edit details popover',
-      enabled: () => !!app.selected.value,
-      run: () => {
-        const ref = app.selected.peek();
-        if (ref) openEditor(app, ref);
-      },
-    },
-    {
-      id: 'event.delete',
-      title: 'Delete Event',
-      description: 'Move the selected event to the Trash.',
-      group: 'Edit',
-      shortcuts: ['delete', 'backspace'],
-      keywords: 'remove trash',
-      enabled: () => !!app.selected.value,
-      run: () => {
-        const ref = app.selected.peek();
-        if (ref) deleteEvent(app, ref);
-      },
-    },
-    {
-      id: 'event.deselect',
-      title: 'Deselect Event',
-      description: 'Clear the selection.',
-      group: 'Edit',
-      shortcuts: ['esc'],
-      keywords: 'clear selection none',
-      enabled: () => !!app.selected.value,
-      run: () => app.select(null),
-    },
+    ...eventCommands(app),
     ...VIEW_COMMANDS.map((v): CommandSpec => ({
       id: `view.${v.view}`,
       title: v.title,
@@ -319,6 +285,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     !app.blocked() ||
     Object.values(DIALOG_COMMAND).includes(c.id) ||
     // The ⋯ menu runs its own commands.
-    (app.calendarMenu.peek() !== null && c.id.startsWith('calendar.'));
+    (app.calendarMenu.peek() !== null && c.id.startsWith('calendar.')) ||
+    (app.eventMenu.peek() !== null && c.id.startsWith('event.'));
   return catalog;
 }

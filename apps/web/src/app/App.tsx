@@ -1,6 +1,7 @@
 import type { CommandCatalog } from '@daybird/ui';
 import type { AppController } from './controller.ts';
 import { Dialogs } from './Dialogs.tsx';
+import { EventOverlays } from './EventOverlays.tsx';
 import { RangeView } from './RangeView.tsx';
 import { Sidebar } from './Sidebar.tsx';
 import { StatusBar } from './StatusBar.tsx';
@@ -17,6 +18,7 @@ export function App({ app, catalog }: { readonly app: AppController; readonly ca
         <RangeView app={app} />
       </div>
       <StatusBar app={app} />
+      <EventOverlays app={app} catalog={catalog} />
       <Dialogs app={app} catalog={catalog} />
     </div>
   );
