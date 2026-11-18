@@ -1,0 +1,2 @@
+# iCalendar files keep their CRLF line endings byte for byte.
+*.ics -text

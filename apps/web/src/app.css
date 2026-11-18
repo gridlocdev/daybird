@@ -1,0 +1,397 @@
+/* The window's layout and the view frames (PRD §5, §6). Tokens and shared components are in @daybird/ui. */
+.db-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.db-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* Toolbar (§5.1) */
+.db-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--db-toolbar);
+  padding: 0 12px;
+  border-bottom: 1px solid var(--db-line);
+  background: var(--db-window);
+}
+.db-range-title {
+  margin: 0 8px 0 4px;
+  font-size: 20px;
+  font-weight: 400;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+.db-range-title strong {
+  font-weight: 700;
+}
+.db-range-title span {
+  color: var(--db-text-2);
+  font-weight: 300;
+}
+.db-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.db-today-button {
+  height: 26px;
+}
+.db-toolbar-space {
+  flex: 1;
+}
+
+/*
+ * Unified toolbar (desktop app on macOS, §14): the window has no title bar, so the toolbar is the title bar.
+ * It leaves room for the traffic lights and drags the window; anything clickable in it opts out.
+ */
+.db-unified .db-toolbar {
+  padding-left: 84px;
+  -webkit-app-region: drag;
+}
+.db-unified.db-fullscreen .db-toolbar {
+  padding-left: 12px;
+}
+.db-unified :is(button, input, select, textarea, a, [role='menu'], [role='dialog']) {
+  -webkit-app-region: no-drag;
+}
+
+/* Sidebar (§5.2) */
+.db-sidebar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 8px;
+  border-right: 1px solid var(--db-line);
+  background: var(--db-sidebar);
+  overflow-y: auto;
+}
+.db-mini-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 2px 4px 4px;
+}
+.db-mini-title {
+  flex: 1;
+  font-weight: 600;
+}
+.db-sidebar-heading {
+  margin: 18px 4px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--db-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Mini month: the sidebar's and Year view's */
+.db-mini-heading {
+  display: block;
+  margin: 0 0 6px 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--db-accent);
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.db-mini-heading:hover {
+  text-decoration: underline;
+}
+.db-mini-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.db-mini-weekday {
+  padding: 2px 0;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--db-text-3);
+}
+.db-mini-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.db-mini-day:hover {
+  background: var(--db-hover);
+}
+.db-mini-day.db-outside {
+  color: var(--db-text-3);
+}
+.db-mini-day.db-shaded {
+  border-radius: 0;
+  background: var(--db-pressed);
+}
+.db-mini-day.db-today {
+  border-radius: 50%;
+  background: var(--db-accent);
+  color: var(--db-accent-text);
+  font-weight: 650;
+}
+
+/* The view area (§6) */
+.db-view {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--db-grid);
+}
+.db-weekday {
+  color: var(--db-text-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.db-gutter {
+  flex: none;
+  width: 56px;
+}
+
+/* Day and Week (§6.1) */
+.db-columns {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.db-column-heads,
+.db-column-body {
+  display: flex;
+}
+.db-column-heads {
+  flex: none;
+  border-bottom: 1px solid var(--db-line);
+  /* Keeps the heads over their columns when the body below shows a scroll bar. */
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+}
+.db-column-head {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 8px 6px;
+  border-left: 1px solid var(--db-line-soft);
+}
+.db-column-head .db-day-number {
+  font-size: 18px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.db-column-head.db-today .db-weekday,
+.db-column-head.db-today .db-day-number {
+  color: var(--db-accent);
+  font-weight: 650;
+}
+.db-column-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.db-time-grid {
+  flex: 1;
+  display: flex;
+  height: calc(24 * var(--db-hour));
+}
+.db-hours {
+  position: relative;
+}
+.db-hour-label {
+  position: absolute;
+  right: 8px;
+  top: calc(var(--db-at) * var(--db-hour) - 0.6em);
+  color: var(--db-text-3);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.db-column {
+  flex: 1;
+  border-left: 1px solid var(--db-line-soft);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--db-hour) - 1px),
+    var(--db-line-soft) calc(var(--db-hour) - 1px),
+    var(--db-line-soft) var(--db-hour)
+  );
+}
+.db-weekend.db-column {
+  background-color: var(--db-weekend);
+}
+
+/* Month (§6.2) */
+.db-month {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.db-month-heads {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--db-line);
+}
+.db-month-heads .db-weekday {
+  padding: 6px 8px;
+  text-align: right;
+}
+.db-month-cells {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(var(--db-weeks), 1fr);
+  min-height: 0;
+}
+.db-month-cell {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 4px 6px;
+  border-right: 1px solid var(--db-line-soft);
+  border-bottom: 1px solid var(--db-line-soft);
+  min-height: 0;
+}
+.db-month-cell.db-weekend {
+  background: var(--db-weekend);
+}
+.db-month-cell.db-outside {
+  background: var(--db-outside);
+  color: var(--db-text-3);
+}
+.db-month-cell .db-day-number {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  line-height: 22px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.db-month-cell.db-today .db-day-number {
+  background: var(--db-accent);
+  color: var(--db-accent-text);
+  font-weight: 650;
+}
+.db-week-number {
+  position: absolute;
+  left: 6px;
+  top: 7px;
+  color: var(--db-text-3);
+  font-size: 10px;
+}
+
+/* Year (§6.3) */
+.db-year {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 28px;
+  padding: 20px 28px;
+  overflow-y: auto;
+  align-content: start;
+}
+@media (max-width: 900px) {
+  .db-year {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 620px) {
+  .db-year {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Agenda (§6.4) */
+.db-agenda {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.db-empty {
+  margin: 0;
+  text-align: center;
+  color: var(--db-text-2);
+  font-size: 14px;
+}
+.db-empty span {
+  color: var(--db-text-3);
+  font-size: 12px;
+}
+
+/* Status bar (§5.5) */
+.db-status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--db-status);
+  padding: 0 12px;
+  border-top: 1px solid var(--db-line);
+  background: var(--db-window);
+  font-size: 12px;
+}
+.db-notice {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.db-notice > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.db-notice-error > span {
+  color: var(--db-danger);
+  font-weight: 550;
+}
+
+/* Settings accent swatches show each accent's light value */
+[data-accent-swatch='blue'] {
+  --db-swatch: #1f6fe5;
+}
+[data-accent-swatch='red'] {
+  --db-swatch: #d93f3f;
+}
+[data-accent-swatch='orange'] {
+  --db-swatch: #c95a06;
+}
+[data-accent-swatch='green'] {
+  --db-swatch: #1f8a4c;
+}
+[data-accent-swatch='teal'] {
+  --db-swatch: #0f8278;
+}
+[data-accent-swatch='purple'] {
+  --db-swatch: #7c45c4;
+}
+[data-accent-swatch='pink'] {
+  --db-swatch: #c4378f;
+}

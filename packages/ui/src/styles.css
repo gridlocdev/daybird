@@ -1,0 +1,470 @@
+/*
+ * Daybird: theme tokens and the shared component styles (PRD §5.3). Light by default; [data-theme] or the
+ * system picks dark; [data-accent] picks the accent. The chrome is layered greys and the grid is the
+ * lightest surface, so colour comes only from calendars and the one accent.
+ */
+:root {
+  --db-window: #f3f3f4;
+  --db-sidebar: #f7f7f8;
+  --db-grid: #ffffff;
+  --db-raised: #ffffff;
+  --db-weekend: #fafafa;
+  --db-outside: #f6f6f7;
+  --db-hover: rgba(0, 0, 0, 0.05);
+  --db-pressed: rgba(0, 0, 0, 0.09);
+  --db-line: #e7e7e9;
+  --db-line-soft: #f1f1f3;
+  --db-line-strong: #d0d0d4;
+  --db-text: #1d1d1f;
+  --db-text-2: #5f6068;
+  --db-text-3: #8e8f97;
+  --db-accent: var(--db-accent-light);
+  --db-accent-soft: color-mix(in srgb, var(--db-accent) 14%, transparent);
+  --db-accent-text: #ffffff;
+  --db-now: #e5484d;
+  --db-danger: #d13438;
+  --db-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --db-backdrop: rgba(0, 0, 0, 0.28);
+  color-scheme: light;
+  --db-radius: 6px;
+  --db-toolbar: 52px;
+  --db-status: 24px;
+  --db-sidebar-width: 240px;
+  --db-hour: 48px;
+  --db-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+:root,
+:root[data-accent='blue'] {
+  --db-accent-light: #1f6fe5;
+  --db-accent-dark: #4c8dff;
+}
+:root[data-accent='red'] {
+  --db-accent-light: #d93f3f;
+  --db-accent-dark: #ff6b6b;
+}
+:root[data-accent='orange'] {
+  --db-accent-light: #c95a06;
+  --db-accent-dark: #ff9440;
+}
+:root[data-accent='green'] {
+  --db-accent-light: #1f8a4c;
+  --db-accent-dark: #3fc77a;
+}
+:root[data-accent='teal'] {
+  --db-accent-light: #0f8278;
+  --db-accent-dark: #34c2b3;
+}
+:root[data-accent='purple'] {
+  --db-accent-light: #7c45c4;
+  --db-accent-dark: #b07dff;
+}
+:root[data-accent='pink'] {
+  --db-accent-light: #c4378f;
+  --db-accent-dark: #f272bd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --db-window: #232325;
+    --db-sidebar: #1f1f21;
+    --db-grid: #1a1a1b;
+    --db-raised: #2b2b2e;
+    --db-weekend: #1d1d1f;
+    --db-outside: #1d1d1f;
+    --db-hover: rgba(255, 255, 255, 0.06);
+    --db-pressed: rgba(255, 255, 255, 0.1);
+    --db-line: #303033;
+    --db-line-soft: #262628;
+    --db-line-strong: #46464a;
+    --db-text: #ececee;
+    --db-text-2: #a8a8b0;
+    --db-text-3: #7c7c85;
+    --db-accent: var(--db-accent-dark);
+    --db-accent-soft: color-mix(in srgb, var(--db-accent) 24%, transparent);
+    --db-accent-text: #ffffff;
+    --db-now: #ff6369;
+    --db-danger: #ff6b6b;
+    --db-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --db-backdrop: rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --db-window: #232325;
+  --db-sidebar: #1f1f21;
+  --db-grid: #1a1a1b;
+  --db-raised: #2b2b2e;
+  --db-weekend: #1d1d1f;
+  --db-outside: #1d1d1f;
+  --db-hover: rgba(255, 255, 255, 0.06);
+  --db-pressed: rgba(255, 255, 255, 0.1);
+  --db-line: #303033;
+  --db-line-soft: #262628;
+  --db-line-strong: #46464a;
+  --db-text: #ececee;
+  --db-text-2: #a8a8b0;
+  --db-text-3: #7c7c85;
+  --db-accent: var(--db-accent-dark);
+  --db-accent-soft: color-mix(in srgb, var(--db-accent) 24%, transparent);
+  --db-accent-text: #ffffff;
+  --db-now: #ff6369;
+  --db-danger: #ff6b6b;
+  --db-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --db-backdrop: rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font: 13px/1.4 var(--db-font);
+  color: var(--db-text);
+  background: var(--db-window);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--db-accent);
+  outline-offset: 1px;
+}
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  padding: 0 5px;
+  border: 1px solid var(--db-line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font: 11px/1.6 var(--db-font);
+  text-align: center;
+  color: var(--db-text-2);
+  background: var(--db-raised);
+}
+.db-icon {
+  display: inline-flex;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.db-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.db-visually-hidden,
+.db-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Buttons */
+.db-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--db-radius);
+  background: none;
+  color: var(--db-text-2);
+  cursor: pointer;
+}
+.db-icon-button:hover {
+  background: var(--db-hover);
+  color: var(--db-text);
+}
+.db-icon-button:active {
+  background: var(--db-pressed);
+}
+.db-icon-button.db-small {
+  width: 20px;
+  height: 20px;
+}
+.db-icon-button.db-small .db-icon {
+  width: 13px;
+  height: 13px;
+}
+.db-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--db-line-strong);
+  border-radius: var(--db-radius);
+  background: var(--db-raised);
+  cursor: pointer;
+  font-weight: 500;
+}
+.db-button:hover {
+  background: color-mix(in srgb, var(--db-raised) 92%, var(--db-text));
+}
+.db-button-primary {
+  border-color: var(--db-accent);
+  background: var(--db-accent);
+  color: var(--db-accent-text);
+}
+.db-button-primary:hover {
+  background: color-mix(in srgb, var(--db-accent) 88%, #000);
+}
+.db-button-danger {
+  border-color: var(--db-danger);
+  background: var(--db-danger);
+  color: #fff;
+}
+.db-link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--db-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.db-link-button:hover {
+  text-decoration: underline;
+}
+
+/* Segmented control (the view switcher, Settings choices) */
+.db-segmented {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 7px;
+  background: var(--db-pressed);
+}
+.db-segmented button {
+  height: 24px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--db-text-2);
+  font-weight: 500;
+  cursor: pointer;
+}
+.db-segmented button:hover {
+  color: var(--db-text);
+}
+.db-segmented button[aria-pressed='true'],
+.db-segmented button[aria-checked='true'] {
+  background: var(--db-raised);
+  color: var(--db-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Dialogs */
+.db-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--db-backdrop);
+}
+.db-backdrop-top {
+  align-items: flex-start;
+  padding-top: 12vh;
+}
+.db-dialog:focus {
+  outline: none;
+}
+.db-dialog {
+  width: 440px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  background: var(--db-raised);
+  box-shadow: var(--db-shadow);
+}
+.db-dialog-wide {
+  width: 660px;
+}
+.db-dialog form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.db-dialog h2 {
+  margin: 0;
+  padding: 18px 20px 4px;
+  font-size: 15px;
+  font-weight: 650;
+}
+.db-dialog-body {
+  padding: 10px 20px;
+  overflow-y: auto;
+}
+.db-dialog-body p {
+  margin: 0 0 10px;
+}
+.db-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 18px;
+}
+.db-field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.db-field > span {
+  color: var(--db-text-2);
+  text-align: right;
+}
+.db-field select,
+.db-field input:not([type='checkbox']) {
+  justify-self: start;
+  min-width: 160px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--db-line-strong);
+  border-radius: var(--db-radius);
+  background: var(--db-grid);
+}
+.db-field input[type='checkbox'] {
+  justify-self: start;
+  margin: 0;
+}
+.db-swatches {
+  display: flex;
+  gap: 6px;
+}
+.db-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--db-swatch);
+  cursor: pointer;
+}
+.db-swatch[aria-checked='true'] {
+  box-shadow:
+    0 0 0 2px var(--db-raised),
+    0 0 0 4px var(--db-swatch);
+}
+
+/* Command menu */
+.db-palette {
+  width: 560px;
+  overflow: hidden;
+}
+.db-palette input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--db-line);
+  background: none;
+  font-size: 15px;
+  outline: none;
+}
+.db-palette ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.db-palette li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.db-palette li[aria-selected='true'] {
+  background: var(--db-accent-soft);
+}
+.db-palette li.db-disabled {
+  opacity: 0.45;
+}
+.db-palette-title {
+  flex: 1;
+}
+.db-palette-group {
+  color: var(--db-text-3);
+  font-size: 12px;
+}
+.db-palette-empty {
+  margin: 0;
+  padding: 14px 16px;
+  color: var(--db-text-2);
+}
+
+/* Keyboard Shortcuts */
+.db-shortcuts {
+  columns: 2 260px;
+  column-gap: 28px;
+}
+.db-shortcuts section {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
+.db-shortcuts h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--db-text-2);
+}
+.db-shortcuts dl {
+  margin: 0;
+}
+.db-shortcut {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+.db-shortcut dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.db-way {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+.db-or {
+  color: var(--db-text-3);
+  font-size: 11px;
+  margin-right: 2px;
+}

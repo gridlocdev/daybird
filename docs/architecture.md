@@ -1,0 +1,53 @@
+# Architecture
+
+Daybird is one TypeScript code base with three hosts and a CLI. The browser, the NAS server's client and the Electron app run the same UI; only where the calendar files come from differs.
+
+```
+     ┌──────────────── apps/web (Preact + signals, one Vite build) ────────────────┐
+     │  App · Toolbar · Sidebar (mini month) · RangeView · Dialogs · StatusBar       │
+     │  AppController (settings, view, anchor date, dialogs, notices)               │
+     │  commands.ts (the catalog) · shortcuts.ts · nativeMenu.ts                    │
+     └─────────────────────────────────────┬────────────────────────────────────────┘
+                                           │ imports
+     ┌──────────────────── packages/ui (Preact + signals) ─────────────────────┐
+     │  CommandCatalog (keys, two-key sequences, recents) · listenForKeys        │
+     │  Dialog · ListPopup · focusTrap · Icon · settings · schedule (timers)     │
+     └─────────────────────────────────────┬───────────────────────────────────┘
+                                           │
+     ┌──────────────────── packages/core (pure TS) ────────────────────┐
+     │  plainDate (calendar dates) · views (ranges, grids, titles)      │◄──── apps/cli
+     │  colours (palette, accents, text on a colour)                    │
+     └──────────────────────────────────────────────────────────────────┘
+     ┌──────────── packages/node-files (Node) ────────────┐
+     │  readTextFile · writeAtomic (versioned, atomic)    │◄──── apps/desktop, later apps/server and apps/cli
+     └────────────────────────────────────────────────────┘
+```
+
+## Layering
+
+- `packages/core` has no DOM and no Node APIs. ESLint rejects `window`, `document`, `localStorage` and `process` there, so the engine runs the same in a browser, the CLI and the tests.
+- `packages/ui` knows the DOM but not where files live.
+- `packages/node-files` is the only code that touches the disk.
+- Other packages import only through `@daybird/<package>`, and tests only through their own package's `src/index.ts`; the architecture test rejects deep imports.
+- `test/architecture.test.ts` also keeps platform APIs in one place each: key listeners in `packages/ui/src/commands/`, timers in `packages/ui/src/schedule.ts`, browser storage in `packages/ui/src/settings.ts`, and effect hooks in the dialog and popup components.
+
+## Core (`packages/core`)
+
+- `plainDate.ts`: calendar dates as `YYYY-MM-DD` strings, with arithmetic on whole days so a daylight-saving change can't move a date (PRD §4.1).
+- `views.ts`: what each view shows: its date range, the month grid, stepping, and the title (PRD §6).
+- `colours.ts`: the calendar palette and accent colours, and the text colour that reads on each (PRD §5.6).
+
+## UI (`packages/ui`)
+
+- `commands/`: the `CommandCatalog`. Shortcuts are parsed once; `forEvent` turns a key press into a command, a wait for the second key of a sequence, or nothing (PRD §12). `listenForKeys` is the one key listener.
+- `settings.ts`: the per-device settings and where they are kept (PRD §13).
+- `components/`: `Dialog` (modal, focus trap, Esc), `ListPopup` and the `Icon` set.
+
+## Web shell (`apps/web`)
+
+- `AppController` holds the app's state in signals: the settings, today's date, the anchor date the view shows, the open dialog and the status-bar notice. Components read it and call its methods; they keep no state of their own beyond small things such as which month the mini month shows.
+- `main.tsx` wires the controller to the page: the theme and accent on `<html>`, the key listener, a 30-second tick that notices midnight, and, in the desktop app, the native bridge.
+
+## Desktop (`apps/desktop`)
+
+The Electron main process, a sandboxed preload with context isolation, and the `daybirdNative` bridge. The native menu bar is built from the command catalog and sent over IPC. `DAYBIRD_HEADLESS=1` runs it with no window or Dock icon, for automated checks.

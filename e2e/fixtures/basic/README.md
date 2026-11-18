@@ -1,0 +1,1 @@
+Fixture data for the scenarios: two small, made-up calendars around the scenarios' fixed clock (`NOW` in `e2e/server.ts`, Tuesday 17 November 2026). `Home.ics` has a weekly repeat, an all-day event and Unicode text; `Work.ics` has timed events with a time zone. Never copy real data here.

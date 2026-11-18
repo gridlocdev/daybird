@@ -1,0 +1,29 @@
+appId: dev.gridloc.daybird
+productName: Daybird
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**
+  - package.json
+  # The window icon on Linux and Windows (macOS takes the bundle's icon.icns).
+  - build/icon.png
+asar: true
+# One naming scheme on every system: Daybird-1.0.0-mac-arm64.dmg, Daybird-1.0.0-win-x64.exe, …
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+mac:
+  icon: build/icon.icns
+  category: public.app-category.productivity
+  target: [dmg, zip]
+  hardenedRuntime: true
+  # Ad-hoc signature, so Apple silicon will run a local build. Swap for a Developer ID to distribute.
+  identity: '-'
+linux:
+  icon: build/icon.png
+  target: [AppImage]
+  # The package name (@daybird/desktop) isn't a usable file name.
+  executableName: daybird
+  category: Office
+win:
+  icon: build/icon.ico
+  target: [nsis]
