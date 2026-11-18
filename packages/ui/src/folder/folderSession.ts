@@ -97,7 +97,7 @@ export class FolderSession {
     this.#displayZone = options.displayZone ?? systemZoneId();
     this.#copies = new RecoveryCopies(
       options.snapshots,
-      `${options.store.kind}:${options.store.name}`,
+      `${options.store.kind}:${options.store.where ?? options.store.name}`,
       this.#now,
       (text) => this.#say(text, { tone: 'error' }),
     );

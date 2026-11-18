@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { formatSequence } from '@daybird/ui';
-import { makeApp } from './helpers.ts';
+import { makeApp, noFolders } from './helpers.ts';
 
 const doc = readFileSync(new URL('../../../docs/controls.md', import.meta.url), 'utf8');
 
@@ -31,7 +31,7 @@ describe('docs/controls.md', () => {
     const name = mac ? 'macOS' : 'Windows/Linux';
 
     it(`lists every shortcut (${name})`, async () => {
-      const { catalog } = await makeApp();
+      const { catalog } = await makeApp({}, undefined, { folders: noFolders });
       const documented = new Set(rows().flatMap((r) => r[column]));
       const missing = catalog.all
         .flatMap((c) => c.sequences.map((seq) => ({ id: c.id, keys: formatSequence(seq, mac) })))
@@ -41,7 +41,7 @@ describe('docs/controls.md', () => {
     });
 
     it(`lists no ⌘/Ctrl shortcut the catalog doesn't have (${name})`, async () => {
-      const { catalog } = await makeApp();
+      const { catalog } = await makeApp({}, undefined, { folders: noFolders });
       const known = new Set(
         catalog.all.flatMap((c) => c.sequences.flatMap((seq) => formatSequence(seq, mac))),
       );

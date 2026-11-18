@@ -19,7 +19,8 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
      │  colours (palette, accents, text on a colour)                    │
      └──────────────────────────────────────────────────────────────────┘
      ┌──────────── packages/node-files (Node) ────────────┐
-     │  readTextFile · writeAtomic (versioned, atomic)    │◄──── apps/desktop, later apps/server and apps/cli
+     │  FolderStore (versions, lock files, inside only)   │◄──── apps/desktop, later apps/server and apps/cli
+     │  writeAtomic · withLockFile                        │
      └────────────────────────────────────────────────────┘
 ```
 
@@ -27,7 +28,8 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
 
 - `packages/core` has no DOM and no Node APIs. ESLint rejects `window`, `document`, `localStorage` and `process` there, so the engine runs the same in a browser, the CLI and the tests.
 - `packages/ui` knows the DOM but not where files live.
-- `packages/node-files` is the only code that touches the disk.
+- `packages/node-files` is the only code that touches the disk. Its `FolderStore` is one calendar folder: paths are folder-relative and can't leave it, a write is atomic (a temporary file renamed over the target) and, when conditional, checks the version while holding a `.<name>.lock` file, so the desktop app, the NAS server and the CLI can share a folder. `folderResult` turns its errors into plain data for IPC.
+- The desktop app's page reaches the folder through `NativeStore` in `packages/ui`, which sends each call over the preload bridge to `apps/desktop/src/folders.ts` in the main process, where `FolderStore` runs it. The page only ever names files in the folder the user chose.
 - Other packages import only through `@daybird/<package>`, and tests only through their own package's `src/index.ts`; the architecture test rejects deep imports.
 - `test/architecture.test.ts` also keeps platform APIs in one place each: key listeners in `packages/ui/src/commands/`, timers in `packages/ui/src/schedule.ts`, browser storage in `packages/ui/src/settings.ts`, and effect hooks in the dialog and popup components.
 

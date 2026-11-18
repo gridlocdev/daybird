@@ -53,6 +53,7 @@ export {
   BrowserStore,
   ConflictError,
   MemoryStore,
+  NativeStore,
   NotFoundError,
   baseName,
   decodeText,
@@ -66,6 +67,8 @@ export {
   type ConflictReason,
   type Entry,
   type FileData,
+  type NativeFiles,
+  type NativeResult,
   type StoreKind,
   type WriteOptions,
 } from './platform/index.ts';

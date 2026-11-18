@@ -4,8 +4,14 @@ import { appFile, dataPaths, isAppUrl } from '../src/index.ts';
 
 describe('dataPaths', () => {
   it('moves the app files only when a check asks', () => {
-    expect(dataPaths({})).toEqual({ userData: null });
-    expect(dataPaths({ DAYBIRD_USER_DATA: '/tmp/check' })).toEqual({ userData: path.resolve('/tmp/check') });
+    expect(dataPaths({})).toEqual({ userData: null, documents: null, folder: null });
+    expect(
+      dataPaths({ DAYBIRD_USER_DATA: '/tmp/check', DAYBIRD_DOCUMENTS: '/tmp/docs', DAYBIRD_FOLDER: 'cal' }),
+    ).toEqual({
+      userData: path.resolve('/tmp/check'),
+      documents: path.resolve('/tmp/docs'),
+      folder: path.resolve('cal'),
+    });
   });
 });
 

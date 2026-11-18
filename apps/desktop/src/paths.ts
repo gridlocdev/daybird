@@ -4,11 +4,24 @@ import path from 'node:path';
 export interface DataPaths {
   /** Overrides Electron's user-data folder, or null for the default. */
   readonly userData: string | null;
+  /** Overrides the Documents folder the first start offers (Documents/Daybird), or null for the real one. */
+  readonly documents: string | null;
+  /** A calendar folder for this run only, not remembered. */
+  readonly folder: string | null;
 }
 
-/** DAYBIRD_USER_DATA moves the app's own files (window place, settings) to another folder, for checks. */
+/**
+ * For checks, which must never touch the owner's files: DAYBIRD_USER_DATA moves the app's own files (window place,
+ * settings, the folder choice), DAYBIRD_DOCUMENTS the Documents folder it offers, and DAYBIRD_FOLDER opens a
+ * calendar folder for one run.
+ */
 export function dataPaths(env: NodeJS.ProcessEnv): DataPaths {
-  return { userData: env.DAYBIRD_USER_DATA ? path.resolve(env.DAYBIRD_USER_DATA) : null };
+  const at = (v: string | undefined) => (v ? path.resolve(v) : null);
+  return {
+    userData: at(env.DAYBIRD_USER_DATA),
+    documents: at(env.DAYBIRD_DOCUMENTS),
+    folder: at(env.DAYBIRD_FOLDER),
+  };
 }
 
 /** Only our own page may use the bridge or be navigated to. */

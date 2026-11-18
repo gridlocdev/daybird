@@ -9,3 +9,4 @@ export {
   saveWindow,
   type SavedWindow,
 } from './windowState.ts';
+export { Folders, loadFolderChoice, saveFolderChoice, type FolderInfo } from './folders.ts';

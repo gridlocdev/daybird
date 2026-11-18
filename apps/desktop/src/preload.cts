@@ -16,6 +16,19 @@ contextBridge.exposeInMainWorld('daybirdNative', {
   onCommand: (fn: (id: string) => void) => ipcRenderer.on('daybird:command', (_e, id: string) => fn(id)),
   onCloseRequested: (fn: () => void) => ipcRenderer.on('daybird:close-requested', () => fn()),
   closeReady: () => ipcRenderer.send('daybird:close-ready'),
+  files: {
+    list: (dir: string) => ipcRenderer.invoke('daybird:file', 'list', [dir]),
+    read: (path: string) => ipcRenderer.invoke('daybird:file', 'read', [path]),
+    write: (path: string, bytes: Uint8Array, opts: unknown) =>
+      ipcRenderer.invoke('daybird:file', 'write', [path, bytes, opts]),
+    move: (from: string, to: string) => ipcRenderer.invoke('daybird:file', 'move', [from, to]),
+    remove: (path: string) => ipcRenderer.invoke('daybird:file', 'remove', [path]),
+  },
+  folder: {
+    current: () => ipcRenderer.invoke('daybird:folder-current'),
+    choose: () => ipcRenderer.invoke('daybird:folder-choose'),
+    useDefault: () => ipcRenderer.invoke('daybird:folder-use-default'),
+  },
   onFullScreen: (fn: (full: boolean) => void) =>
     ipcRenderer.on('daybird:full-screen', (_e, full: boolean) => fn(full)),
 });

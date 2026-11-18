@@ -3,7 +3,10 @@ export {
   AppController,
   NOTICE_ACTION_MS,
   NOTICE_MS,
+  type ControllerOptions,
   type DialogKind,
+  type FolderChooser,
+  type FolderPrompt,
   type Notice,
 } from './app/controller.ts';
 export { buildCommands } from './app/commands.ts';

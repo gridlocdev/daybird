@@ -17,3 +17,4 @@ export {
 } from './calendarStore.ts';
 export { MemoryStore } from './memoryStore.ts';
 export { BrowserStore, persistStorage, privateFolder } from './browserStore.ts';
+export { NativeStore, type NativeFiles, type NativeResult } from './nativeStore.ts';

@@ -35,6 +35,8 @@ export interface CalendarStore {
   readonly kind: StoreKind;
   /** The folder's display name. */
   readonly name: string;
+  /** Where the folder is, when its name alone doesn't tell folders apart: the full path on disk. */
+  readonly where?: string;
   /** "Stored in this browser" (§3.7): the folder isn't one the user can see on disk. */
   readonly isPrivate: boolean;
   /** The entries directly in `dir` (`''` for the folder itself). A missing folder lists as empty. */

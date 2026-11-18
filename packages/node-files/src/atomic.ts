@@ -13,9 +13,9 @@ export interface TextFileRead {
   readonly version: string | null;
 }
 
-/** A file's version: the SHA-256 of its UTF-8 bytes, in hex (PRD §3.5). */
-export function versionOf(text: string): string {
-  return createHash('sha256').update(text, 'utf8').digest('hex');
+/** A file's version: the SHA-256 of its bytes (text as UTF-8), in hex (PRD §3.5). */
+export function versionOf(data: string | Uint8Array): string {
+  return createHash('sha256').update(data).digest('hex');
 }
 
 function errorCode(e: unknown): string | undefined {
@@ -33,7 +33,7 @@ export async function readTextFile(file: string): Promise<TextFileRead> {
 }
 
 /** The file a path really names: a symlink's target, so saving replaces the target and keeps the link. */
-async function realFile(file: string): Promise<string> {
+export async function realFile(file: string): Promise<string> {
   try {
     return await realpath(file);
   } catch (e) {
@@ -42,7 +42,7 @@ async function realFile(file: string): Promise<string> {
   }
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+export const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
 /** Windows refuses a rename while another program (a virus scanner, a sync client) has the file open. */
 async function renameRetrying(from: string, to: string): Promise<void> {
@@ -58,11 +58,14 @@ async function renameRetrying(from: string, to: string): Promise<void> {
   }
 }
 
+/** Our own temp files, `.<name>.<12 hex>.tmp`: never listed, and left by a crash at worst. */
+export const TEMP_FILE = /^\..+\.[0-9a-f]{12}\.tmp$/;
+
 /**
- * Writes `text` to `file` atomically, creating the folder if needed. A symlinked file keeps its link: the
- * text replaces the file the link points at.
+ * Writes `data` (text as UTF-8, or bytes) to `file` atomically, creating the folder if needed. A symlinked file
+ * keeps its link: the data replaces the file the link points at.
  */
-export async function writeAtomic(file: string, text: string): Promise<void> {
+export async function writeAtomic(file: string, data: string | Uint8Array): Promise<void> {
   const target = await realFile(file);
   const dir = path.dirname(target);
   await mkdir(dir, { recursive: true });
@@ -70,7 +73,7 @@ export async function writeAtomic(file: string, text: string): Promise<void> {
   try {
     const handle = await open(tmp, constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY, 0o644);
     try {
-      await handle.writeFile(text, 'utf8');
+      await handle.writeFile(data);
       await handle.sync();
     } finally {
       await handle.close();

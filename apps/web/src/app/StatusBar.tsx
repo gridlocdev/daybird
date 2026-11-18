@@ -45,6 +45,11 @@ export function StatusBar({ app }: { readonly app: AppController }) {
           Stored in this browser
         </span>
       )}
+      {store?.where && (
+        <span class="db-where" title={store.where}>
+          {store.name}
+        </span>
+      )}
       <div class="db-live" role="status" aria-live="polite" aria-atomic="true">
         {app.announcement.value}
       </div>

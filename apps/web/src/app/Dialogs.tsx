@@ -12,11 +12,13 @@ import {
   type WeekStartSetting,
 } from '@daybird/ui';
 import type { AppController } from './controller.ts';
-import { ConflictDialog, RecoveryDialog } from './FolderDialogs.tsx';
+import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
 import { shortcutGroups } from './shortcuts.ts';
 
 /** The open dialog, if any. One at a time; a question about the folder comes before any other. */
 export function Dialogs({ app, catalog }: { readonly app: AppController; readonly catalog: CommandCatalog }) {
+  const prompt = app.folderPrompt.value;
+  if (prompt) return <FolderPromptDialog app={app} prompt={prompt} />;
   const session = app.session.value;
   const recovery = session?.recovery.value;
   if (session && recovery) return <RecoveryDialog session={session} offer={recovery} />;

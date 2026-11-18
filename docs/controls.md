@@ -35,6 +35,7 @@ Single-letter keys only work when you aren't typing in a box.
 
 | Action                                      | macOS         | Windows / Linux   |
 | ------------------------------------------- | ------------- | ----------------- |
+| Open Calendar Folder… (desktop app)         | **⌘O**        | **Ctrl+O**        |
 | Settings                                    | **⌘,**        | **Ctrl+,**        |
 | Command menu                                | **⌘K**        | **Ctrl+K**        |
 | Keyboard Shortcuts                          | **⌘/**        | **Ctrl+/**        |

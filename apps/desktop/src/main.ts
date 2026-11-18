@@ -2,10 +2,22 @@
  * Daybird desktop (PRD §14): one window running the web build from app://daybird/. The page reaches the
  * main process only through the preload's `daybirdNative`.
  */
-import { app, BrowserWindow, ipcMain, Menu, nativeTheme, net, protocol, screen, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  nativeTheme,
+  net,
+  protocol,
+  screen,
+  shell,
+} from 'electron';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Channels, type NativeMenuItem } from './bridge.ts';
+import { Folders } from './folders.ts';
 import { editMenuTemplate, toTemplate, withStandardMenus } from './menu.ts';
 import { appFile, dataPaths, isAppUrl } from './paths.ts';
 import { loadSavedWindow, placeWindow, saveWindow, type SavedWindow } from './windowState.ts';
@@ -26,7 +38,13 @@ if (headless) app.dock?.hide();
 
 const paths = dataPaths(process.env);
 if (paths.userData) app.setPath('userData', paths.userData);
+if (paths.documents) app.setPath('documents', paths.documents);
 const windowFile = path.join(app.getPath('userData'), 'window-state.json');
+/** DAYBIRD_FOLDER opens that folder for this run without remembering it (automated checks). */
+const folders = new Folders(
+  path.join(app.getPath('userData'), 'folder.json'),
+  process.env.DAYBIRD_FOLDER || null,
+);
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -153,6 +171,24 @@ function registerIpc(): void {
     const template = withStandardMenus(toTemplate(items, send), process.platform, !app.isPackaged);
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
   });
+  ipcMain.handle(Channels.file, (e, op: unknown, args: unknown) =>
+    trusted(e) ? folders.call(op, args) : { ok: false, code: 'failed', message: 'Not allowed.' },
+  );
+  ipcMain.handle(Channels.folderCurrent, (e) => (trusted(e) ? folders.current() : null));
+  // Both answer the folder now open, or null when the user cancelled.
+  ipcMain.handle(Channels.folderChoose, async (e) => {
+    if (!trusted(e) || !win) return null;
+    const picked = await dialog.showOpenDialog(win, {
+      title: 'Open Calendar Folder',
+      buttonLabel: 'Open',
+      properties: ['openDirectory', 'createDirectory'],
+    });
+    const folder = picked.canceled ? undefined : picked.filePaths[0];
+    return folder ? folders.open(folder) : null;
+  });
+  ipcMain.handle(Channels.folderUseDefault, (e) =>
+    trusted(e) ? folders.open(path.join(app.getPath('documents'), 'Daybird')) : null,
+  );
 }
 
 if (!app.requestSingleInstanceLock()) app.quit();
@@ -172,6 +208,7 @@ else {
       const file = appFile(webRoot, new URL(req.url).pathname);
       return file ? net.fetch(pathToFileURL(file).toString()) : new Response('Forbidden', { status: 403 });
     });
+    await folders.start();
     registerIpc();
     lastWindow = await loadSavedWindow(windowFile);
     win = createWindow();

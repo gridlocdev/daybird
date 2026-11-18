@@ -47,6 +47,20 @@ export interface ControllerOptions {
   readonly now?: () => number;
   /** The locale for dates; the runtime's when left out. */
   readonly locale?: string;
+  /** The desktop app: the user picks the calendar folder (PRD §3.7). Absent in the browser. */
+  readonly folders?: FolderChooser;
+}
+
+/** Opening a calendar folder on disk. Each resolves once the folder is open, or the user cancelled. */
+export interface FolderChooser {
+  choose(): Promise<void>;
+  useDefault(): Promise<void>;
+}
+
+/** The desktop app has no folder yet (first start), or the last one is gone (PRD §3.7). */
+export interface FolderPrompt {
+  /** The path of the folder that went missing; null on first start. */
+  readonly missing: string | null;
 }
 
 export class AppController {
@@ -64,9 +78,15 @@ export class AppController {
   readonly session = signal<FolderSession | null>(null);
   readonly canUndo = computed(() => (this.session.value?.undoStack.value.done.length ?? 0) > 0);
   readonly canRedo = computed(() => (this.session.value?.undoStack.value.undone.length ?? 0) > 0);
-  /** A question about the folder waits: restoring unsaved changes, or a conflict (PRD §3.5, §3.6). */
+  /** The desktop app asks which folder to use. */
+  readonly folderPrompt = signal<FolderPrompt | null>(null);
+  readonly folders: FolderChooser | null;
+  /** A question about the folder waits: which folder, restoring unsaved changes, or a conflict (PRD §3.5–3.7). */
   readonly folderQuestion = computed(
-    () => !!this.session.value?.recovery.value || (this.session.value?.conflicts.value.length ?? 0) > 0,
+    () =>
+      !!this.folderPrompt.value ||
+      !!this.session.value?.recovery.value ||
+      (this.session.value?.conflicts.value.length ?? 0) > 0,
   );
 
   readonly view;
@@ -81,6 +101,7 @@ export class AppController {
 
   constructor(options: ControllerOptions) {
     this.version = options.version;
+    this.folders = options.folders ?? null;
     this.locale = options.locale;
     this.#storage = options.settings;
     this.#now = options.now ?? Date.now;
@@ -175,7 +196,24 @@ export class AppController {
 
   /** The folder has loaded. */
   attach(session: FolderSession): void {
-    this.session.value = session;
+    batch(() => {
+      this.session.value = session;
+      this.folderPrompt.value = null;
+    });
+  }
+
+  /** ⌘O in the desktop app: another calendar folder. */
+  openFolder(): void {
+    this.folders?.choose().catch((e: unknown) => this.#couldNotOpen(e));
+  }
+
+  /** The first-start offer's default: Documents/Daybird. */
+  useDefaultFolder(): void {
+    this.folders?.useDefault().catch((e: unknown) => this.#couldNotOpen(e));
+  }
+
+  #couldNotOpen(e: unknown): void {
+    this.say(`Couldn’t open the folder: ${e instanceof Error ? e.message : String(e)}`, { tone: 'error' });
   }
 
   /** ⌘Z: takes back the last change and says which (PRD §7.6). */

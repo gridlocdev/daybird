@@ -1,19 +1,43 @@
 // One contract for every CalendarStore: the folder session relies on these answers whatever the folder is
-// backed by. The desktop and NAS stores join the list when they arrive.
-import { beforeEach, describe, expect, it } from 'vitest';
+// backed by. The NAS store joins the list when it arrives.
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { FolderStore, folderResult } from '@daybird/node-files';
 import {
   BrowserStore,
   ConflictError,
   MemoryStore,
+  NativeStore,
   NotFoundError,
   decodeText,
   encodeText,
   versionOf,
   type CalendarStore,
+  type NativeFiles,
 } from '../src/index.ts';
 import { fakeFolder } from './fakeFileSystem.ts';
 
+const temp = mkdtempSync(path.join(tmpdir(), 'daybird-contract-'));
+afterAll(() => rmSync(temp, { recursive: true, force: true }));
+let folders = 0;
+
+/** The desktop app's store: the page's NativeStore over the main process's FolderStore, as the bridge joins them. */
+function nativeStore(): CalendarStore {
+  const disk = new FolderStore(path.join(temp, `folder ${++folders}`));
+  const files: NativeFiles = {
+    list: (dir) => folderResult(() => disk.list(dir)),
+    read: (p) => folderResult(() => disk.read(p)),
+    write: (p, bytes, opts) => folderResult(() => disk.write(p, bytes, opts)),
+    move: (from, to) => folderResult(() => disk.move(from, to)),
+    remove: (p) => folderResult(() => disk.remove(p)),
+  };
+  return new NativeStore(files, 'Calendars', disk.root);
+}
+
 const stores: [string, () => CalendarStore][] = [
+  ['NativeStore over FolderStore', nativeStore],
   ['MemoryStore', () => new MemoryStore('Calendars')],
   [
     'BrowserStore',

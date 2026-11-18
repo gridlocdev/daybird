@@ -23,6 +23,20 @@ const DIALOG_COMMAND: Readonly<Record<DialogKind, string>> = {
 
 export function buildCommands(app: AppController): CommandCatalog {
   const specs: CommandSpec[] = [
+    // Only the desktop app opens folders on disk; the browser keeps its calendars in its own storage.
+    ...(app.folders
+      ? [
+          {
+            id: 'file.openFolder',
+            title: 'Open Calendar Folder…',
+            description: 'Use another folder of calendar files.',
+            group: 'File',
+            shortcuts: ['mod+o'],
+            keywords: 'folder directory switch location',
+            run: () => app.openFolder(),
+          } satisfies CommandSpec,
+        ]
+      : []),
     {
       id: 'app.settings',
       title: 'Settings…',

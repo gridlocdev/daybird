@@ -1,5 +1,5 @@
 import { Dialog, type Conflict, type FolderSession, type RecoveryOffer } from '@daybird/ui';
-import type { AppController } from './controller.ts';
+import type { AppController, FolderPrompt } from './controller.ts';
 
 const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
 
@@ -102,6 +102,48 @@ export function ConflictDialog({
           <strong>Use Theirs</strong> {deleted ? 'removes the calendar' : 'drops this window’s changes'}.
         </li>
       </ul>
+    </Dialog>
+  );
+}
+
+/**
+ * The desktop app's first start, or the folder it used last is gone (PRD §3.7). Daybird keeps calendars only in a
+ * folder the user can see, so it asks which before showing any. Escape leaves the dialog up.
+ */
+export function FolderPromptDialog({
+  app,
+  prompt,
+}: {
+  readonly app: AppController;
+  readonly prompt: FolderPrompt;
+}) {
+  return (
+    <Dialog
+      title={prompt.missing ? 'The calendar folder is missing' : 'Where should Daybird keep calendars?'}
+      onClose={() => undefined}
+      onSubmit={() => app.useDefaultFolder()}
+      actions={
+        <>
+          <button type="button" class="db-button" onClick={() => app.openFolder()}>
+            Choose Folder…
+          </button>
+          <button type="submit" class="db-button db-button-primary" data-autofocus>
+            Use Documents/Daybird
+          </button>
+        </>
+      }
+    >
+      {prompt.missing ? (
+        <p>
+          Daybird can’t find <span class="db-where">{prompt.missing}</span>. If it’s on a drive that isn’t
+          connected, connect it and choose it again, or pick another folder.
+        </p>
+      ) : (
+        <p>
+          Each calendar is one .ics file in a folder you choose, so other apps and backups can read it.
+          Daybird makes the Daybird folder in Documents if you use it.
+        </p>
+      )}
     </Dialog>
   );
 }

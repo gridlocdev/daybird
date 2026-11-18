@@ -12,7 +12,7 @@ import {
 import type { AppController } from './controller.ts';
 
 /** Separators go before these ids. */
-const BREAKS = new Set(['view.sidebar', 'view.themeAuto', 'go.today', 'help.shortcuts']);
+const BREAKS = new Set(['app.settings', 'view.sidebar', 'view.themeAuto', 'go.today', 'help.shortcuts']);
 
 /** Cut, Copy, Paste and Select All are Electron roles, so text fields get real clipboard events. */
 const CLIPBOARD_ROLES: readonly NativeMenuItem[] = [

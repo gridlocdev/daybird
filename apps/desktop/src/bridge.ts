@@ -8,6 +8,10 @@ export const Channels = {
   command: 'daybird:command',
   closeRequested: 'daybird:close-requested',
   fullScreen: 'daybird:full-screen',
+  file: 'daybird:file',
+  folderCurrent: 'daybird:folder-current',
+  folderChoose: 'daybird:folder-choose',
+  folderUseDefault: 'daybird:folder-use-default',
 } as const;
 
 /** One item of the menu bar the page sends, as `NativeMenuItem` in @daybird/ui. */

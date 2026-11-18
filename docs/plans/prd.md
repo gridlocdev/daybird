@@ -68,7 +68,8 @@ Daybird is a calendar for one person. It runs as a desktop app (Electron), in th
 
 ### §3.7 Where the folder lives
 
-- Desktop: chosen with **Open Calendar Folder…**; the last one reopens. First start offers `~/Documents/Daybird` (created when chosen) or another folder.
+- Desktop: chosen with **Open Calendar Folder…** (⌘O); the last one reopens, remembered in `folder.json` in the app's data folder. First start asks before showing any calendar: **Use Documents/Daybird** (created when chosen) or **Choose Folder…**. When the remembered folder is gone (an unplugged drive), the same question names it and nothing is created in its place. Switching folders waits up to 5 s for the old folder's saves; if they haven't landed it says so and stays. The status bar shows the folder's name, with its path on hover.
+- Desktop files are written to a temporary file beside the target and renamed over it, so a crash leaves the old file or the new one. A save holds a `.<name>.lock` file next to the target while it checks the version and writes, so the CLI and the NAS server never write the same file at once; a lock older than 10 s is taken as left by a crash, and a save that can't get the lock in 12 s fails with "is being saved by another program". Paths outside the folder, `..` and symlinks that lead out are refused. A closing window waits up to 2.5 s for saves, then keeps a recovery snapshot of anything still unsaved (§3.6).
 - Browser: the File System Access API folder, where the browser has it; otherwise calendars live in the browser's storage, and **Export All** (§11) is the way out. The status bar says "Stored in this browser" in that case.
 - NAS: the folder the server is started with (§15).
 
@@ -306,7 +307,7 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Calendar ▸, Delete); empt
 ## §14 Desktop
 
 - Electron, the shared static build, a hidden title bar with inset traffic lights on macOS. Native menu from the catalog (Daybird, File, Edit, View, Go, Window, Help).
-- `DAYBIRD_HEADLESS=1` runs it with no window shown, for checks.
+- `DAYBIRD_HEADLESS=1` runs it with no window shown, for checks. `DAYBIRD_USER_DATA`, `DAYBIRD_DOCUMENTS` and `DAYBIRD_FOLDER` move its own files, the Documents folder it offers and the calendar folder, so checks never touch the owner's.
 - Window size and position remembered. Closing the last window quits on Windows and Linux, stays in the Dock on macOS. Reminders keep firing while the app runs with no window on macOS.
 - Opening an `.ics` file from Finder imports it (§11), asking which calendar.
 

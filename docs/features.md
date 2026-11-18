@@ -20,7 +20,7 @@ Settings (**⌘,** or **Ctrl+,**) chooses light, dark or the system's appearance
 
 ## Saving
 
-Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it back. If a calendar file changes somewhere else while this window has changes to it that aren't saved yet, Daybird asks what to keep: your version as a copy, your version over theirs, or theirs. Changes made in other apps show up when you come back to the window. If a window closes before it can save, the next one offers to put those changes back. In a browser that can't open a folder, calendars are kept in the browser itself, and the status bar says so.
+Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it back. If a calendar file changes somewhere else while this window has changes to it that aren't saved yet, Daybird asks what to keep: your version as a copy, your version over theirs, or theirs. Changes made in other apps show up when you come back to the window. If a window closes before it can save, the next one offers to put those changes back. The desktop app keeps each calendar as an `.ics` file in a folder you choose: on first start it offers Documents/Daybird, and **Open Calendar Folder…** (**⌘O**) switches to another. In a browser that can't open a folder, calendars are kept in the browser itself, and the status bar says so.
 
 ## Desktop, browser and NAS
 
