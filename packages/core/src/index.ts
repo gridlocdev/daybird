@@ -279,3 +279,18 @@ export {
   type MoveTarget,
 } from './model/eventMoves.ts';
 export { occurrenceDetails, type OccurrenceDetails } from './model/details.ts';
+export {
+  REPEAT_PRESETS,
+  customDefaults,
+  customOf,
+  isLastWeekdayOf,
+  ordinalOf,
+  presetOf,
+  presetRule,
+  ruleFromCustom,
+  untilDate,
+  untilOn,
+  type CustomRepeat,
+  type RepeatClock,
+  type RepeatPreset,
+} from './model/repeat.ts';

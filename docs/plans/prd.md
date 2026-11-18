@@ -223,7 +223,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ### §7.4 Selecting
 
-- Click selects; the selection follows Tab / Shift-Tab through the visible events in time order. Enter opens the popover; Escape clears the selection.
+- Click selects, and a click on the selected event does nothing more; double-click opens the popover. The selection follows Tab / Shift-Tab through the visible events in time order. Enter opens the popover; Escape clears the selection.
 
 ### §7.5 Copy, cut, paste, duplicate
 
@@ -248,6 +248,8 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 - Custom… opens a small dialog: every N day(s) / week(s) / month(s) / year(s); weekly: which weekdays; monthly: "on day 17" or "on the third Tuesday" or "on the last day"; yearly: which months, and optionally "on the third Tuesday"; end: never, on a date, after N times.
 - A rule the dialog can't show (`BYSETPOS` combinations, `BYHOUR` lists, `BYWEEKNO`, secondly/minutely) shows read-only in words with **Replace with a Simple Rule**. Its other fields stay editable.
 - Rules are described in words by the engine, in English for 1.0.
+- A rule written from the menu or the dialog names its days, months or day of the month even where the start implies them, so it keeps its meaning when a series is split at a later occurrence. A preset keeps the old rule's end.
+- A single event that's given a repeat becomes a series at once. A repeat change to a repeating event is held until the popover closes, then asks only **This and Future Events** or **All Events**: a repeat can't be for one occurrence.
 
 ### §8.2 Changing one or all
 

@@ -6,6 +6,7 @@ import { whenOf, withWhen, type PlainDate, type WhenFields } from '@daybird/core
 import { Dialog } from '@daybird/ui';
 import type { AppController, OccurrenceRef } from './controller.ts';
 import { colourOf, occurrenceKey } from './eventParts.tsx';
+import { RepeatField } from './RepeatDialog.tsx';
 import { answerScope, closeEditor, deleteEvent, editEvent, editorDetails } from './eventActions.ts';
 
 const findDrawn = (ref: OccurrenceRef): Element | null =>
@@ -123,12 +124,7 @@ export function EventPopover({ app }: { readonly app: AppController }) {
             />
           )}
         </div>
-        {d.repeat && (
-          <div class="db-popover-row">
-            <span>Repeat</span>
-            <span class="db-popover-value">{d.repeat}</span>
-          </div>
-        )}
+        <RepeatField app={app} d={d} />
         <label class="db-popover-row">
           <span>Calendar</span>
           <span class="db-dot" style={{ '--db-c': colourOf(calendar) }} aria-hidden="true" />
@@ -168,6 +164,8 @@ export function ScopeDialog({ app }: { readonly app: AppController }) {
   const q = app.scopeQuestion.value;
   if (!q) return null;
   const verb = q.action === 'delete' ? 'delete' : 'change';
+  // A new repeat can't be for one occurrence (§8.2): it starts here or covers them all.
+  const ruleChange = q.action === 'edit' && q.patch.rule !== undefined;
   const button = (label: string, scope: 'this' | 'future' | 'all', primary = false) => (
     <button
       type="button"
@@ -188,12 +186,16 @@ export function ScopeDialog({ app }: { readonly app: AppController }) {
             Cancel
           </button>
           {button('All Events', 'all')}
-          {button('This and Future Events', 'future')}
-          {button('This Event', 'this', true)}
+          {button('This and Future Events', 'future', ruleChange)}
+          {!ruleChange && button('This Event', 'this', true)}
         </>
       }
     >
-      <p>Do you want to {verb} only this occurrence, this one and the ones after it, or every one?</p>
+      <p>
+        {ruleChange
+          ? 'Do you want the new repeat to start with this occurrence, or to change every one?'
+          : `Do you want to ${verb} only this occurrence, this one and the ones after it, or every one?`}
+      </p>
     </Dialog>
   );
 }

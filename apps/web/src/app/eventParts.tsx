@@ -22,10 +22,10 @@ export function pickEvent(app: AppController, o: Occurrence) {
   const calendar = app.calendars.peek().find((c) => c.id === o.calendarId);
   return {
     'data-occurrence': occurrenceKey(ref),
+    // A click selects and a double-click opens: opening on a click of the selected event would put the
+    // popover's backdrop under the double-click's second click, which closes it again.
     onClick: () => {
-      if (justDragged()) return;
-      if (sameOccurrence(app.selected.peek(), ref)) openEditor(app, ref);
-      else app.select(ref);
+      if (!justDragged()) app.select(ref);
     },
     onDblClick: () => openEditor(app, ref),
     onContextMenu: (e: MouseEvent) => {

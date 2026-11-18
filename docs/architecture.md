@@ -100,6 +100,7 @@ stateDiagram-v2
 - `eventActions.ts` is everything creating, editing and deleting an event does; the popover, the drags in `dragCreate.ts` and the commands call it. A visit to the popover is one undo group: the session joins steps of one group, and `retract` drops the group's step with no redo, for Escape on an untouched new event.
 - In core, `eventTimes.ts` turns drags and the popover's fields into start and end values, and `details.ts` gives the popover an occurrence in its own frame with its repeat in words.
 - `moveActions.ts` moves, copies and pastes events; `dragMove.ts` turns a drag on any event into a target under the pointer (a `.db-column[data-date]` for a time, a `[data-week]` row for a day) and draws the ghost there; `eventCommands.ts` holds the commands on the selected event, before Previous and Next so the arrow keys move a selected event. In core, `eventMoves.ts` works out the new times and writes one event as a calendar file for the clipboard.
+- `RepeatDialog.tsx` holds the popover's Repeat field and the Custom… dialog, whose choices live in `app.repeatDialog` while it's open. In core, `repeat.ts` reads a rule as a menu item or the dialog's choices (null when the dialog can't show it) and writes it back.
 
 ## Desktop (`apps/desktop`)
 

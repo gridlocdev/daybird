@@ -1,10 +1,12 @@
 /** What the event popover shows for one occurrence (PRD §7.2): its times in its own frame, its repeat and problems. */
 import type { TimeValue } from '../ical/values.ts';
 import { addSeconds, dateOf } from '../time/dateTime.ts';
+import type { RecurrenceRule } from '../time/rrule.ts';
 import { describeRule } from '../time/ruleWords.ts';
+import type { Zone } from '../time/zones.ts';
 import { calendarZones, findSeries, type Calendar } from './calendar.ts';
 import { readEvent } from './event.ts';
-import { eventForKey, findOccurrence, type Occurrence } from './occurrences.ts';
+import { eventForKey, findOccurrence, zoneOf, type Occurrence } from './occurrences.ts';
 
 export interface OccurrenceDetails {
   readonly occurrence: Occurrence;
@@ -15,6 +17,13 @@ export interface OccurrenceDetails {
   readonly repeat: string | null;
   /** What couldn't be read (§3.2). */
   readonly problems: readonly string[];
+  /** The series' rule; null when it doesn't repeat by a rule. */
+  readonly rule: RecurrenceRule | null;
+  /** True when the repeat is more than one rule, or extra dates: shown in words, never edited (§8.1). */
+  readonly complexRepeat: boolean;
+  /** The series' first start and its zone: the clock its rule runs on. */
+  readonly seriesStart: TimeValue;
+  readonly zone: Zone;
 }
 
 export function occurrenceDetails(
@@ -49,5 +58,16 @@ export function occurrenceDetails(
     end = { ...frame, dateTime: addSeconds(o.ownStart, Math.max(0, o.end - o.start)) };
   }
   const problems = [...info.problems, ...(master && event !== series.master ? master.problems : [])];
-  return { occurrence: o, start, end, repeat, problems: [...new Set(problems)] };
+  const seriesStart = master?.start ?? info.start;
+  return {
+    occurrence: o,
+    start,
+    end,
+    repeat,
+    problems: [...new Set(problems)],
+    rule: rule ?? null,
+    complexRepeat: !!master && (master.rules.length > 1 || master.rDates.length > 0),
+    seriesStart,
+    zone: zoneOf(seriesStart, calendarZones(calendar.document)).zone,
+  };
 }

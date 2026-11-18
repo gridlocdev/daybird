@@ -1086,3 +1086,59 @@
   text-overflow: ellipsis;
   pointer-events: none;
 }
+
+/* Repeat (§8.1) */
+.db-popover-repeat .db-popover-value {
+  flex: 1;
+  min-width: 0;
+}
+.db-button-small {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+.db-repeat-dialog {
+  width: 360px;
+}
+.db-repeat-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.db-repeat-row input[type='number'] {
+  width: 56px;
+}
+.db-repeat-days,
+.db-repeat-months {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.db-repeat-days button,
+.db-repeat-months button {
+  flex: 1 0 auto;
+}
+.db-repeat-choices {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+.db-repeat-choices legend {
+  margin-bottom: 4px;
+  color: var(--db-text-2);
+}
+.db-repeat-choices label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.db-repeat-choices input[type='number'] {
+  width: 64px;
+}
+.db-repeat-preview {
+  margin: 0;
+  color: var(--db-text-2);
+}

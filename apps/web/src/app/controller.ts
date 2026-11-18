@@ -15,6 +15,7 @@ import {
   viewRange,
   type Accent,
   type Calendar,
+  type CustomRepeat,
   type DateRange,
   type EventPatch,
   type MoveTarget,
@@ -184,6 +185,8 @@ export class AppController {
   /** How many one-line entries fit in a Month cell, measured from the window (§6.2). */
   readonly monthLanes = signal(3);
   readonly editor = signal<EditorState | null>(null);
+  /** The Custom… repeat dialog over the popover (§8.1): its choices while it's open. */
+  readonly repeatDialog = signal<CustomRepeat | null>(null);
   /** The copied event (§7.5), and the calendar it came from. */
   readonly clipboard = signal<{ readonly fields: NewEventFields; readonly calendarId: string } | null>(null);
   /** A right-click menu on an event or on empty grid; `target` is where New Event Here and Paste go (§12). */
@@ -329,6 +332,7 @@ export class AppController {
       this.calendarMenu.peek() !== null ||
       this.eventMenu.peek() !== null ||
       this.editor.peek() !== null ||
+      this.repeatDialog.peek() !== null ||
       this.scopeQuestion.peek() !== null ||
       this.folderQuestion.peek()
     );

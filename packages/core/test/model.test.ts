@@ -17,6 +17,7 @@ import {
   redo,
   restoreTrashEntry,
   retract,
+  rule,
   seriesOf,
   toLocalSeconds,
   trashEntries,
@@ -257,6 +258,28 @@ describe('creating and editing', () => {
       'this',
     );
     expect(writeCalendar(moved.workspace.calendars[0]!.document)).toContain('SEQUENCE:1');
+  });
+
+  it('names an event by key once it repeats, and by null once it stops (§8.1)', () => {
+    const single = workspace(
+      calendar(
+        'Home.ics',
+        ics(['UID:one', 'SUMMARY:Gym', 'DTSTART:20261117T090000Z', 'DTEND:20261117T100000Z']),
+      ),
+    );
+    const made = editOccurrence(
+      single,
+      context(),
+      { calendarId: 'Home.ics', uid: 'one', key: null },
+      { rule: rule('DAILY') },
+      'all',
+    );
+    sound(made.workspace);
+    expect(made.ref.key).toBe(keyOf('2026-11-17T09:00:00'));
+    expect(findOccurrence(made.workspace.calendars[0]!, 'one', made.ref.key, ZONE)?.title).toBe('Gym');
+    const stopped = editOccurrence(made.workspace, context(), made.ref, { rule: null }, 'all');
+    expect(stopped.ref.key).toBeNull();
+    expect(findOccurrence(stopped.workspace.calendars[0]!, 'one', null, ZONE)?.title).toBe('Gym');
   });
 
   it('records nothing for an edit that changes nothing', () => {

@@ -7,12 +7,14 @@ import {
   calendarById,
   createEvent,
   deleteOccurrence,
+  describeRule,
   editOccurrence,
   findOccurrence,
   needsScope,
   nextHalfHour,
   occurrenceDetails,
   timedTimes,
+  whenOf,
   type EventPatch,
   type OccurrenceDetails,
   type Scope,
@@ -98,6 +100,13 @@ export function editorDetails(app: AppController): (OccurrenceDetails & { calend
     },
     start: p.start ?? d.start,
     end: p.end ?? d.end,
+    rule: p.rule !== undefined ? p.rule : d.rule,
+    repeat:
+      p.rule === undefined
+        ? d.repeat
+        : p.rule
+          ? describeRule(p.rule, whenOf(d.start, d.end).startDate)
+          : null,
     calendarId: ed.toCalendar ?? ed.ref.calendarId,
   };
 }

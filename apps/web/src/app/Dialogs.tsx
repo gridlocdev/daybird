@@ -17,6 +17,7 @@ import { CalendarDialogs } from './CalendarDialogs.tsx';
 import { DayListDialog } from './DayListDialog.tsx';
 import { EventPopover, ScopeDialog } from './EventPopover.tsx';
 import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
+import { RepeatDialog } from './RepeatDialog.tsx';
 import { shortcutGroups } from './shortcuts.ts';
 
 /** The open dialog, if any. One at a time; a question about the folder comes before any other. */
@@ -29,6 +30,7 @@ export function Dialogs({ app, catalog }: { readonly app: AppController; readonl
   const conflict = session?.conflicts.value[0];
   if (session && conflict) return <ConflictDialog app={app} session={session} conflict={conflict} />;
   if (app.scopeQuestion.value) return <ScopeDialog app={app} />;
+  if (app.repeatDialog.value) return <RepeatDialog app={app} />;
   if (app.editor.value) return <EventPopover app={app} />;
   const day = app.dayList.value;
   if (day) return <DayListDialog app={app} day={day} />;

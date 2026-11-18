@@ -200,9 +200,17 @@ export function editOccurrence(
 
   if (!repeating || key === null || scope === 'all' || (scope === 'future' && isFirstKey(series, key))) {
     const changed = editAll(series, key, patch, sctx);
+    // A new repeat names its occurrences by key; no repeat names the event by null.
+    const first = changed.events[0];
+    const nextKey =
+      patch.rule === undefined
+        ? key
+        : patch.rule && first
+          ? (key ?? wallSeconds(readEvent(first).start))
+          : null;
     if (target === calendar) {
       const next = putSeries(calendar, series.uid, before, changed.events, ctx);
-      return { workspace: withCalendar(ws, next), ref };
+      return { workspace: withCalendar(ws, next), ref: { ...ref, key: nextKey } };
     }
     const moved = freeUid(
       target,
@@ -215,7 +223,7 @@ export function editOccurrence(
     };
     let next = withCalendar(ws, withDocument(calendar, withSeriesEvents(calendar.document, series.uid, [])));
     next = withCalendar(next, putNewSeries(target, stamped, ctx));
-    return { workspace: next, ref: { calendarId: target.id, uid: moved.uid, key } };
+    return { workspace: next, ref: { calendarId: target.id, uid: moved.uid, key: nextKey } };
   }
 
   if (scope === 'this') {
@@ -261,7 +269,8 @@ export function editOccurrence(
   const into = calendarById(next, target.id) ?? target;
   const split = target === calendar ? changed.split : freeUid(into, changed.split, ctx);
   next = withCalendar(next, putNewSeries(into, split, ctx));
-  const newKey = split.master ? wallSeconds(readEvent(split.master).start) : key;
+  const info = split.master ? readEvent(split.master) : null;
+  const newKey = info ? (isRepeating(info) ? wallSeconds(info.start) : null) : key;
   return { workspace: next, ref: { calendarId: target.id, uid: split.uid, key: newKey } };
 }
 
