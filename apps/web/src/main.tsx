@@ -30,6 +30,7 @@ import { loadTrashedCalendars } from './app/trashActions.ts';
 import { browserNotification, startReminders, type ReminderMessage } from './app/reminders.ts';
 import { nativeBridge, type DaybirdNative, type NativeFolder } from './app/native.ts';
 import { menuSender, nativeMenu, watchMenuInputs } from './app/nativeMenu.ts';
+import { importOpenedFiles } from './app/openedFiles.ts';
 import pkg from '../package.json';
 
 /** How often the clock checks for midnight (PRD §6.1). */
@@ -256,6 +257,7 @@ function start(): void {
     });
     watchMenuInputs(app, () => menu.send(nativeMenu(catalog)));
     menu.send(nativeMenu(catalog));
+    importOpenedFiles(app, native);
   }
 }
 

@@ -113,3 +113,5 @@ The `daybird` command on `packages/core` and `packages/node-files` only. `cli.ts
 ## Desktop (`apps/desktop`)
 
 The Electron main process, a sandboxed preload with context isolation, and the `daybirdNative` bridge. The native menu bar is built from the command catalog and sent over IPC. Reminders come over `daybird:notify` as native notifications (none in headless mode), and a click sends `daybird:notification-click` back. `DAYBIRD_HEADLESS=1` runs it with no window or Dock icon, for automated checks.
+
+`.ics` files opened from the Finder (`open-file`), a second launch or the first launch's arguments wait in `OpenedFiles` (`openedFiles.ts`). The main process sends `daybird:files-opened`; the page, once a folder is open, calls `daybird:take-opened-files` and offers each file through the Import dialog (`apps/web/src/app/openedFiles.ts`). On macOS closing the window hides it, so the page and its reminders keep running.

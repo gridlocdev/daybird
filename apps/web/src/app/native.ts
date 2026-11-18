@@ -35,7 +35,16 @@ export interface DaybirdNative {
   notify(notification: { readonly id: string; readonly title: string; readonly body: string }): void;
   /** A notification was clicked: its id. */
   onNotificationClick(fn: (id: string) => void): void;
+  /** `.ics` files were opened from the Finder or the command line: take them with `takeOpenedFiles`. */
+  onFilesOpened(fn: () => void): void;
+  /** The opened files waiting, each read once; the main process forgets them. */
+  takeOpenedFiles(): Promise<readonly OpenedFile[]>;
 }
+
+/** An `.ics` file opened from outside the app (PRD §14), or why it couldn't be read. */
+export type OpenedFile =
+  | { readonly ok: true; readonly name: string; readonly text: string }
+  | { readonly ok: false; readonly name: string; readonly message: string };
 
 export function nativeBridge(): DaybirdNative | null {
   return (globalThis as { daybirdNative?: DaybirdNative }).daybirdNative ?? null;

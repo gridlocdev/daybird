@@ -34,4 +34,6 @@ contextBridge.exposeInMainWorld('daybirdNative', {
   notify: (n: NativeNotification) => ipcRenderer.send('daybird:notify', n),
   onNotificationClick: (fn: (id: string) => void) =>
     ipcRenderer.on('daybird:notification-click', (_e, id: string) => fn(id)),
+  onFilesOpened: (fn: () => void) => ipcRenderer.on('daybird:files-opened', () => fn()),
+  takeOpenedFiles: () => ipcRenderer.invoke('daybird:take-opened-files'),
 });

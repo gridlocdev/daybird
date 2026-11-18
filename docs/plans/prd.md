@@ -318,8 +318,9 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar change
 
 - Electron, the shared static build, a hidden title bar with inset traffic lights on macOS. Native menu from the catalog (Daybird, File, Edit, View, Go, Window, Help).
 - `DAYBIRD_HEADLESS=1` runs it with no window shown, for checks. `DAYBIRD_USER_DATA`, `DAYBIRD_DOCUMENTS` and `DAYBIRD_FOLDER` move its own files, the Documents folder it offers and the calendar folder, so checks never touch the owner's.
-- Window size and position remembered. Closing the last window quits on Windows and Linux, stays in the Dock on macOS. Reminders keep firing while the app runs with no window on macOS.
-- Opening an `.ics` file from Finder imports it (§11), asking which calendar.
+- Window size and position remembered. Closing the last window quits on Windows and Linux, stays in the Dock on macOS. On macOS closing hides the window and keeps its page, so reminders keep firing while the app runs with no window; clicking the Dock icon or a reminder shows it again. Quitting closes it as on the other systems, finishing saves first.
+- Opening an `.ics` file from the Finder or the Explorer, or passing one on the command line (`Daybird invite.ics`), imports it (§11): the Import dialog asks which calendar, one file at a time. Files opened before a calendar folder is open wait until it is. A file that can't be read (gone, not a file, over 20 MB) gets an error notice. The packages register Daybird for `.ics` files as a viewer, so it is offered under Open With without taking over the default.
+- The app icon is `assets/icon.svg`: a calendar page with a bird on the blue accent. `just icons` renders it into `apps/desktop/build` (`icon.icns`, `icon.ico`, `icon.png`), which is committed.
 
 ## §15 NAS server
 

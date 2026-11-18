@@ -80,6 +80,8 @@ just package-desktop-dir  # an unpacked app only, faster for local testing
 just install-desktop      # macOS: package and install into /Applications
 ```
 
+The app icon's source is `assets/icon.svg`. `just icons` renders it into `apps/desktop/build` (`icon.icns`, `icon.ico` and `icon.png`) with Inkscape and macOS's `iconutil`; commit the files it writes, so packaging needs neither.
+
 ## Releasing
 
 Pushing a `vX.Y.Z` tag runs `.github/workflows/release.yml`, which packages the desktop app for macOS, Windows and Linux and publishes them on a GitHub release.

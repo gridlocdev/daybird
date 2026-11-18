@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Daybird's app icon. 1024 canvas on Apple's icon grid: an 824-unit tile at (100,100) with a transparent margin.
+     scripts/make-icons.sh crops to the tile for Windows and Linux, so keep the tile there. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="tile" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="924">
+      <stop offset="0" stop-color="#4C8DFF" />
+      <stop offset="1" stop-color="#1757C2" />
+    </linearGradient>
+  </defs>
+
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#tile)" />
+
+  <g transform="translate(0 24)">
+    <!-- The calendar page: a frame with a solid header band and two binding tabs. -->
+    <rect x="232" y="268" width="560" height="500" rx="70" fill="none" stroke="#FFFFFF" stroke-width="40" />
+    <path d="M 232 338 A 70 70 0 0 1 302 268 L 722 268 A 70 70 0 0 1 792 338 L 792 400 L 232 400 Z" fill="#FFFFFF" />
+    <rect x="352" y="210" width="48" height="110" rx="24" fill="#FFFFFF" stroke="url(#tile)" stroke-width="20" />
+    <rect x="624" y="210" width="48" height="110" rx="24" fill="#FFFFFF" stroke="url(#tile)" stroke-width="20" />
+    <!-- The bird: a round body, a head, a beak and a tail, facing right. -->
+    <g fill="#FFFFFF">
+      <path d="M 404 560 L 318 500 L 392 626 Z" />
+      <ellipse cx="490" cy="590" rx="112" ry="88" />
+      <circle cx="594" cy="526" r="62" />
+      <path d="M 646 506 L 712 530 L 650 552 Z" />
+    </g>
+    <circle cx="606" cy="514" r="13" fill="url(#tile)" />
+  </g>
+</svg>

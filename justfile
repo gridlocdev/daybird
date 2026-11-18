@@ -63,6 +63,11 @@ build-web:
 build-desktop: build-web
     pnpm --filter @daybird/desktop build
 
+# Render the app icon (assets/icon.svg) into apps/desktop/build; commit what it writes. Needs Inkscape and macOS.
+[group('build')]
+icons:
+    scripts/make-icons.sh
+
 # Package the desktop app for this OS into apps/desktop/release (.dmg and .zip on macOS).
 [group('build')]
 package-desktop: build-web

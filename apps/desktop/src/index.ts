@@ -10,3 +10,11 @@ export {
   type SavedWindow,
 } from './windowState.ts';
 export { Folders, loadFolderChoice, saveFolderChoice, type FolderInfo } from './folders.ts';
+export {
+  icsArguments,
+  isIcsPath,
+  OpenedFiles,
+  readOpened,
+  MAX_OPENED_BYTES,
+  type OpenedFile,
+} from './openedFiles.ts';

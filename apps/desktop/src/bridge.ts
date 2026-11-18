@@ -14,6 +14,8 @@ export const Channels = {
   folderUseDefault: 'daybird:folder-use-default',
   notify: 'daybird:notify',
   notificationClick: 'daybird:notification-click',
+  filesOpened: 'daybird:files-opened',
+  takeOpenedFiles: 'daybird:take-opened-files',
 } as const;
 
 /** A reminder the page asks the main process to show as a system notification (PRD §9). */

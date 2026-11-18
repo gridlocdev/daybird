@@ -80,4 +80,4 @@ The `daybird` command lists, adds, changes and deletes events in a calendar fold
 
 ## Desktop, browser and NAS
 
-The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar.
+The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar. Open an `.ics` file with Daybird from the Finder or the Explorer and it asks which calendar to import it into. On a Mac, closing the window keeps Daybird in the Dock and its reminders keep ringing.

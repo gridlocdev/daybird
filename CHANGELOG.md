@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.0 - 2026-11-17
+
+The first release.
+
 - The app shell: Day, Week, Month, Year and Agenda views with a toolbar to move through time, a sidebar with a mini month, the command menu (⌘K), the Keyboard Shortcuts window (⌘/), and Settings for appearance, accent colour, the first day of the week and week numbers.
 - The desktop app for macOS, Windows and Linux, with a native menu bar.
 - Daybird reads and writes `.ics` files itself. A file it hasn't changed is written back byte for byte, properties and components it doesn't know are kept, and a file it can't make sense of is refused with the line that went wrong.
@@ -26,3 +30,6 @@
 - Time zone support in Settings adds a picker for the zone times show in, in Settings and the toolbar, and a Time zone field in the popover. Without it, an event in another zone shows its own time in the popover. Dragging or pasting an event in another zone keeps its zone.
 - A click on the selected event no longer opens it, so double-clicking a selected event opens the popover instead of closing it again.
 - The `daybird` command line lists the events in a range, adds, changes and deletes events (one occurrence of a repeating event with `--occurrence`), lists the calendars, and imports and exports `.ics` files, with `--json` output. It saves against what it read, so it never overwrites a change made meanwhile by the app or another program.
+- Opening an `.ics` file with the desktop app, from the Finder, the Explorer or the command line, asks which calendar to import it into.
+- On a Mac, closing the window keeps Daybird in the Dock, and reminders keep ringing.
+- Daybird has an app icon: a calendar page with a bird.

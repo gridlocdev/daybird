@@ -19,6 +19,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Channels, type NativeMenuItem, type NativeNotification } from './bridge.ts';
 import { Folders } from './folders.ts';
+import { icsArguments, OpenedFiles } from './openedFiles.ts';
 import { editMenuTemplate, toTemplate, withStandardMenus } from './menu.ts';
 import { appFile, dataPaths, isAppUrl } from './paths.ts';
 import { loadSavedWindow, placeWindow, saveWindow, type SavedWindow } from './windowState.ts';
@@ -52,6 +53,9 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 let win: BrowserWindow | null = null;
+/** `.ics` files opened from the Finder or the command line, until the page takes them (PRD §14). */
+const opened = new OpenedFiles();
+opened.add(icsArguments(process.argv.slice(1), process.cwd()));
 let lastWindow: SavedWindow | null = null;
 let quitting = false;
 
@@ -126,6 +130,12 @@ function createWindow(): BrowserWindow {
   w.on('close', (e) => {
     rememberWindow(w);
     if (allowClose) return;
+    // macOS keeps the app running with no window: hiding it keeps the page, so reminders still ring (PRD §14).
+    if (process.platform === 'darwin' && !quitting && !headless) {
+      e.preventDefault();
+      w.hide();
+      return;
+    }
     e.preventDefault();
     if (closeTimer) return;
     w.webContents.send(Channels.closeRequested);
@@ -187,6 +197,24 @@ function notify(e: Electron.IpcMainEvent, n: NativeNotification): void {
   shown.show();
 }
 
+/** Brings the window forward, making one if it was closed (macOS keeps running with none). */
+function showWindow(): void {
+  if (!win) {
+    win = createWindow();
+    return;
+  }
+  if (win.isMinimized()) win.restore();
+  if (!headless) win.show();
+  win.focus();
+}
+
+/** New opened files: the page takes them once it has a calendar folder open. */
+function filesOpened(files: readonly string[]): void {
+  if (!opened.add(files) || !app.isReady()) return;
+  showWindow();
+  win?.webContents.send(Channels.filesOpened);
+}
+
 function registerIpc(): void {
   ipcMain.on(Channels.setMenu, (e, items: readonly NativeMenuItem[]) => {
     if (!trusted(e) || !Array.isArray(items)) return;
@@ -210,6 +238,7 @@ function registerIpc(): void {
     return folder ? folders.open(folder) : null;
   });
   ipcMain.on(Channels.notify, (e, n: NativeNotification) => notify(e, n));
+  ipcMain.handle(Channels.takeOpenedFiles, (e) => (trusted(e) ? opened.take() : []));
   ipcMain.handle(Channels.folderUseDefault, (e) =>
     trusted(e) ? folders.open(path.join(app.getPath('documents'), 'Daybird')) : null,
   );
@@ -217,12 +246,14 @@ function registerIpc(): void {
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
-  app.on('second-instance', () => {
-    if (!win) win = createWindow();
-    else {
-      if (win.isMinimized()) win.restore();
-      win.focus();
-    }
+  // Before ready too: macOS sends the files a launch opens before the app is ready.
+  app.on('open-file', (e, file) => {
+    e.preventDefault();
+    filesOpened([file]);
+  });
+  app.on('second-instance', (_e, argv, cwd) => {
+    showWindow();
+    filesOpened(icsArguments(argv.slice(1), cwd));
   });
   app.on('before-quit', () => {
     quitting = true;
@@ -236,9 +267,7 @@ else {
     registerIpc();
     lastWindow = await loadSavedWindow(windowFile);
     win = createWindow();
-    app.on('activate', () => {
-      if (!win) win = createWindow();
-    });
+    app.on('activate', showWindow);
   });
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin' || quitting || headless) app.quit();
