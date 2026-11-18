@@ -36,6 +36,7 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
 - `plainDate.ts`: calendar dates as `YYYY-MM-DD` strings, with arithmetic on whole days so a daylight-saving change can't move a date (PRD §4.1).
 - `views.ts`: what each view shows: its date range, the month grid, stepping, and the title (PRD §6).
 - `colours.ts`: the calendar palette and accent colours, and the text colour that reads on each (PRD §5.6).
+- `ical/`: our own iCalendar reader and writer (PRD §3.2, §3.3). `contentLine.ts` parses and formats one line, folds at 75 octets and handles text escapes. `document.ts` reads a file into an immutable tree of components and properties in file order. Each node read from disk keeps its physical lines, so an unedited file writes back byte for byte; a changed node is written fresh. Lines it can't read are kept and written back as they were; a file whose structure is broken is refused with a line number. `calendarFile.ts` reads the name and colour, fills in missing UIDs and stamps PRODID. The fixture corpus is in `packages/core/test/fixtures/ical/`.
 
 ## UI (`packages/ui`)
 

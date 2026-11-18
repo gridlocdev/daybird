@@ -1,0 +1,11 @@
+﻿BEGIN:VCALENDAR
+version:2.0
+prodid:-//Example//Tiny Tool 1.0//EN
+begin:vevent
+uid:lf-1@example.com
+dtstamp:20261117T000000Z
+dtstart:20261118T090000Z
+summary:Tab
+	folded
+end:vevent
+END:VCALENDAR
