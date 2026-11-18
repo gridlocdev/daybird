@@ -13,6 +13,7 @@ import {
   toggleCalendar,
 } from './calendarActions.ts';
 import { eventCommands } from './eventCommands.ts';
+import { fileCommands } from './fileCommands.ts';
 import { newEventNow } from './eventActions.ts';
 
 const VIEW_COMMANDS: readonly { view: View; title: string; key: string; n: number }[] = [
@@ -164,6 +165,7 @@ export function buildCommands(app: AppController): CommandCatalog {
       run: () => app.redo(),
     },
     ...eventCommands(app),
+    ...fileCommands(app),
     ...VIEW_COMMANDS.map((v): CommandSpec => ({
       id: `view.${v.view}`,
       title: v.title,
@@ -286,6 +288,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     Object.values(DIALOG_COMMAND).includes(c.id) ||
     // The ⋯ menu runs its own commands.
     (app.calendarMenu.peek() !== null && c.id.startsWith('calendar.')) ||
-    (app.eventMenu.peek() !== null && c.id.startsWith('event.'));
+    (app.eventMenu.peek() !== null && c.id.startsWith('event.')) ||
+    (app.trashMenu.peek() !== null && c.id.startsWith('trash.'));
   return catalog;
 }

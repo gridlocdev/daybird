@@ -18,6 +18,7 @@ import { DayListDialog } from './DayListDialog.tsx';
 import { EventPopover, ScopeDialog } from './EventPopover.tsx';
 import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
 import { RepeatDialog } from './RepeatDialog.tsx';
+import { ImportDialog, TrashQuestionDialog } from './TrashDialogs.tsx';
 import { DisplayZoneSelect } from './ZoneSelect.tsx';
 import { shortcutGroups } from './shortcuts.ts';
 
@@ -36,6 +37,10 @@ export function Dialogs({ app, catalog }: { readonly app: AppController; readonl
   const day = app.dayList.value;
   if (day) return <DayListDialog app={app} day={day} />;
   if (app.calendarDialog.value) return <CalendarDialogs app={app} />;
+  const trashQuestion = app.trashQuestion.value;
+  if (trashQuestion) return <TrashQuestionDialog app={app} q={trashQuestion} />;
+  const offer = app.importOffer.value;
+  if (offer) return <ImportDialog app={app} offer={offer} />;
   switch (app.dialog.value) {
     case 'commands':
       return <CommandMenu app={app} catalog={catalog} />;

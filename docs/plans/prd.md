@@ -237,9 +237,9 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 ### §7.7 Trash
 
 - Deleting an event (Delete or ⌫ on a selection, the popover's Delete, the context menu) moves the series or occurrence to `.daybird/trash.ics` with `X-DAYBIRD-CALENDAR` (the file name) and `X-DAYBIRD-DELETED` (UTC). Each deletion is one entry: its VEVENTs share `X-DAYBIRD-ENTRY`, and `X-DAYBIRD-KIND` says whether it was a series, a skipped occurrence or a changed occurrence. Restoring a skipped occurrence removes its `EXDATE`; when its series is gone it comes back as a single event. A restored series whose UID is taken gets a new one. No confirmation; the notice "Deleted Lunch." with Undo.
-- Deleting a calendar asks "Delete <name> and its N events?" and moves its file to `.daybird/trash/<file> <YYYY-MM-DD-HHmmss>.ics`.
-- The Trash view lists deleted events and calendars, newest first, with **Restore** and **Delete Permanently** (asks), and **Empty Trash** (asks, names the count, "can't be undone").
-- Items deleted more than 30 days ago are removed when the folder loads.
+- Deleting a calendar asks "Delete <name>?", says it and its N events move to the Trash, and moves its file to `.daybird/trash/<file> <YYYY-MM-DD-HHmmss>.ics`.
+- The Trash row under the calendars in the sidebar (with its count) opens the Trash view in the view's place; picking a view closes it. It lists deleted events and calendars, newest first, each with **Restore** and **Delete Permanently…** (asks), and **Empty Trash…** (asks, naming what goes; also in the Trash row's right-click menu). Restoring an event, deleting one for good and emptying the event trash are undo steps; a calendar file deleted for good can't come back, and the question says so. A restored calendar's file goes back under its old name, or the next free one ("Work 2.ics").
+- Items deleted more than 30 days ago are removed when the folder loads: trash entries and calendar files alike.
 
 ## §8 Repeating events
 
@@ -271,13 +271,14 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ## §10 Search
 
-- ⌘F or / focuses the search field. Typing filters occurrences by title, location and notes (case- and accent-insensitive), shown in the Agenda list, from a year back to two years ahead, nearest first. Enter shows the first in its day; Escape clears and returns to the previous view.
+- The search field sits at the right end of the toolbar. ⌘F or / focuses it. Typing lists the occurrences whose title, location or notes hold every typed word (case- and accent-insensitive) in the Agenda list, in the view's place, from a year back to two years ahead, nearest first: today and later days in order, then earlier days, latest first. The list stops after about 300 results and says so. Enter shows the first in its day, selected, and clears the search; Escape clears it and the view comes back.
 - Empty: "No events match "<text>"."
 
 ## §11 Import and export
 
 - **Import…** reads an `.ics` file and asks which calendar to add its events to (or a new one named after the file). Events whose UID already exists in that calendar are skipped, and the notice says "Imported N events (M already there)." with Undo.
-- **Export Calendar…** saves a copy of one calendar file. **Export All…** saves a `.zip` of every calendar (browser storage) — desktop and NAS users have the folder itself.
+- A file that isn't a calendar says why ("Couldn't import notes.ics: …"); one with no events says so. Events with no UID get one each. The time zones the imported events use come along.
+- **Export Calendar…** (in a calendar's menu too) saves a copy of one calendar file: the one whose menu is open, else the default. **Export All…** saves `Daybird Calendars <date>.zip` with every calendar file, stored without compression. It matters most in the browser, where the files have no folder, but every platform has it.
 
 ## §12 Commands and keys
 

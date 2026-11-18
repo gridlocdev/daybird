@@ -1,0 +1,108 @@
+/* Search (§10) and the Trash (§7.7) */
+.db-search {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 0 6px;
+  height: 26px;
+  border: 1px solid var(--db-line);
+  border-radius: var(--db-radius);
+  background: var(--db-window);
+  color: var(--db-text-2);
+}
+.db-search:focus-within {
+  border-color: var(--db-accent);
+  box-shadow: 0 0 0 2px var(--db-accent-soft);
+}
+.db-search input {
+  width: 160px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--db-text);
+  font: inherit;
+}
+.db-search-summary {
+  margin: 12px 16px 4px;
+  color: var(--db-text-2);
+}
+.db-sidebar-trash {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  min-height: 28px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--db-radius);
+  background: transparent;
+  color: var(--db-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.db-sidebar-trash:hover {
+  background: var(--db-hover);
+}
+.db-sidebar-trash.db-selected {
+  background: var(--db-pressed);
+}
+.db-sidebar-trash-label {
+  text-align: left;
+  flex: 1;
+}
+.db-count {
+  color: var(--db-text-3);
+  font-size: 12px;
+}
+.db-trash {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+.db-trash-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.db-trash-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.db-trash-header span {
+  flex: 1;
+  color: var(--db-text-2);
+}
+.db-trash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.db-trash-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas: 'title restore delete' 'detail restore delete';
+  align-items: center;
+  column-gap: 8px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--db-line-soft);
+}
+.db-trash-title {
+  grid-area: title;
+  font-weight: 600;
+}
+.db-trash-detail {
+  grid-area: detail;
+  color: var(--db-text-2);
+  font-size: 12px;
+}
+@media (max-width: 560px) {
+  .db-search input {
+    width: 90px;
+  }
+}

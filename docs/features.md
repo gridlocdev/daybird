@@ -38,6 +38,18 @@ Every IANA time zone works, and times show in your system's zone. Turn on Time z
 
 Year shows the twelve months of the year, each day tinted by how busy it is, in four steps from none to six or more events, with today ringed. Click a day to open it. Agenda lists every event from the chosen day on, grouped under day headings ("Today", "Tomorrow", "Thursday, November 19") with the time, a colour dot, the title and the location; days with nothing are left out. Scroll to the end, or click **Show 60 More Days**, to see further ahead, and **Show Earlier** at the top to look back. Click a row to select the event.
 
+## Search
+
+Press **⌘F** (**Ctrl+F**) or **/** and type: the events whose title, place or notes have every word you typed, in any case and with or without accents, take the view's place, from a year ago to two years ahead, the nearest first. **Enter** shows the first one in its day; **Escape** clears the search and brings the view back.
+
+## Trash
+
+Deleted events and calendars go to the Trash under the calendars in the sidebar, and stay 30 days. The Trash lists them newest first, each with Restore, which puts it back where it was, and Delete Permanently. Right-click **Trash**, or use the button in the Trash, to empty it. A deleted calendar is still a file in the folder's `.daybird/trash` until then.
+
+## Import and export
+
+**Import…** (**⇧⌘I**, **Ctrl+Shift+I**) reads an `.ics` file from another calendar app and adds its events to a calendar you choose, or to a new one named after the file; events already there are skipped, and Undo takes the import back. **Export Calendar…**, also in a calendar's menu, saves a copy of its file, and **Export All…** saves a `.zip` of every calendar.
+
 ## Moving through time
 
 The arrows beside **Today** move one day, week, month or year at a time, by the view, and **Today** comes back. The title says which range you are looking at. The sidebar's mini month shades that range; click a day there, or in the Year view, to show it.

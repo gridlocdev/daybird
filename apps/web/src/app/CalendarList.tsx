@@ -9,6 +9,7 @@ export const CALENDAR_MENU = [
   'calendar.rename',
   'calendar.colour',
   'calendar.setDefault',
+  'calendar.export',
   '|',
   'calendar.delete',
 ];

@@ -171,7 +171,7 @@ e2e *args: build-web-nas
 [group('quality')]
 [positional-arguments]
 e2e-update *args: build-web-nas
-    pnpm exec playwright test -c e2e/playwright.config.ts --project=web --update-snapshots "$@"
+    pnpm exec playwright test -c e2e/playwright.config.ts --project=web --update-snapshots=changed "$@"
 
 # Drive the app headlessly for a quick look: just drive cmd:"Month" key:KeyT shot:after aria
 [group('quality')]

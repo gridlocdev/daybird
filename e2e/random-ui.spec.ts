@@ -4,7 +4,7 @@
 // as its own scenario.
 import { readFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
-import { expect, openApp, readData, test, watchErrors } from './fixtures.ts';
+import { expect, openApp, readData, runCommand, test, watchErrors } from './fixtures.ts';
 import { createRandom } from './randomOps.ts';
 
 const STEPS = 40;
@@ -165,6 +165,10 @@ async function checkSettled(page: Page): Promise<void> {
   await expect(dialogs, 'Escape closes every dialog').toHaveCount(0);
   // Until these timers fire, the saved state can show while a change is still on its way to the file.
   await page.clock.runFor(SETTLE_MS);
+  // A reload leaves search and the Trash and shows the view under them, so take those away first.
+  await page.getByRole('searchbox', { name: 'Search' }).fill('');
+  if ((await page.getByRole('main').getAttribute('aria-label')) === 'Trash')
+    await runCommand(page, 'Show Trash');
   const before = await shown(page);
   await openApp(page);
   await page.clock.runFor(SETTLE_MS);

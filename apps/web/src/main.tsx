@@ -2,6 +2,7 @@ import { effect } from '@preact/signals';
 import { render } from 'preact';
 import '@daybird/ui/styles.css';
 import './app.css';
+import './lists.css';
 import {
   BrowserStore,
   FolderSession,
@@ -22,6 +23,7 @@ import { App } from './app/App.tsx';
 import { buildCommands } from './app/commands.ts';
 import { AppController, type FolderChooser } from './app/controller.ts';
 import { loadFolderSettings } from './app/calendarActions.ts';
+import { loadTrashedCalendars } from './app/trashActions.ts';
 import { nativeBridge, type DaybirdNative, type NativeFolder } from './app/native.ts';
 import { menuSender, nativeMenu, watchMenuInputs } from './app/nativeMenu.ts';
 import pkg from '../package.json';
@@ -102,6 +104,7 @@ async function openStore(
   });
   app.attach(session);
   await loadFolderSettings(app);
+  await loadTrashedCalendars(app, true);
   return true;
 }
 

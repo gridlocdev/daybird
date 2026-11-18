@@ -1,9 +1,10 @@
 import { useRef, useState } from 'preact/hooks';
 import { addMonths, countsByDay, dayBounds, formatPlainDate, monthGrid, startOfMonth } from '@daybird/core';
-import { Icon, type CommandCatalog } from '@daybird/ui';
+import { Icon, PopupMenu, type CommandCatalog } from '@daybird/ui';
 import { CalendarList } from './CalendarList.tsx';
 import type { AppController } from './controller.ts';
 import { MiniMonth } from './MiniMonth.tsx';
+import { showTrash, trashCount } from './trashActions.ts';
 
 /**
  * The sidebar (PRD §5.2): a mini month whose arrows page it without moving the view, then the calendars.
@@ -55,6 +56,7 @@ export function Sidebar({ app, catalog }: { readonly app: AppController; readonl
         onPick={(d) => app.goTo(d)}
       />
       <CalendarList app={app} catalog={catalog} />
+      <TrashRow app={app} catalog={catalog} />
     </aside>
   );
 }
@@ -107,5 +109,43 @@ function SidebarEdge(props: {
         e.stopPropagation();
       }}
     />
+  );
+}
+
+/** The Trash row under the calendars (§7.7): opens the Trash view; its right-click menu offers Empty Trash. */
+function TrashRow({ app, catalog }: { readonly app: AppController; readonly catalog: CommandCatalog }) {
+  const count = trashCount(app);
+  const shown = app.trashShown.value;
+  const menu = app.trashMenu.value;
+  return (
+    <>
+      <button
+        type="button"
+        class={`db-sidebar-trash${shown ? ' db-selected' : ''}`}
+        aria-pressed={shown}
+        aria-label={count ? `Trash, ${count} item${count === 1 ? '' : 's'}` : 'Trash, empty'}
+        onClick={() => showTrash(app, !shown)}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          app.trashMenu.value = { x: e.clientX, y: e.clientY };
+        }}
+      >
+        <Icon name="trash" />
+        <span class="db-sidebar-trash-label">Trash</span>
+        {count > 0 && <span class="db-count">{count}</span>}
+      </button>
+      {menu && (
+        <PopupMenu
+          label="Trash menu"
+          catalog={catalog}
+          items={['trash.empty']}
+          x={menu.x}
+          y={menu.y}
+          onClose={() => {
+            app.trashMenu.value = null;
+          }}
+        />
+      )}
+    </>
   );
 }

@@ -1,6 +1,6 @@
 // Creating, editing and deleting events (PRD §7.1, §7.2, §7.7, §8.2). The page clock is Tuesday 17 November 2026,
 // 14:00 UTC, and the display zone is UTC.
-import { expect, icsWith, openApp, putPrivateFiles, test } from './fixtures.ts';
+import { expect, icsWith, openApp, privateText, putPrivateFiles, test } from './fixtures.ts';
 import type { Page } from '@playwright/test';
 
 const popover = (page: Page) => page.getByRole('dialog', { name: /^Edit / });
@@ -45,6 +45,7 @@ test.describe('Creating and editing events', () => {
     await page.keyboard.press('Enter');
     await expect(popover(page)).toHaveCount(0);
     await expect(event(page, 'Dentist')).toBeVisible();
+    await expect.poll(() => privateText(page, 'Calendar.ics')).toContain('SUMMARY:Dentist');
     await openApp(page);
     await page.keyboard.press('d');
     await expect(event(page, 'Dentist')).toBeVisible();

@@ -34,7 +34,18 @@ Single-letter keys only work when you aren't typing in a box.
 | --- | --- | --- |
 | New calendar | **⌥⌘N** or **+** beside Calendars | **Ctrl+Alt+N** or **+** beside Calendars |
 | Show or hide a calendar | Click its checkbox | Click its checkbox |
-| Rename, colour, default or delete | Right-click it, or **⋯** on its row | Right-click it, or **⋯** on its row |
+| Rename, colour, default, export or delete | Right-click it, or **⋯** on its row | Right-click it, or **⋯** on its row |
+| Import an .ics file | **⇧⌘I** | **Ctrl+Shift+I** |
+| Show the Trash | Click **Trash** under the calendars | Click **Trash** under the calendars |
+| Empty the Trash | Right-click **Trash** | Right-click **Trash** |
+
+## Search
+
+| Action                           | macOS                       | Windows / Linux               |
+| -------------------------------- | --------------------------- | ----------------------------- |
+| Search                           | **⌘F** or **/**             | **Ctrl+F** or **/**           |
+| Show the first result in its day | **↩** in the search field   | **Enter** in the search field |
+| Clear the search                 | **Esc** in the search field | **Esc** in the search field   |
 
 ## Views
 

@@ -16,6 +16,7 @@ import {
   viewRange,
   type Accent,
   type Calendar,
+  type ComponentNode,
   type CustomRepeat,
   type DateRange,
   type EventPatch,
@@ -38,6 +39,7 @@ import {
   type Settings,
   type SettingsStorage,
   type Theme,
+  type TrashedCalendar,
 } from '@daybird/ui';
 
 /** Which occurrence is selected: at most one in every view (PRD §6). */
@@ -84,6 +86,19 @@ export type ScopeQuestion =
       readonly toCalendar: string | null;
     }
   | { readonly action: 'delete'; readonly ref: OccurrenceRef };
+
+/** Delete Permanently or Empty Trash, waiting for a yes (§7.7). */
+export type TrashQuestion =
+  | { readonly kind: 'empty' }
+  | { readonly kind: 'entry'; readonly id: string; readonly title: string }
+  | { readonly kind: 'calendar'; readonly calendar: TrashedCalendar };
+
+/** A file read for Import, waiting for the calendar to put its events in (§11). */
+export interface ImportOffer {
+  readonly fileName: string;
+  readonly document: ComponentNode;
+  readonly count: number;
+}
 
 /** A calendar's dialogs (PRD §5.2): naming a new one, renaming, its colour, and deleting it. */
 export type CalendarDialog = 'new' | 'rename' | 'colour' | 'delete';
@@ -202,6 +217,16 @@ export class AppController {
   readonly scopeQuestion = signal<ScopeQuestion | null>(null);
   /** The day whose "N more" list is open in Month view (§6.2). */
   readonly dayList = signal<PlainDate | null>(null);
+  /** The search field's text (§10); while it has any, the results take the view's place. */
+  readonly search = signal('');
+  /** The Trash view takes the view's place (§7.7). */
+  readonly trashShown = signal(false);
+  /** Calendar files in the folder's trash, read when the folder opens and when the Trash view does. */
+  readonly trashedCalendars = signal<readonly TrashedCalendar[]>([]);
+  readonly trashQuestion = signal<TrashQuestion | null>(null);
+  /** The Trash row's right-click menu. */
+  readonly trashMenu = signal<{ readonly x: number; readonly y: number } | null>(null);
+  readonly importOffer = signal<ImportOffer | null>(null);
 
   readonly #storage: SettingsStorage;
   readonly #now: () => number;
@@ -256,8 +281,12 @@ export class AppController {
     this.#storage.save(next);
   }
 
+  /** Shows a view, in place of the Trash view too. */
   setView(view: View): void {
-    if (this.view.peek() !== view) this.update({ view });
+    batch(() => {
+      this.trashShown.value = false;
+      if (this.view.peek() !== view) this.update({ view });
+    });
   }
 
   /** ‹ and › (PRD §6.5). */
@@ -346,6 +375,9 @@ export class AppController {
       this.editor.peek() !== null ||
       this.repeatDialog.peek() !== null ||
       this.scopeQuestion.peek() !== null ||
+      this.trashQuestion.peek() !== null ||
+      this.trashMenu.peek() !== null ||
+      this.importOffer.peek() !== null ||
       this.folderQuestion.peek()
     );
   }

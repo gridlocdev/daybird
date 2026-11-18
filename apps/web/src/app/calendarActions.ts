@@ -9,6 +9,7 @@ import {
 } from '@daybird/core';
 import { readFolderSettings, writeFolderSettings } from '@daybird/ui';
 import type { AppController, CalendarDialog } from './controller.ts';
+import { loadTrashedCalendars, showTrash } from './trashActions.ts';
 
 const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -104,7 +105,8 @@ export async function deleteCalendar(app: AppController, id: string): Promise<vo
     await session.deleteCalendar(id);
     const hidden = app.settings.peek().hiddenCalendars;
     if (hidden.includes(id)) app.update({ hiddenCalendars: hidden.filter((h) => h !== id) });
-    app.say(`Deleted ${calendar.name}. Its file is in the folder’s .daybird/trash.`);
+    app.say(`Deleted ${calendar.name}.`, { action: { label: 'Show Trash', run: () => showTrash(app) } });
+    await loadTrashedCalendars(app);
   } catch (e) {
     app.say(`Couldn’t delete ${calendar.name}: ${message(e)}`, { tone: 'error' });
   }

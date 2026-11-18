@@ -100,8 +100,8 @@ export function CalendarDialogs({ app }: { readonly app: AppController }) {
           }
         >
           <p>
-            {calendar!.name} and its {plural(count, 'event')} leave Daybird. The file {calendar!.id} moves to
-            the folder’s .daybird/trash, so you can put it back by hand.
+            {calendar!.name} and its {plural(count, 'event')} move to the Trash, where you can restore them
+            for 30 days.
           </p>
         </Dialog>
       );

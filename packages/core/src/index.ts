@@ -295,3 +295,5 @@ export {
   type RepeatClock,
   type RepeatPreset,
 } from './model/repeat.ts';
+export { matchesSearch, nearestFirst, searchKey, searchRange } from './model/search.ts';
+export { importEvents, importableSeries, type ImportResult } from './model/importing.ts';

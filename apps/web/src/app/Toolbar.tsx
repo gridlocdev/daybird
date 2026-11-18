@@ -1,6 +1,7 @@
 import { VIEWS, type View } from '@daybird/core';
 import { Icon, type CommandCatalog } from '@daybird/ui';
 import type { AppController } from './controller.ts';
+import { SearchField } from './SearchView.tsx';
 import { DisplayZoneSelect } from './ZoneSelect.tsx';
 
 const VIEW_TITLES: Readonly<Record<View, string>> = {
@@ -84,7 +85,7 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
           <button
             key={v}
             type="button"
-            aria-pressed={view === v}
+            aria-pressed={view === v && !app.trashShown.value}
             title={tip(catalog, `view.${v}`)}
             onClick={() => catalog.run(`view.${v}`)}
           >
@@ -92,6 +93,7 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
           </button>
         ))}
       </div>
+      <SearchField app={app} catalog={catalog} />
     </header>
   );
 }

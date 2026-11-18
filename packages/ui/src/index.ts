@@ -111,3 +111,12 @@ export {
   type SessionNotice,
   type SessionOptions,
 } from './folder/sessionTypes.ts';
+export {
+  CALENDAR_TRASH_DIR,
+  parseTrashedName,
+  purgeTrashedCalendars,
+  restoreTrashedCalendar,
+  trashedCalendars,
+  type TrashedCalendar,
+} from './folder/calendarTrash.ts';
+export { zipFiles } from './platform/zip.ts';

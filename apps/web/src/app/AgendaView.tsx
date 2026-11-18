@@ -89,7 +89,7 @@ function endWatcher(onSeen: () => void): (el: HTMLElement | null) => void {
   };
 }
 
-function AgendaDay(props: {
+export function AgendaDay(props: {
   readonly app: AppController;
   readonly date: PlainDate;
   readonly items: readonly Occurrence[];
