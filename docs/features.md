@@ -1,6 +1,6 @@
 # Features
 
-Daybird is a calendar that keeps each calendar in a plain `.ics` file. This page grows with each release; the [product requirements](plans/prd.md) describe everything planned for 1.0.
+Daybird is a calendar that keeps each calendar in a plain `.ics` file and puts every action on a key. [Controls](controls.md) lists the keys, and [Getting started](getting-started.md) covers installing it.
 
 ## Calendar views
 
@@ -80,4 +80,4 @@ The `daybird` command lists, adds, changes and deletes events in a calendar fold
 
 ## Desktop, browser and NAS
 
-The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar. Open an `.ics` file with Daybird from the Finder or the Explorer and it asks which calendar to import it into. On a Mac, closing the window keeps Daybird in the Dock and its reminders keep ringing.
+The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar. Open an `.ics` file with Daybird from the Finder or the Explorer, or pass it to the app on the command line on Linux, and it asks which calendar to import it into. On a Mac, closing the window keeps Daybird in the Dock and its reminders keep ringing.
