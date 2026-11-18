@@ -330,6 +330,13 @@ kbd {
 .db-dialog-body p {
   margin: 0 0 10px;
 }
+.db-choices {
+  margin: 0;
+  padding-left: 18px;
+}
+.db-choices li {
+  margin-bottom: 6px;
+}
 .db-dialog-actions {
   display: flex;
   justify-content: flex-end;

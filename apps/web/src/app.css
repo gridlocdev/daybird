@@ -356,6 +356,10 @@
   background: var(--db-window);
   font-size: 12px;
 }
+.db-where {
+  flex: none;
+  color: var(--db-text-2);
+}
 .db-notice {
   flex: 1;
   min-width: 0;

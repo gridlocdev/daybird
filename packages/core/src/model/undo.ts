@@ -120,3 +120,12 @@ export function mergeSteps(first: UndoStep, second: UndoStep): UndoStep {
 export function clearUndo(): UndoStack {
   return EMPTY_UNDO;
 }
+
+/**
+ * Forgets a calendar whose file went from the folder or was taken over its changes (§3.5): every step that changed
+ * it goes, so undo can never bring back a calendar whose file is gone, or write an old version over the disk's.
+ */
+export function withoutCalendarSteps(stack: UndoStack, calendarId: string): UndoStack {
+  const keep = (s: UndoStep) => !s.before.has(calendarId) && !s.after.has(calendarId);
+  return { done: stack.done.filter(keep), undone: stack.undone.filter(keep) };
+}

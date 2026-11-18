@@ -18,6 +18,10 @@ The arrows beside **Today** move one day, week, month or year at a time, by the 
 
 Settings (**⌘,** or **Ctrl+,**) chooses light, dark or the system's appearance, an accent colour, the first day of the week (or your region's), and whether to show week numbers.
 
+## Saving
+
+Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it back. If a calendar file changes somewhere else while this window has changes to it that aren't saved yet, Daybird asks what to keep: your version as a copy, your version over theirs, or theirs. Changes made in other apps show up when you come back to the window. If a window closes before it can save, the next one offers to put those changes back. In a browser that can't open a folder, calendars are kept in the browser itself, and the status bar says so.
+
 ## Desktop, browser and NAS
 
 The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar.

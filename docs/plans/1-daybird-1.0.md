@@ -12,7 +12,7 @@ Each slice leaves `just check` green and fits one session. "Waits on" names the 
 
 ## Storage
 
-- [ ] **6. Store interface.** Folder of files with per-file versions: `MemoryStore`, `BrowserStore` (File System Access + storage fallback), the contract test; save session statechart, retries, conflict dialog, recovery snapshot, outside-change pickup (§3.1, §3.4–§3.7). Waits on 5.
+- [x] **6. Store interface.** Folder of files with per-file versions: `MemoryStore`, `BrowserStore` (File System Access + storage fallback), the contract test; save session statechart, retries, conflict dialog, recovery snapshot, outside-change pickup (§3.1, §3.4–§3.7). Waits on 5.
 - [ ] **7. Desktop store and folder picking.** Node file store with atomic writes and lock files, Open Calendar Folder…, first-start folder offer (§3.7, §14). Waits on 6.
 
 ## Views

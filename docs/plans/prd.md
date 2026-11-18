@@ -27,7 +27,7 @@ Daybird is a calendar for one person. It runs as a desktop app (Electron), in th
 - A calendar's name is its `X-WR-CALNAME`, or the file name without `.ics` when that's missing. Its colour is `X-APPLE-CALENDAR-COLOR` (`#RRGGBB`, the property Apple Calendar reads and writes); a missing or unreadable colour gets the next unused colour from §5.6.
 - A new calendar is written as `<name>.ics`, with characters not allowed in file names replaced by `-`, and ` 2`, ` 3`… added when the name is taken. Renaming a calendar changes `X-WR-CALNAME` only, never the file name, so other programs keep their path.
 - An empty folder gets one calendar, `Calendar.ics`, on first start (no welcome card).
-- `.daybird/settings.json` holds the settings that follow the folder (§13): the default calendar. `.daybird/trash.ics` holds deleted events (§7.7). `.daybird/trash/` holds deleted calendar files.
+- `.daybird/settings.json` holds the settings that follow the folder (§13): the default calendar. `.daybird/trash.ics` holds deleted events (§7.7). `.daybird/trash/` holds deleted calendar files. A `trash.ics` Daybird can't read is moved aside as `.daybird/trash unreadable <YYYY-MM-DD-HHmmss>.ics`, never written over, and a new trash starts.
 
 ### §3.2 Reading a calendar file
 
@@ -50,19 +50,21 @@ Daybird is a calendar for one person. It runs as a desktop app (Electron), in th
 - Every change is saved immediately. Each calendar file saves on its own; saves to one file never overlap (a change during a save is saved right after it).
 - Saves are atomic: write a temp file next to it, flush, rename over the file. A symlink stays a symlink.
 - The desktop app, the NAS server and the CLI hold a lock file (`.<name>.ics.lock`) while checking the version and writing; a lock older than 10 s is taken over. Browser tabs use a Web Lock.
-- A failed save is retried twice (300 ms, 600 ms), then the status bar shows "Couldn't save <calendar>." with **Try again** until a save works, then "Saved." The unsaved calendar is kept in the browser's storage until then (§3.6).
+- A failed save is retried twice (300 ms, 600 ms), then the status bar shows "Couldn't save <calendar>." with **Try Again** until a save works, then "Saved." The unsaved calendar is kept in the browser's storage until then (§3.6).
 - Settings changes are saved but aren't undo steps.
 
 ### §3.5 Versions and conflicts
 
 - Every read returns a version per file (SHA-256 of its bytes). Every save sends the version last read or written; a different version on disk fails the save with a conflict.
 - The conflict dialog, "<Calendar> changed somewhere else", says how many events differ and offers **Save Mine as a Copy** (default: write `<name> copy <YYYY-MM-DD-HHmmss>.ics`, which then shows as its own calendar, and load the file on disk), **Keep Mine** and **Use Theirs**. Nothing merges, nothing overwrites without the user choosing.
+- The copy is named "<name> copy" and gets the next unused colour. It is written before anything is taken from disk, so a copy that can't be written leaves the dialog open.
+- A file deleted elsewhere under unsaved changes opens the same dialog, "<Calendar> was deleted somewhere else": **Save Mine as a Copy** writes the copy and removes the calendar, **Keep Mine** writes the file again, and **Use Theirs** removes the calendar. While the dialog is open, edits go on and are kept; nothing is saved to that file until the user chooses.
 - Changes made elsewhere (Apple Calendar, the CLI, another window) are picked up when the window comes to the front and every 15 s while it's in front, file by file. A changed file with nothing unsaved in this window is taken as one undo step, with "Updated <calendar> with N changes made elsewhere." and Undo. New `.ics` files appear as calendars; a removed file removes its calendar with "<Calendar> was removed from the folder." (no undo: the file is gone).
 
 ### §3.6 Recovery
 
 - Every 30 s while anything is unsaved, and on closing, the unsaved calendars are written to the browser's storage (desktop: the app's data folder) as a snapshot.
-- On start, a snapshot newer than its file opens the recovery dialog: **Restore** (shows the snapshot as unsaved changes, then saves through the normal conflict check) or **Discard**. Restore is the default.
+- On start, a snapshot newer than its file opens the recovery dialog: **Restore** (shows the snapshot as unsaved changes, then saves through the normal conflict check) or **Discard**. Restore is the default. Restore is one undo step, "Restore Unsaved Changes". Nothing in the offered files is saved until the user chooses. A snapshot left by a window that is still open is never offered.
 
 ### §3.7 Where the folder lives
 

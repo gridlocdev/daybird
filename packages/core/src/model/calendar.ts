@@ -160,3 +160,22 @@ export function readSeries(series: EventSeries): { master: EventInfo | null; ove
     overrides: series.overrides.map(readEvent),
   };
 }
+
+/** Characters a file name can't have on some disk. Control characters become `-` too (`safeName`). */
+const UNSAFE = /[\\/:*?"<>|]/g;
+
+const safeName = (name: string) =>
+  [...name.replace(UNSAFE, '-')].map((ch) => (ch.charCodeAt(0) < 32 ? '-' : ch)).join('');
+
+/**
+ * The file name for a new calendar (§3.1): its name with unsafe characters as `-`, and ` 2`, ` 3`… when the name
+ * is taken. `taken` compares without case, as macOS and Windows disks do.
+ */
+export function calendarFileName(name: string, taken: readonly string[]): string {
+  const base = safeName(name).replace(/^\.+/, '-').trim() || 'Calendar';
+  const used = new Set(taken.map((t) => t.toLowerCase()));
+  for (let i = 1; ; i++) {
+    const file = `${base}${i === 1 ? '' : ` ${i}`}.ics`;
+    if (!used.has(file.toLowerCase())) return file;
+  }
+}

@@ -19,6 +19,7 @@ import {
 import {
   HOUR_HEIGHTS,
   after,
+  type FolderSession,
   resolveWeekStart,
   type Settings,
   type SettingsStorage,
@@ -58,6 +59,15 @@ export class AppController {
   readonly notice = signal<Notice | null>(null);
   /** What the polite live region reads out; the notice text, and other changes worth hearing. */
   readonly announcement = signal('');
+
+  /** The open calendar folder; null until it has loaded. */
+  readonly session = signal<FolderSession | null>(null);
+  readonly canUndo = computed(() => (this.session.value?.undoStack.value.done.length ?? 0) > 0);
+  readonly canRedo = computed(() => (this.session.value?.undoStack.value.undone.length ?? 0) > 0);
+  /** A question about the folder waits: restoring unsaved changes, or a conflict (PRD §3.5, §3.6). */
+  readonly folderQuestion = computed(
+    () => !!this.session.value?.recovery.value || (this.session.value?.conflicts.value.length ?? 0) > 0,
+  );
 
   readonly view;
   readonly weekStart;
@@ -160,7 +170,24 @@ export class AppController {
 
   /** A dialog is open, so plain keys and most commands wait. */
   blocked(): boolean {
-    return this.dialog.peek() !== null;
+    return this.dialog.peek() !== null || this.folderQuestion.peek();
+  }
+
+  /** The folder has loaded. */
+  attach(session: FolderSession): void {
+    this.session.value = session;
+  }
+
+  /** ⌘Z: takes back the last change and says which (PRD §7.6). */
+  undo(): void {
+    const label = this.session.peek()?.undo();
+    if (label) this.say(`Undid ${label}.`);
+  }
+
+  /** ⇧⌘Z. */
+  redo(): void {
+    const label = this.session.peek()?.redo();
+    if (label) this.say(`Redid ${label}.`);
   }
 
   /** Shows a notice in the status bar and reads it out (PRD §5.5). */

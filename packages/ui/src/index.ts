@@ -49,3 +49,52 @@ export { Dialog } from './components/Dialog.tsx';
 export { focusables, trapIndex, trapTab } from './components/focusTrap.ts';
 export { Icon } from './components/Icon.tsx';
 export { ListPopup, listStep } from './components/ListPopup.tsx';
+export {
+  BrowserStore,
+  ConflictError,
+  MemoryStore,
+  NotFoundError,
+  baseName,
+  decodeText,
+  encodeText,
+  joinPath,
+  parentOf,
+  persistStorage,
+  privateFolder,
+  versionOf,
+  type CalendarStore,
+  type ConflictReason,
+  type Entry,
+  type FileData,
+  type StoreKind,
+  type WriteOptions,
+} from './platform/index.ts';
+export { localSnapshots } from './platform/localSnapshots.ts';
+export {
+  SAVE_TRANSITIONS,
+  hasUnsaved,
+  step as saveStep,
+  toMermaid as saveChartMermaid,
+  type Effect as SaveEffect,
+  type SaveEvent,
+  type SaveState,
+  type Transition as SaveTransition,
+} from './folder/saveChart.ts';
+export {
+  memorySnapshots,
+  parseSnapshot,
+  type Snapshot,
+  type SnapshotFile,
+  type SnapshotStorage,
+} from './folder/snapshots.ts';
+export { FolderSession } from './folder/folderSession.ts';
+export {
+  RETRY_DELAYS,
+  SNAPSHOT_MS,
+  TRASH_PATH,
+  type Conflict,
+  type ConflictChoice,
+  type RecoveryOffer,
+  type SessionNotice,
+  type SessionOptions,
+} from './folder/sessionTypes.ts';

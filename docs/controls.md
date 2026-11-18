@@ -4,6 +4,13 @@ Every action is in the menu bar, in the **command menu** (**⌘K** on a Mac, **C
 
 Single-letter keys only work when you aren't typing in a box.
 
+## Editing
+
+| Action | macOS             | Windows / Linux                |
+| ------ | ----------------- | ------------------------------ |
+| Undo   | **⌘Z**            | **Ctrl+Z**                     |
+| Redo   | **⇧⌘Z** or **⌘Y** | **Ctrl+Shift+Z** or **Ctrl+Y** |
+
 ## Views
 
 | Action                   | macOS           | Windows / Linux     |

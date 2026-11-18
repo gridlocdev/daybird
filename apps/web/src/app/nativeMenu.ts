@@ -15,10 +15,7 @@ import type { AppController } from './controller.ts';
 const BREAKS = new Set(['view.sidebar', 'view.themeAuto', 'go.today', 'help.shortcuts']);
 
 /** Cut, Copy, Paste and Select All are Electron roles, so text fields get real clipboard events. */
-const EDIT_ROLES: readonly NativeMenuItem[] = [
-  { role: 'undo' },
-  { role: 'redo' },
-  { type: 'separator' },
+const CLIPBOARD_ROLES: readonly NativeMenuItem[] = [
   { role: 'cut' },
   { role: 'copy' },
   { role: 'paste' },
@@ -55,9 +52,7 @@ export function nativeMenu(catalog: CommandCatalog): NativeMenuItem[] {
       if (BREAKS.has(c.id) && items.length > 0) items.push({ type: 'separator' });
       items.push(item(catalog, c));
     }
-    // Until events can be edited, Edit holds the text-field roles only.
-    if (group === 'Edit' && !items.some((i) => 'command' in i && i.command === 'edit.undo'))
-      items.unshift(...EDIT_ROLES);
+    if (group === 'Edit') items.push({ type: 'separator' }, ...CLIPBOARD_ROLES);
     return { label: group, submenu: items };
   }).filter((m) => 'submenu' in m && m.submenu && m.submenu.length > 0);
 }
@@ -88,6 +83,9 @@ export function watchMenuInputs(app: AppController, changed: () => void, settleM
   const stop = effect(() => {
     void app.settings.value;
     void app.dialog.value;
+    void app.folderQuestion.value;
+    void app.canUndo.value;
+    void app.canRedo.value;
     later.call();
   });
   return () => {

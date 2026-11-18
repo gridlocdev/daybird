@@ -154,6 +154,7 @@ export {
 } from './ical/values.ts';
 export { fileZones, readVTimezone, vtimezoneFor, withVTimezones } from './ical/vtimezone.ts';
 export {
+  calendarFileName,
   emptyCalendarDocument,
   findSeries,
   loadCalendar,
@@ -221,8 +222,10 @@ export {
   pushStep,
   redo,
   undo,
+  withoutCalendarSteps,
   type UndoResult,
   type UndoStack,
   type UndoStep,
 } from './model/undo.ts';
 export { checkInvariants } from './model/invariants.ts';
+export { countEventChanges } from './model/compare.ts';

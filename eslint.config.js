@@ -14,7 +14,7 @@ export default tseslint.config(
       '**/out/**',
       '**/release/**',
       '**/.types/**',
-      '.types-test/**',
+      '**/.types-test/**',
       '.types-e2e/**',
       '.e2e-data/**',
       '.e2e-results/**',

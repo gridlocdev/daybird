@@ -45,6 +45,50 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
 - `commands/`: the `CommandCatalog`. Shortcuts are parsed once; `forEvent` turns a key press into a command, a wait for the second key of a sequence, or nothing (PRD §12). `listenForKeys` is the one key listener.
 - `settings.ts`: the per-device settings and where they are kept (PRD §13).
 - `components/`: `Dialog` (modal, focus trap, Esc), `ListPopup` and the `Icon` set.
+- `platform/`: where the folder lives (PRD §3.7). `CalendarStore` is the one interface the app reads and writes files through, with folder-relative paths and a SHA-256 version per file; a conditional write refuses with `ConflictError` when the file changed or went. `MemoryStore` is for tests and as the last fallback, `BrowserStore` wraps a browser folder handle (the private folder, or one the user picked) and holds a Web Lock per file while it checks and writes. `localSnapshots.ts` keeps recovery snapshots in local storage, one per window, with a Web Lock that tells a live window's snapshot from a closed one's. The contract test in `packages/ui/test/storeContract.test.ts` runs every store through the same cases.
+- `folder/`: the open folder. `FolderSession` holds the workspace and the undo stack as signals and runs one save chart per file (below). `sessionTypes.ts` has its types and constants, `sessionFiles.ts` the pure helpers that read and write one file, and `snapshots.ts` the snapshot format.
+
+## Saving
+
+Each file (each calendar, and the trash) has its own copy of the save chart in `packages/ui/src/folder/saveChart.ts` (PRD §3.4–§3.6). `FolderSession` fires an event, the chart says which state comes next and which effects to run, and the session runs them. `saveChart.test.ts` drives the chart with random events against a model of the disk and checks its promises: never two writes at once, nothing written over a conflict until the user chooses, and unsaved changes always in the recovery snapshot. `folderSessionRandom.test.ts` does the same with the real session, a `MemoryStore` that fails writes on demand, and changes made elsewhere; at the end the disk holds exactly what the window shows.
+
+```mermaid
+stateDiagram-v2
+  [*] --> clean
+  clean --> saving : edit / keepCopy, writeFile
+  clean --> clean : outsideChange / takeFile
+  clean --> removed : outsideDelete / takeFile
+  saving --> savingDirty : edit / keepCopy
+  saving --> clean : saved / dropCopy, clearReport
+  saving --> retrying : failed / scheduleRetry
+  saving --> failed : failedFinal / report
+  saving --> conflict : versionChanged / flag
+  savingDirty --> savingDirty : edit / keepCopy
+  savingDirty --> saving : saved / writeFile
+  savingDirty --> retrying : failed / scheduleRetry
+  savingDirty --> failed : failedFinal / report
+  savingDirty --> conflict : versionChanged / flag
+  retrying --> retrying : edit / keepCopy
+  retrying --> saving : retryTimer / writeFile
+  retrying --> conflict : outsideChange / cancelRetry, flag
+  retrying --> conflict : outsideDelete / cancelRetry, flag
+  failed --> saving : edit / keepCopy, writeFile
+  failed --> saving : tryAgain / writeFile
+  failed --> conflict : outsideChange / flag
+  failed --> conflict : outsideDelete / flag
+  conflict --> conflict : edit / keepCopy
+  conflict --> clean : saveCopy / replaceWithFile, unflag, dropCopy
+  conflict --> saving : keepMine / unflag, overwriteFile
+  conflict --> clean : useTheirs / replaceWithFile, unflag, dropCopy
+  conflict --> removed : gone / replaceWithFile, unflag, dropCopy
+  removed --> saving : edit / keepCopy, writeFile
+```
+
+- `writeFile` sends the version last read or written; `overwriteFile` (Keep Mine) sends none. A new file is written with `create`, so it never replaces one that appeared meanwhile.
+- `keepCopy` marks the file for the next recovery snapshot; `dropCopy` unmarks it once the disk has every change.
+- `takeFile` takes a file changed elsewhere as one undo step; a file that went removes its calendar. `replaceWithFile` does the same after the user chose Use Theirs or Save Mine as a Copy.
+- `flag` opens the conflict dialog, `unflag` closes it. `report` and `clearReport` show and clear "Couldn’t save <calendar>." in the status bar.
+- `refresh` reads only files in `clean`, `retrying` or `failed`, and skips a file whose own write landed during the read.
 
 ## Web shell (`apps/web`)
 
