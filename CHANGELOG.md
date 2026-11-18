@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.1 - 2026-11-17
+
+- The ‹ Today › buttons in the toolbar stay put as the title changes width: the title keeps room for its longest form, and the buttons sit centred between it and the view buttons.
+
 ## 1.0.0 - 2026-11-17
 
 The first release.
