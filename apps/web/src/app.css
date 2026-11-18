@@ -259,22 +259,38 @@
   padding: 6px 8px;
   text-align: right;
 }
-.db-month-cells {
+.db-month-weeks {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(var(--db-weeks), 1fr);
+  display: flex;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
+}
+/* Each week is one grid: the cells fill every row, and bars, lines and "N more" sit in lanes over them. */
+.db-month-week {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  /* The last row takes what the lanes leave, so the cells reach the bottom of the week. */
+  grid-template-rows: var(--db-month-head) repeat(var(--db-lanes), var(--db-lane)) minmax(0, 1fr);
+  overflow: hidden;
 }
 .db-month-cell {
+  grid-row: 1 / -1;
   position: relative;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
-  padding: 4px 6px;
+  padding: 3px 4px;
   border-right: 1px solid var(--db-line-soft);
   border-bottom: 1px solid var(--db-line-soft);
   min-height: 0;
+}
+.db-month-week > :not(.db-month-cell) {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
 }
 .db-month-cell.db-weekend {
   background: var(--db-weekend);
@@ -285,17 +301,83 @@
 }
 .db-month-cell .db-day-number {
   min-width: 22px;
-  height: 22px;
+  height: 20px;
   padding: 0 6px;
-  border-radius: 11px;
-  line-height: 22px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: 20px;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.db-month-cell .db-day-number:hover {
+  background: var(--db-hover);
 }
 .db-month-cell.db-today .db-day-number {
   background: var(--db-accent);
   color: var(--db-accent-text);
   font-weight: 650;
+}
+.db-month-week .db-bar {
+  height: calc(var(--db-lane) - 2px);
+  align-self: center;
+}
+.db-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 2px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--db-text);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: default;
+}
+.db-line:hover {
+  background: var(--db-hover);
+}
+.db-line.db-selected {
+  background: var(--db-c);
+  color: #fff;
+}
+.db-line.db-past {
+  opacity: 0.6;
+}
+.db-line:focus-visible {
+  outline: 2px solid var(--db-accent);
+  outline-offset: -1px;
+}
+.db-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--db-c);
+}
+.db-line-time {
+  flex: 0 1000 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--db-text-2);
+  font-variant-numeric: tabular-nums;
+}
+.db-line.db-selected .db-line-time {
+  color: inherit;
+}
+.db-line-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .db-week-number {
   position: absolute;
@@ -592,4 +674,16 @@
 }
 .db-more:hover {
   background: var(--db-hover);
+}
+.db-day-list-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.db-day-list-items .db-line {
+  width: 100%;
+  height: 28px;
+  font-size: 13px;
 }

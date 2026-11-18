@@ -243,3 +243,13 @@ export {
   type Timed,
 } from './layout/timeGrid.ts';
 export { dayBars, rowCount, type Bar, type DaySpan } from './layout/dayBars.ts';
+export {
+  dateAt,
+  daysCovered,
+  itemsOnDay,
+  layoutMonthWeek,
+  type MonthItem,
+  type MonthLine,
+  type MonthMore,
+  type MonthWeek,
+} from './layout/monthWeek.ts';

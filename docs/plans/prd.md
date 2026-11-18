@@ -172,7 +172,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 - A 6-week grid (5 when the month fits in 5 without hiding a week). Day numbers at the top right of each cell; the 1st shows the month name ("Dec 1"); today's number in an accent circle; days outside the month greyed.
 - All-day and multi-day events are bars that span their days and wrap at week ends. Timed events are lines: a dot in the calendar colour, the start time, the title. Sorted all-day first, then by start.
-- A cell shows as many as fit; the rest become "N more", which opens a popover listing the day.
+- A cell shows as many as fit; the rest become "N more", which opens a list of everything on the day (picking one selects it; **Show Day** opens Day view). A bar shows only where every day it crosses has room for it, so a bar is never cut short without a "N more" saying so. Clicking a day number opens Day view on it.
 - Rows stretch to fill the window height.
 - Month view pages a month at a time, like every other view, rather than scrolling by week: the range title always matches what's on screen, and ‹ › mean the same thing in every view.
 

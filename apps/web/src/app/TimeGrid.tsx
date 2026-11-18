@@ -11,17 +11,16 @@ import {
   layoutDay,
   openingMinutes,
   rowCount,
-  textOn,
   timeLabel,
   wallMinutes,
   weekday,
-  type Bar,
   type Calendar,
   type Occurrence,
   type PlainDate,
   type Placed,
 } from '@daybird/core';
 import { sameOccurrence, type AppController } from './controller.ts';
+import { AllDayBar, HOUR12, describe } from './eventParts.tsx';
 
 /** The all-day strip shows this many rows before "+N more" (§6.1). */
 const ALL_DAY_ROWS = 4;
@@ -33,7 +32,6 @@ const STACK_ROOM = 45;
 const PLACE_ROOM = 60;
 /** The labelled hours: midnight sits at the top edge, so it has none. */
 const HOURS = Array.from({ length: 23 }, (_, i) => i + 1);
-const HOUR12 = { locale: undefined, '12': true, '24': false } as const;
 /** Room above the opening hour for its label. */
 const LABEL_ROOM = 10;
 
@@ -128,17 +126,6 @@ function scrollOnce(el: HTMLElement | null, top: number): void {
   if (!el || scrolled.has(el)) return;
   scrolled.add(el);
   el.scrollTop = Math.max(0, top);
-}
-
-/** The words a screen reader hears for an event, and the tooltip. */
-function describe(app: AppController, o: Occurrence, calendar: Calendar | undefined): string {
-  const hour12 = HOUR12[app.settings.peek().timeFormat];
-  const when = o.allDay
-    ? 'all day'
-    : `${timeLabel(o.start, app.locale, app.displayZone, hour12)} to ${timeLabel(o.end, app.locale, app.displayZone, hour12)}`;
-  return [o.title || 'New Event', when, o.location, calendar?.name, o.repeating ? 'repeats' : '']
-    .filter(Boolean)
-    .join(', ');
 }
 
 function EventBlock({
@@ -250,46 +237,5 @@ function AllDayStrip({
           })}
       </div>
     </div>
-  );
-}
-
-function AllDayBar({
-  app,
-  bar,
-  calendar,
-}: {
-  readonly app: AppController;
-  readonly bar: Bar<Occurrence>;
-  readonly calendar: Calendar | undefined;
-}) {
-  const o = bar.item;
-  const colour = calendar?.color ?? '#8e8f97';
-  const selected = sameOccurrence(app.selected.value, o);
-  const cls = [
-    'db-bar',
-    selected && 'db-selected',
-    bar.continuesBefore && 'db-continues-before',
-    bar.continuesAfter && 'db-continues-after',
-  ]
-    .filter(Boolean)
-    .join(' ');
-  return (
-    <button
-      type="button"
-      class={cls}
-      style={{
-        background: colour,
-        color: textOn(colour),
-        gridColumn: `${bar.first + 1} / ${bar.last + 2}`,
-        gridRow: `${bar.row + 1}`,
-      }}
-      aria-label={describe(app, o, calendar)}
-      aria-pressed={selected}
-      title={describe(app, o, calendar)}
-      onClick={() => app.select({ calendarId: o.calendarId, uid: o.uid, key: o.key })}
-    >
-      {o.title || 'New Event'}
-      {o.repeating && ' ↻'}
-    </button>
   );
 }

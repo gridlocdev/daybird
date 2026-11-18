@@ -122,6 +122,10 @@ export class AppController {
   readonly selected = signal<OccurrenceRef | null>(null);
   /** The Day and Week all-day strip shows every row, not just four (§6.1). */
   readonly allDayExpanded = signal(false);
+  /** How many one-line entries fit in a Month cell, measured from the window (§6.2). */
+  readonly monthLanes = signal(3);
+  /** The day whose "N more" list is open in Month view (§6.2). */
+  readonly dayList = signal<PlainDate | null>(null);
 
   readonly #storage: SettingsStorage;
   readonly #now: () => number;
@@ -188,6 +192,15 @@ export class AppController {
     this.anchor.value = date;
   }
 
+  /** Day view on `date`: clicking a day number in Month or Year (§6.2, §6.3). */
+  openDay(date: PlainDate): void {
+    batch(() => {
+      this.dayList.value = null;
+      this.goTo(date);
+      this.setView('day');
+    });
+  }
+
   isShowingToday(): boolean {
     const { start, end } = this.range.peek();
     const today = this.today.peek();
@@ -232,7 +245,7 @@ export class AppController {
 
   /** A dialog is open, so plain keys and most commands wait. */
   blocked(): boolean {
-    return this.dialog.peek() !== null || this.folderQuestion.peek();
+    return this.dialog.peek() !== null || this.dayList.peek() !== null || this.folderQuestion.peek();
   }
 
   /** The folder has loaded. */

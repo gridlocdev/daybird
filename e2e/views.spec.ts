@@ -139,3 +139,51 @@ test.describe('Week and Day', () => {
     await expect.poll(hour).toBe('40px');
   });
 });
+
+test.describe('Month', () => {
+  test.beforeEach(async ({ seed, page }) => {
+    seed('basic');
+    await openApp(page);
+  });
+
+  test('bars wrap at week ends, timed events are lines, and a full day lists the rest', async ({ page }) => {
+    await putPrivateFiles(page, {
+      'Work.ics': icsWith('Work', '#1f6fe5', [
+        'DTSTART;VALUE=DATE:20261116\nDTEND;VALUE=DATE:20261119\nSUMMARY:Offsite',
+        'DTSTART;VALUE=DATE:20261120\nDTEND;VALUE=DATE:20261124\nSUMMARY:Long weekend',
+        ...['08', '09', '10', '11', '12', '13'].map(
+          (h) => `DTSTART:20261117T${h}0000Z\nDTEND:20261117T${h}3000Z\nSUMMARY:Call ${h}`,
+        ),
+        'DTSTART:20261125T150000Z\nDTEND:20261125T160000Z\nSUMMARY:Dentist',
+      ]),
+    });
+    await page.keyboard.press('m');
+    const month = view(page, 'Month');
+    await expect(
+      page.getByRole('group', { name: 'View' }).getByRole('button', { name: 'Month' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(month.getByRole('button', { name: /^Dentist, 3:00 PM to 4:00 PM, Work/ })).toBeVisible();
+    await expect(month.getByRole('button', { name: /^Offsite, all day/ })).toHaveCount(1);
+    // Friday to Monday: one bar in each week.
+    await expect(month.getByRole('button', { name: /^Long weekend/ })).toHaveCount(2);
+
+    // Offsite and six calls don't fit on the 17th: the rest are one click away.
+    const more = month.getByRole('button', { name: /^\d+ more$/ });
+    await expect(more).toHaveCount(1);
+    const shown = await month.getByRole('button', { name: /^Call / }).count();
+    await expect(more).toHaveText(`${6 - shown} more`);
+    await more.click();
+    const list = page.getByRole('dialog', { name: 'Tuesday, November 17' });
+    await expect(list.getByRole('button', { name: /^(Offsite|Call )/ })).toHaveCount(7);
+    await list.getByRole('button', { name: /^Call 13/ }).click();
+    await expect(list).toBeHidden();
+
+    // A taller window fits them all.
+    await page.setViewportSize({ width: 1280, height: 1400 });
+    await expect(more).toHaveCount(0);
+    await expect(month.getByRole('button', { name: /^Call / })).toHaveCount(6);
+
+    await month.getByRole('button', { name: /^Tuesday, November 17/ }).click();
+    await expect(view(page, 'Day')).toBeVisible();
+  });
+});
