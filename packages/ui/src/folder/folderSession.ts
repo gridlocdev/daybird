@@ -18,6 +18,7 @@ import {
   pushStep,
   readCalendar,
   redo as redoStep,
+  retract as retractStep,
   systemZoneId,
   undo as undoStep,
   withCalendar,
@@ -25,6 +26,7 @@ import {
   withoutCalendarSteps,
   type Calendar,
   type EditContext,
+  type UndoResult,
   type UndoStack,
   type UndoStep,
   type Workspace,
@@ -33,8 +35,8 @@ import { ConflictError, encodeText, type CalendarStore } from '../platform/calen
 import { after, every } from '../schedule.ts';
 import { hasUnsaved as isUnsaved, step, type SaveEvent, type SaveState } from './saveChart.ts';
 import { RecoveryCopies } from './recoveryCopies.ts';
-import type { SnapshotFile } from './snapshots.ts';
 import {
+  calendarPaths,
   conflictOf,
   copyOf,
   docOf,
@@ -45,6 +47,7 @@ import {
   readTrash,
   recoveryOfferOf,
   serializeDoc,
+  snapshotFiles,
   trashedCalendarPath,
   withDoc,
 } from './sessionFiles.ts';
@@ -121,9 +124,13 @@ export class FolderSession {
     return this.#files.get(path)?.state ?? null;
   }
 
-  /** Makes a change as one undo step and saves every file it touched. Returns false when nothing changed. */
-  commit(label: string, next: Workspace): boolean {
-    const s = diffStep(label, this.workspace.peek(), next);
+  /**
+   * Makes a change as one undo step and saves every file it touched; steps of one `group` in a row join (§7.2).
+   * Returns false when nothing changed.
+   */
+  commit(label: string, next: Workspace, group?: string): boolean {
+    const diff = diffStep(label, this.workspace.peek(), next);
+    const s = diff && group !== undefined ? { ...diff, group } : diff;
     if (!s) return false;
     batch(() => {
       this.workspace.value = next;
@@ -158,24 +165,25 @@ export class FolderSession {
 
   /** Undoes the last step; returns its label, or null when there's nothing to undo. */
   undo(): string | null {
-    const r = undoStep(this.workspace.peek(), this.undoStack.peek());
-    if (!r) return null;
-    batch(() => {
-      this.workspace.value = r.workspace;
-      this.undoStack.value = r.stack;
-    });
-    this.#edited(r.step, 'before');
-    return r.step.label;
+    return this.#takeStep(undoStep(this.workspace.peek(), this.undoStack.peek()), 'before');
   }
 
   redo(): string | null {
-    const r = redoStep(this.workspace.peek(), this.undoStack.peek());
+    return this.#takeStep(redoStep(this.workspace.peek(), this.undoStack.peek()), 'after');
+  }
+
+  /** Takes back the last step when it's in `group`, with no redo (§7.1). Returns whether it did. */
+  retract(group: string): boolean {
+    return !!this.#takeStep(retractStep(this.workspace.peek(), this.undoStack.peek(), group), 'before');
+  }
+
+  #takeStep(r: UndoResult | null, side: 'before' | 'after'): string | null {
     if (!r) return null;
     batch(() => {
       this.workspace.value = r.workspace;
       this.undoStack.value = r.stack;
     });
-    this.#edited(r.step, 'after');
+    this.#edited(r.step, side);
     return r.step.label;
   }
 
@@ -298,13 +306,8 @@ export class FolderSession {
   async #load(): Promise<void> {
     // The snapshots come first: nothing may be written before a crashed window's changes are known.
     await this.#copies.load();
-    const entries = await this.store.list('');
-    const paths = entries
-      .filter((e) => e.kind === 'file' && isCalendarFile(e.name))
-      .map((e) => e.path)
-      .sort((a, b) => a.localeCompare(b));
     const pending: string[] = [];
-    for (const path of paths) {
+    for (const path of await calendarPaths(this.store)) {
       const disk = await readDisk(this.store, path);
       if (disk && this.#addCalendar(path, disk)) pending.push(path);
     }
@@ -589,11 +592,6 @@ export class FolderSession {
   }
 
   async #writeSnapshot(): Promise<void> {
-    const files: SnapshotFile[] = [];
-    for (const [path, rec] of this.#files) {
-      const doc = rec.unsaved ? docOf(this.workspace.peek(), path) : null;
-      if (doc) files.push({ path, base: rec.base, text: serializeDoc(path, doc, this.#appVersion) });
-    }
-    await this.#copies.save(files);
+    await this.#copies.save(snapshotFiles(this.#files, this.workspace.peek(), this.#appVersion));
   }
 }

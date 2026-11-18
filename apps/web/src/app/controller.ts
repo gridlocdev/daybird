@@ -16,6 +16,7 @@ import {
   type Accent,
   type Calendar,
   type DateRange,
+  type EventPatch,
   type Occurrence,
   type PlainDate,
   type RangeTitle,
@@ -46,6 +47,29 @@ export const sameOccurrence = (a: OccurrenceRef | null, b: OccurrenceRef | null)
   !!a && !!b && a.calendarId === b.calendarId && a.uid === b.uid && a.key === b.key;
 
 export type DialogKind = 'commands' | 'shortcuts' | 'settings';
+
+/** The event popover (PRD §7.2). */
+export interface EditorState {
+  readonly ref: OccurrenceRef;
+  /** The undo group: everything from open to close is one step. */
+  readonly group: string;
+  /** Just created and not changed yet: Escape takes it away with no trace (§7.1). */
+  readonly fresh: boolean;
+  /** A repeating occurrence's changes, held until the popover closes and asks This/Future/All (§8.2). */
+  readonly draft: EventPatch | null;
+  /** The calendar a repeating occurrence's changes move it to. */
+  readonly toCalendar: string | null;
+}
+
+/** This Event, This and Future Events, or All Events? (§8.2) */
+export type ScopeQuestion =
+  | {
+      readonly action: 'edit';
+      readonly ref: OccurrenceRef;
+      readonly patch: EventPatch;
+      readonly toCalendar: string | null;
+    }
+  | { readonly action: 'delete'; readonly ref: OccurrenceRef };
 
 /** A calendar's dialogs (PRD §5.2): naming a new one, renaming, its colour, and deleting it. */
 export type CalendarDialog = 'new' | 'rename' | 'colour' | 'delete';
@@ -147,6 +171,8 @@ export class AppController {
   readonly allDayExpanded = signal(false);
   /** How many one-line entries fit in a Month cell, measured from the window (§6.2). */
   readonly monthLanes = signal(3);
+  readonly editor = signal<EditorState | null>(null);
+  readonly scopeQuestion = signal<ScopeQuestion | null>(null);
   /** The day whose "N more" list is open in Month view (§6.2). */
   readonly dayList = signal<PlainDate | null>(null);
 
@@ -278,6 +304,8 @@ export class AppController {
       this.dayList.peek() !== null ||
       this.calendarDialog.peek() !== null ||
       this.calendarMenu.peek() !== null ||
+      this.editor.peek() !== null ||
+      this.scopeQuestion.peek() !== null ||
       this.folderQuestion.peek()
     );
   }

@@ -97,6 +97,8 @@ stateDiagram-v2
 
 - `AppController` holds the app's state in signals: the settings, today's date, the anchor date the view shows, the open dialog and the status-bar notice. Components read it and call its methods; they keep no state of their own beyond small things such as which month the mini month shows.
 - `main.tsx` wires the controller to the page: the theme and accent on `<html>`, the key listener, a 30-second tick that notices midnight, and, in the desktop app, the native bridge.
+- `eventActions.ts` is everything creating, editing and deleting an event does; the popover, the drags in `dragCreate.ts` and the commands call it. A visit to the popover is one undo group: the session joins steps of one group, and `retract` drops the group's step with no redo, for Escape on an untouched new event.
+- In core, `eventTimes.ts` turns drags and the popover's fields into start and end values, and `details.ts` gives the popover an occurrence in its own frame with its repeat in words.
 
 ## Desktop (`apps/desktop`)
 

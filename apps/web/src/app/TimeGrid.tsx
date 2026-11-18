@@ -20,7 +20,8 @@ import {
   type Placed,
 } from '@daybird/core';
 import { sameOccurrence, type AppController } from './controller.ts';
-import { AllDayBar, HOUR12, describe } from './eventParts.tsx';
+import { dateAtPoint, useDayDrag, useTimeDrag } from './dragCreate.ts';
+import { AllDayBar, HOUR12, describe, pickEvent } from './eventParts.tsx';
 
 /** The all-day strip shows this many rows before "+N more" (§6.1). */
 const ALL_DAY_ROWS = 4;
@@ -62,6 +63,8 @@ export function TimeGrid({ app }: { readonly app: AppController }) {
   const hourHeight = app.settings.value.hourHeight;
   const opening = openingMinutes(nowAt, app.settings.value.firstHour);
   const weekNumbers = app.settings.value.weekNumbers;
+  const drag = useTimeDrag(app, hourHeight);
+  const draft = drag.draft;
 
   return (
     <div class="db-columns" style={{ '--db-days': days.length }}>
@@ -99,6 +102,8 @@ export function TimeGrid({ app }: { readonly app: AppController }) {
               class={`db-column${isWeekend(d) ? ' db-weekend' : ''}`}
               role="group"
               aria-label={formatPlainDate(d, app.locale, { weekday: 'long', month: 'long', day: 'numeric' })}
+              tabIndex={-1}
+              {...drag.handlers(d)}
             >
               {perDay[i]!.map((p) => (
                 <EventBlock
@@ -109,6 +114,15 @@ export function TimeGrid({ app }: { readonly app: AppController }) {
                   past={p.item.end <= nowSeconds}
                 />
               ))}
+              {draft?.day === d && (
+                <div
+                  class="db-event db-draft"
+                  style={{ '--db-top': draft.from / 60, '--db-len': (draft.to - draft.from) / 60 }}
+                  aria-hidden="true"
+                >
+                  <span class="db-event-title">New Event</span>
+                </div>
+              )}
               {i === todayIndex && nowAt !== null && nowAt >= 0 && nowAt < MINUTES_PER_DAY && (
                 <div class="db-now" style={{ '--db-at': nowAt / 60 }} aria-hidden="true" />
               )}
@@ -167,7 +181,7 @@ function EventBlock({
       aria-label={describe(app, o, calendar)}
       aria-pressed={selected}
       title={describe(app, o, calendar)}
-      onClick={() => app.select({ calendarId: o.calendarId, uid: o.uid, key: o.key })}
+      {...pickEvent(app, o)}
     >
       <span class="db-event-title">
         {o.title || 'New Event'}
@@ -199,6 +213,8 @@ function AllDayStrip({
   // Folded, three rows show and the fourth says how many more each day has.
   const shownRows = fits ? Math.max(rows, 1) : ALL_DAY_ROWS;
   const shown = fits ? bars : bars.filter((b) => b.row < ALL_DAY_ROWS - 1);
+  const drag = useDayDrag(app, dateAtPoint);
+  const draft = drag.draft;
   const hiddenOn = (i: number) =>
     bars.filter((b) => b.row >= ALL_DAY_ROWS - 1 && b.first <= i && b.last >= i).length;
   return (
@@ -211,7 +227,24 @@ function AllDayStrip({
           </button>
         )}
       </span>
-      <div class="db-all-day-bars" role="group" aria-label="All-day events">
+      <div
+        class="db-all-day-bars"
+        role="group"
+        aria-label="All-day events"
+        data-week={days[0]}
+        data-days={days.length}
+        tabIndex={-1}
+        {...drag.handlers}
+      >
+        {draft && (
+          <div
+            class="db-day-draft"
+            style={{
+              gridColumn: `${days.indexOf(draft.first < days[0]! ? days[0]! : draft.first) + 1} / ${days.indexOf(draft.last) + 2}`,
+            }}
+            aria-hidden="true"
+          />
+        )}
         {shown.map((b) => (
           <AllDayBar
             key={`${b.item.calendarId}/${b.item.uid}/${b.item.key ?? ''}`}

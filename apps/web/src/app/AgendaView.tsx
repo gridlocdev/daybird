@@ -11,7 +11,7 @@ import {
   type PlainDate,
 } from '@daybird/core';
 import { sameOccurrence, type AppController } from './controller.ts';
-import { HOUR12, colourOf, describe } from './eventParts.tsx';
+import { HOUR12, colourOf, describe, pickEvent } from './eventParts.tsx';
 
 /**
  * Agenda (PRD §6.4): the days from the anchor that have events, under sticky headings, 60 days at a time. Scrolling
@@ -131,7 +131,7 @@ function AgendaRow(props: {
         class={`db-agenda-row${past ? ' db-past' : ''}${selected ? ' db-selected' : ''}`}
         aria-label={describe(app, o, props.calendar)}
         aria-pressed={selected}
-        onClick={() => app.select({ calendarId: o.calendarId, uid: o.uid, key: o.key })}
+        {...pickEvent(app, o)}
       >
         <span class="db-agenda-time">{whenOn(app, o, props.date)}</span>
         <span class="db-dot" style={{ background: colourOf(props.calendar) }} />

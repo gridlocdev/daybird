@@ -13,7 +13,8 @@ import {
   type PlainDate,
 } from '@daybird/core';
 import { sameOccurrence, type AppController } from './controller.ts';
-import { AllDayBar, HOUR12, colourOf, describe } from './eventParts.tsx';
+import { dateAtPoint, useDayDrag } from './dragCreate.ts';
+import { AllDayBar, HOUR12, colourOf, describe, pickEvent } from './eventParts.tsx';
 
 /** The day number's row and each lane, in px; the CSS takes them from here. */
 const HEAD = 26;
@@ -55,6 +56,8 @@ export function MonthView({ app }: { readonly app: AppController }) {
   const colours = new Map(app.calendars.value.map((c) => [c.id, c]));
   const nowSeconds = app.now.value / 1000;
   const weekNumbers = app.settings.value.weekNumbers;
+  const drag = useDayDrag(app, dateAtPoint);
+  const draft = drag.draft;
   return (
     <div class="db-month" style={{ '--db-lane': `${LANE}px`, '--db-month-head': `${HEAD}px` }}>
       <div class="db-month-heads">
@@ -68,7 +71,15 @@ export function MonthView({ app }: { readonly app: AppController }) {
         {weeks.map((days) => {
           const layout = layoutMonthWeek(occurrences, days, app.displayZone, lanes);
           return (
-            <div key={days[0]} class="db-month-week" style={{ '--db-lanes': lanes }}>
+            <div
+              key={days[0]}
+              class="db-month-week"
+              style={{ '--db-lanes': lanes }}
+              data-week={days[0]}
+              data-days={7}
+              tabIndex={-1}
+              {...drag.handlers}
+            >
               {days.map((d, i) => {
                 const { day, month: m } = datePart(d);
                 const cls = [
@@ -76,6 +87,7 @@ export function MonthView({ app }: { readonly app: AppController }) {
                   m !== month && 'db-outside',
                   isWeekend(d) && 'db-weekend',
                   d === today && 'db-today',
+                  draft && d >= draft.first && d <= draft.last && 'db-in-draft',
                 ]
                   .filter(Boolean)
                   .join(' ');
@@ -173,7 +185,7 @@ export function MonthLine({
       aria-label={describe(app, item, calendar)}
       aria-pressed={selected}
       title={describe(app, item, calendar)}
-      onClick={() => app.select({ calendarId: item.calendarId, uid: item.uid, key: item.key })}
+      {...pickEvent(app, item)}
     >
       <span class="db-dot" aria-hidden="true" />
       <span class="db-line-time">{timeLabel(item.start, app.locale, app.displayZone, hour12)}</span>

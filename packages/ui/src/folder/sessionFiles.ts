@@ -18,7 +18,15 @@ import {
 } from '@daybird/core';
 import { NotFoundError, baseName, decodeText, type CalendarStore } from '../platform/calendarStore.ts';
 import type { RecoveryCopies } from './recoveryCopies.ts';
-import { TRASH_PATH, type Conflict, type DiskFile, type RecoveryOffer } from './sessionTypes.ts';
+import type { SnapshotFile } from './snapshots.ts';
+import {
+  TRASH_PATH,
+  isCalendarFile,
+  type Conflict,
+  type DiskFile,
+  type FileRecord,
+  type RecoveryOffer,
+} from './sessionTypes.ts';
 
 /** The file as it is on disk now; null when it's gone. */
 export async function readDisk(store: CalendarStore, path: string): Promise<DiskFile | null> {
@@ -139,4 +147,26 @@ export function recoveryOfferOf(ws: Workspace, copies: RecoveryCopies, appVersio
     files.push({ path, name: nameOf(ws, path) });
   }
   return { files, savedAt: copies.savedAt() };
+}
+
+/** The calendar files in the folder, by name. */
+export async function calendarPaths(store: CalendarStore): Promise<string[]> {
+  return (await store.list(''))
+    .filter((e) => e.kind === 'file' && isCalendarFile(e.name))
+    .map((e) => e.path)
+    .sort((a, b) => a.localeCompare(b));
+}
+
+/** The recovery snapshot: every file with unsaved changes, as the window has it (§3.6). */
+export function snapshotFiles(
+  files: ReadonlyMap<string, FileRecord>,
+  ws: Workspace,
+  appVersion: string,
+): SnapshotFile[] {
+  const out: SnapshotFile[] = [];
+  for (const [path, rec] of files) {
+    const doc = rec.unsaved ? docOf(ws, path) : null;
+    if (doc) out.push({ path, base: rec.base, text: serializeDoc(path, doc, appVersion) });
+  }
+  return out;
 }

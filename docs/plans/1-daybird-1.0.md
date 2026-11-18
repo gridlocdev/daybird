@@ -24,7 +24,7 @@ Each slice leaves `just check` green and fits one session. "Waits on" names the 
 
 ## Editing
 
-- [ ] **12. Create and popover editor.** Drag/double-click/⌘N create, the popover, one undo step per open, Escape on untouched new event (§7.1, §7.2, §7.4). Waits on 8.
+- [x] **12. Create and popover editor.** Drag/double-click/⌘N create, the popover, one undo step per open, Escape on untouched new event (§7.1, §7.2, §7.4). Waits on 8.
 - [ ] **13. Move, resize, keyboard moves, copy/paste/duplicate, context menus** (§7.3, §7.5, §12 menus). Waits on 12.
 - [ ] **14. Repeat editing.** Repeat menu, Custom dialog, read-only complex rules, This/Future/All prompt (§8). Waits on 12, 5.
 - [ ] **15. Time zone support setting** and display-zone picker (§4.3, §13). Waits on 12.

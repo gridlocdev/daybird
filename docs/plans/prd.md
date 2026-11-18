@@ -208,7 +208,8 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 - Opens beside the event (right, else left, else below), with an arrow at it. Escape, a click outside, or Enter in the title closes it. Every change saves as you go, with the whole open-to-close as one undo step.
 - Fields: title; location; all-day toggle; start and end (date and time; changing the start moves the end to keep the length); time zone (shown only when "Time zone support" is on in Settings, or the event already has a zone other than the display zone); repeat (§8.1); calendar (coloured menu); reminders (§9); URL; notes (plain text, multi-line).
-- Footer: **Delete**. Read-only fields (from an unreadable property, §3.2) list below.
+- A repeating occurrence's changes are held until the popover closes, then the This/Future/All question (§8.2) applies them at once; Cancel drops them. A calendar that can't be changed shows its fields disabled.
+- Footer: **Delete** and **Done**. Read-only fields (from an unreadable property, §3.2) list below.
 - Tab order follows the fields; the first field focused is the title.
 
 ### §7.3 Moving and resizing

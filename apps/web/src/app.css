@@ -943,3 +943,118 @@
   background: currentColor;
   opacity: 0.55;
 }
+
+/* Creating by dragging (§7.1) */
+.db-column:focus,
+.db-all-day-bars:focus,
+.db-month-week:focus {
+  outline: none;
+}
+.db-event.db-draft {
+  --db-c: var(--db-accent);
+  left: 0;
+  right: 4px;
+  z-index: 5;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.db-day-draft {
+  grid-row: 1 / -1;
+  margin: 0 2px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--db-accent) 22%, transparent);
+  pointer-events: none;
+}
+.db-month-cell.db-in-draft {
+  background: color-mix(in srgb, var(--db-accent) 16%, transparent);
+}
+
+/* The event popover (§7.2) */
+.db-backdrop-clear {
+  background: transparent;
+}
+.db-dialog.db-popover {
+  position: fixed;
+  width: 320px;
+  max-height: calc(100vh - 24px);
+}
+.db-popover h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.db-popover::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--db-arrow, 24px) - 7px);
+  width: 14px;
+  height: 14px;
+  background: var(--db-raised);
+  transform: rotate(45deg);
+}
+.db-popover[data-side='right']::before {
+  left: -7px;
+}
+.db-popover[data-side='left']::before {
+  right: -7px;
+}
+.db-popover[data-side='below']::before {
+  display: none;
+}
+.db-popover .db-dialog-body {
+  padding-top: 14px;
+}
+.db-popover-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.db-popover-fields > input,
+.db-popover-fields > textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+}
+.db-popover-fields > .db-popover-title {
+  font-size: 15px;
+  font-weight: 650;
+}
+.db-popover-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.db-popover-row > span:first-child {
+  flex: none;
+  width: 64px;
+  color: var(--db-text-2);
+}
+.db-popover-row select {
+  flex: 1;
+  min-width: 0;
+}
+.db-popover-value {
+  color: var(--db-text);
+}
+.db-popover-note,
+.db-popover-problems {
+  margin: 10px 0 0;
+  color: var(--db-text-2);
+  font-size: 12px;
+}
+.db-popover-problems {
+  padding-left: 18px;
+  color: var(--db-danger, #c4372d);
+}
+.db-popover-row > input:not([type='checkbox']) {
+  flex: 1 1 0;
+  min-width: 0;
+  font: inherit;
+}

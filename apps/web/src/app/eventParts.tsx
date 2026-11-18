@@ -1,12 +1,29 @@
 /** Pieces every view draws events with (PRD §6): the words for an event, and a bar across days. */
 import { textOn, timeLabel, type Bar, type Calendar, type Occurrence } from '@daybird/core';
-import { sameOccurrence, type AppController } from './controller.ts';
+import { sameOccurrence, type AppController, type OccurrenceRef } from './controller.ts';
+import { openEditor } from './eventActions.ts';
+
+/** How an occurrence is marked in the page, for the popover to sit beside it. */
+export const occurrenceKey = (o: OccurrenceRef): string => `${o.calendarId}/${o.uid}/${o.key ?? ''}`;
 
 /** The 12/24-hour setting as the formatter's option: the locale's own when "locale". */
 export const HOUR12 = { locale: undefined, '12': true, '24': false } as const;
 
 /** A calendar's colour, grey for one that has gone. */
 export const colourOf = (calendar: Calendar | undefined): string => calendar?.color ?? '#8e8f97';
+
+/**
+ * What clicking an event does (§6, §7.2, §7.4): the first click selects it, a click on the selected event or a
+ * double-click opens the popover. The element is marked so the popover can find it.
+ */
+export function pickEvent(app: AppController, o: Occurrence) {
+  const ref = { calendarId: o.calendarId, uid: o.uid, key: o.key };
+  return {
+    'data-occurrence': occurrenceKey(ref),
+    onClick: () => (sameOccurrence(app.selected.peek(), ref) ? openEditor(app, ref) : app.select(ref)),
+    onDblClick: () => openEditor(app, ref),
+  };
+}
 
 /** The words a screen reader hears for an event, and the tooltip. */
 export function describe(app: AppController, o: Occurrence, calendar: Calendar | undefined): string {
@@ -58,7 +75,7 @@ export function AllDayBar({
       aria-label={describe(app, o, calendar)}
       aria-pressed={selected}
       title={describe(app, o, calendar)}
-      onClick={() => app.select({ calendarId: o.calendarId, uid: o.uid, key: o.key })}
+      {...pickEvent(app, o)}
     >
       {o.title || 'New Event'}
       {o.repeating && ' ↻'}

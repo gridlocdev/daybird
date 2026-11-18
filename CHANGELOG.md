@@ -15,4 +15,5 @@
 - Year tints each day by how busy it is and rings today. Agenda lists the events from a day on under day headings, loads 60 more days as it scrolls, and can show earlier days.
 - The desktop app keeps calendars in a folder you choose, Documents/Daybird by default, and Open Calendar Folder… switches to another. Saves are atomic and take turns with other programs saving the same file.
 - In a browser without folder access, calendars are kept in the browser's own storage.
+- Events are made by dragging on the grid, double-clicking, or ⌘N, and edited in a popover beside them that saves as you type; a whole visit to the popover undoes in one step, and Escape takes back a new event you haven't touched.
 - The NAS server serves the web client, and the `daybird` command prints its help and version.

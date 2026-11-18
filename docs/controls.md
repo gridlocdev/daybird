@@ -11,7 +11,15 @@ Single-letter keys only work when you aren't typing in a box.
 | Undo   | **⌘Z**            | **Ctrl+Z**                     |
 | Redo   | **⇧⌘Z** or **⌘Y** | **Ctrl+Shift+Z** or **Ctrl+Y** |
 
-## Calendars
+## Events
+
+| Action | macOS | Windows / Linux |
+| --- | --- | --- |
+| New event | **N** or **⌘N**, drag on the grid, or double-click | **N** or **Ctrl+N**, drag on the grid, or double-click |
+| Edit the selected event | **↩** or double-click | **Enter** or double-click |
+| Delete the selected event | **⌦** or **⌫** | **Delete** or **Backspace** |
+| Clear the selection | **Esc** | **Esc** |
+| Close the popover | **Return** in the title, **Esc**, or click outside | **Enter** in the title, **Esc**, or click outside |
 
 | Action | macOS | Windows / Linux |
 | --- | --- | --- |

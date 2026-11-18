@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact';
-import { useEffect, useId, useRef, useState } from 'preact/hooks';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { isComposingKey, isSubmitKey, isUndoKey } from '../commands/shortcut.ts';
 import { trapTab } from './focusTrap.ts';
 
@@ -14,11 +14,22 @@ export function Dialog(props: {
   readonly children: ComponentChildren;
   readonly actions?: ComponentChildren;
   readonly onSubmit?: () => void;
+  /** Escape, when it means something other than a click outside (a new event's popover, §7.1). */
+  readonly onEscape?: () => void;
+  /**
+   * A popover: placed beside this element (right, else left, else below) over a clear backdrop, with an arrow
+   * at it. The function runs once, when the popover opens; null centres it.
+   */
+  readonly anchor?: () => Element | null;
 }) {
   const ref = useRef<HTMLFormElement>(null);
+  const box = useRef<HTMLDivElement>(null);
   const titleId = useId();
   // Taken while rendering: the body's own effects run first and may already have moved focus inside.
   const [previous] = useState(() => document.activeElement as HTMLElement | null);
+  useLayoutEffect(() => {
+    if (props.anchor && box.current) placeBeside(box.current, props.anchor());
+  }, []);
   useEffect(() => {
     const root = ref.current;
     const first =
@@ -31,14 +42,15 @@ export function Dialog(props: {
   }, []);
   return (
     <div
-      class="db-backdrop"
+      class={props.anchor ? 'db-backdrop db-backdrop-clear' : 'db-backdrop'}
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) props.onClose();
       }}
     >
       {/* Keys are handled on the whole box (focusable, so a click on empty space keeps focus in it). */}
       <div
-        class={`db-dialog ${props.class ?? ''}`}
+        ref={box}
+        class={`db-dialog ${props.anchor ? 'db-popover' : ''} ${props.class ?? ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -48,7 +60,7 @@ export function Dialog(props: {
           if (e.key === 'Escape') {
             e.preventDefault();
             e.stopPropagation();
-            props.onClose();
+            (props.onEscape ?? props.onClose)();
           } else if (props.onSubmit && isSubmitKey(e)) {
             e.preventDefault();
             e.stopPropagation();
@@ -87,4 +99,37 @@ function keepsOwnUndo(target: EventTarget | null): boolean {
   if (target instanceof HTMLTextAreaElement) return true;
   if (target instanceof HTMLInputElement) return TEXT_INPUTS.has(target.type);
   return target instanceof HTMLElement && target.isContentEditable;
+}
+
+/** The gap between a popover and its element, and the window edge it keeps clear of. */
+const GAP = 10;
+
+/** Puts a popover beside `target`: right, else left, else below, kept inside the window (§7.2). */
+function placeBeside(box: HTMLElement, target: Element | null): void {
+  if (!target) return;
+  target.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  const r = target.getBoundingClientRect();
+  const w = box.offsetWidth;
+  const h = box.offsetHeight;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const clamp = (v: number, max: number) => Math.max(GAP, Math.min(v, max - GAP));
+  let side: 'right' | 'left' | 'below';
+  let left: number;
+  let top: number;
+  if (r.right + GAP + w <= vw - GAP || r.left - GAP - w >= GAP) {
+    side = r.right + GAP + w <= vw - GAP ? 'right' : 'left';
+    left = side === 'right' ? r.right + GAP : r.left - GAP - w;
+    top = clamp(r.top + r.height / 2 - h / 2, vh - h);
+  } else {
+    side = 'below';
+    left = clamp(r.left + r.width / 2 - w / 2, vw - w);
+    top = clamp(r.bottom + GAP, vh - h);
+  }
+  box.style.left = `${left}px`;
+  box.style.top = `${top}px`;
+  box.dataset.side = side;
+  // The arrow points at the middle of the element, as far as the popover's own edge allows.
+  const arrow = side === 'below' ? r.left + r.width / 2 - left : r.top + r.height / 2 - top;
+  box.style.setProperty('--db-arrow', `${Math.max(16, Math.min(arrow, (side === 'below' ? w : h) - 16))}px`);
 }

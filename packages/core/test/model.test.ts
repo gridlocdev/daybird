@@ -16,6 +16,7 @@ import {
   readEvent,
   redo,
   restoreTrashEntry,
+  retract,
   seriesOf,
   toLocalSeconds,
   trashEntries,
@@ -440,5 +441,29 @@ describe('deleting, the trash and undo', () => {
     expect(undone?.changed).toEqual(['Home.ics']);
     const redone = redo(undone!.workspace, undone!.stack);
     expect(redone?.workspace.calendars[0]).toBe(ws1.calendars[0]);
+  });
+
+  it('joins steps of one group, and retracts a group without leaving a redo', () => {
+    const ws0 = workspace(calendar('Home.ics', ics()));
+    const ctx = context();
+    const made = createEvent(ws0, ctx, 'Home.ics', {
+      title: 'New Event',
+      start: { kind: 'date', date: '2026-11-20' },
+      end: { kind: 'date', date: '2026-11-21' },
+    });
+    const step = (label: string, a: Workspace, b: Workspace, group?: string) => {
+      const s = diffStep(label, a, b);
+      return s && { ...s, group };
+    };
+    let stack = pushStep(EMPTY_UNDO, step('New Event', ws0, made.workspace, 'g1'));
+    const ws2 = editOccurrence(made.workspace, ctx, made.ref, { title: 'Lunch' }, 'all').workspace;
+    stack = pushStep(stack, step('Edited Lunch', made.workspace, ws2, 'g1'));
+    expect(stack.done).toHaveLength(1);
+    expect(stack.done[0]?.label).toBe('Edited Lunch');
+    expect(undo(ws2, stack)?.workspace.calendars[0]).toBe(ws0.calendars[0]);
+    expect(retract(ws2, stack, 'g2')).toBeNull();
+    const r = retract(ws2, stack, 'g1');
+    expect(r?.workspace.calendars[0]).toBe(ws0.calendars[0]);
+    expect(r?.stack).toEqual(EMPTY_UNDO);
   });
 });

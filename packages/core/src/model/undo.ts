@@ -17,6 +17,8 @@ export interface UndoStep {
   readonly after: ReadonlyMap<string, Calendar | null>;
   readonly trashBefore: ComponentNode | null;
   readonly trashAfter: ComponentNode | null;
+  /** Steps of one group in a row join into one: the popover's open-to-close (§7.2). */
+  readonly group?: string;
 }
 
 export interface UndoStack {
@@ -50,10 +52,29 @@ export function diffStep(label: string, before: Workspace, after: Workspace): Un
   };
 }
 
-/** Adds a step; the redo list clears and the oldest step drops past 200. */
+/**
+ * Adds a step; the redo list clears and the oldest step drops past 200. A step in the same group as the last one
+ * joins it.
+ */
 export function pushStep(stack: UndoStack, step: UndoStep | null): UndoStack {
   if (!step) return stack;
+  const last = stack.done.at(-1);
+  if (last && step.group !== undefined && last.group === step.group)
+    return {
+      done: [...stack.done.slice(0, -1), { ...mergeSteps(last, step), group: step.group }],
+      undone: [],
+    };
   return { done: [...stack.done, step].slice(-UNDO_LIMIT), undone: [] };
+}
+
+/**
+ * Takes back the last step when it's in `group`, leaving nothing to redo: Escape on a new event nobody touched
+ * (§7.1). Null when the last step is another one.
+ */
+export function retract(ws: Workspace, stack: UndoStack, group: string): UndoResult | null {
+  if (stack.done.at(-1)?.group !== group) return null;
+  const r = undo(ws, stack);
+  return r && { ...r, stack: { done: r.stack.done, undone: stack.undone } };
 }
 
 function apply(

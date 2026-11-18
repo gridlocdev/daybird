@@ -222,6 +222,7 @@ export {
   mergeSteps,
   pushStep,
   redo,
+  retract,
   undo,
   withoutCalendarSteps,
   type UndoResult,
@@ -255,3 +256,15 @@ export {
 } from './layout/monthWeek.ts';
 export { busyLevel, countsByDay } from './layout/dayCounts.ts';
 export { agendaDays, type AgendaDay } from './layout/agenda.ts';
+export {
+  SNAP_MINUTES,
+  allDayTimes,
+  nextHalfHour,
+  snapDown,
+  timedTimes,
+  whenOf,
+  withWhen,
+  zoneDateTime,
+  type WhenFields,
+} from './model/eventTimes.ts';
+export { occurrenceDetails, type OccurrenceDetails } from './model/details.ts';

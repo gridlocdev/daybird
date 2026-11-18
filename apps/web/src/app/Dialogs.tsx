@@ -2,6 +2,7 @@ import { useMemo, useState } from 'preact/hooks';
 import { ACCENTS, type Accent } from '@daybird/core';
 import {
   Dialog,
+  EVENT_LENGTHS,
   ListPopup,
   THEMES,
   filterEntries,
@@ -14,6 +15,7 @@ import {
 import type { AppController } from './controller.ts';
 import { CalendarDialogs } from './CalendarDialogs.tsx';
 import { DayListDialog } from './DayListDialog.tsx';
+import { EventPopover, ScopeDialog } from './EventPopover.tsx';
 import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
 import { shortcutGroups } from './shortcuts.ts';
 
@@ -26,6 +28,8 @@ export function Dialogs({ app, catalog }: { readonly app: AppController; readonl
   if (session && recovery) return <RecoveryDialog session={session} offer={recovery} />;
   const conflict = session?.conflicts.value[0];
   if (session && conflict) return <ConflictDialog app={app} session={session} conflict={conflict} />;
+  if (app.scopeQuestion.value) return <ScopeDialog app={app} />;
+  if (app.editor.value) return <EventPopover app={app} />;
   const day = app.dayList.value;
   if (day) return <DayListDialog app={app} day={day} />;
   if (app.calendarDialog.value) return <CalendarDialogs app={app} />;
@@ -226,6 +230,19 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
           {WEEK_STARTS.map((w) => (
             <option key={w.value} value={String(w.value)}>
               {w.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label class="db-field">
+        <span>New events last</span>
+        <select
+          value={String(s.eventMinutes)}
+          onChange={(e) => app.update({ eventMinutes: Number(e.currentTarget.value) })}
+        >
+          {EVENT_LENGTHS.map((m) => (
+            <option key={m} value={String(m)}>
+              {m < 60 ? `${m} minutes` : m === 60 ? '1 hour' : `${m / 60} hours`}
             </option>
           ))}
         </select>
