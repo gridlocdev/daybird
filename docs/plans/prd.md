@@ -227,7 +227,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ### §7.7 Trash
 
-- Deleting an event (Delete or ⌫ on a selection, the popover's Delete, the context menu) moves the series or occurrence to `.daybird/trash.ics` with `X-DAYBIRD-CALENDAR` (the file name) and `X-DAYBIRD-DELETED` (UTC). No confirmation; the notice "Deleted Lunch." with Undo.
+- Deleting an event (Delete or ⌫ on a selection, the popover's Delete, the context menu) moves the series or occurrence to `.daybird/trash.ics` with `X-DAYBIRD-CALENDAR` (the file name) and `X-DAYBIRD-DELETED` (UTC). Each deletion is one entry: its VEVENTs share `X-DAYBIRD-ENTRY`, and `X-DAYBIRD-KIND` says whether it was a series, a skipped occurrence or a changed occurrence. Restoring a skipped occurrence removes its `EXDATE`; when its series is gone it comes back as a single event. A restored series whose UID is taken gets a new one. No confirmation; the notice "Deleted Lunch." with Undo.
 - Deleting a calendar asks "Delete <name> and its N events?" and moves its file to `.daybird/trash/<file> <YYYY-MM-DD-HHmmss>.ics`.
 - The Trash view lists deleted events and calendars, newest first, with **Restore** and **Delete Permanently** (asks), and **Empty Trash** (asks, names the count, "can't be undone").
 - Items deleted more than 30 days ago are removed when the folder loads.
@@ -246,7 +246,8 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 - Editing, moving or deleting an occurrence of a repeating event asks: **This Event**, **This and Future Events**, **All Events**, Cancel. The popover asks once when it closes, for all changes made while it was open.
 - This Event: an override with `RECURRENCE-ID` (or an `EXDATE` for delete).
 - This and Future: the master's rule ends (`UNTIL`) before this occurrence, and a new series with a new UID starts here with the changes. Overrides after the split move to the new series.
-- All Events: changes the master; a time change moves overrides that kept the master's old time by the same amount, and leaves overrides the user moved.
+- All Events: changes the master; a time change moves overrides that kept the master's old time by the same amount, and leaves overrides the user moved. A new time is taken as made on the occurrence before any override moved it. A change of title, location, notes, URL or reminders also reaches overrides that hadn't changed that field. The occurrence the change was made on takes the whole change. Overrides and skipped dates the new rule no longer makes are dropped.
+- Moving one occurrence of a repeating event to another calendar (This Event) skips it in its series and makes it a single event in the other calendar. All Events moves the series; This and Future moves the new series.
 - Deleting the first occurrence with This Event is an `EXDATE`, not a change of `DTSTART`.
 
 ## §9 Reminders

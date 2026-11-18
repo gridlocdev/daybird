@@ -7,4 +7,5 @@
 - Daybird reads and writes `.ics` files itself. A file it hasn't changed is written back byte for byte, properties and components it doesn't know are kept, and a file it can't make sense of is refused with the line that went wrong.
 - Time zones come from the system's own zone data, so every IANA zone works. Windows zone names in Outlook files are understood, a file's own VTIMEZONE is used when a name is unknown, and a VTIMEZONE is written for each zone a file needs.
 - Repeating events follow every part of the iCalendar repeat rules, including extra and skipped dates, and a repeat is described in plain words such as "Every month on the last Friday".
+- Events can be created, changed, moved between calendars and deleted, and a change to a repeating event can apply to one occurrence, to it and the ones after, or to all of them. Deleted events go to the Trash, and every change can be undone.
 - The NAS server serves the web client, and the `daybird` command prints its help and version.

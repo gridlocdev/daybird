@@ -153,3 +153,76 @@ export {
   type TimeValue,
 } from './ical/values.ts';
 export { fileZones, readVTimezone, vtimezoneFor, withVTimezones } from './ical/vtimezone.ts';
+export {
+  emptyCalendarDocument,
+  findSeries,
+  loadCalendar,
+  readSeries,
+  seriesEvents,
+  seriesOf,
+  withDocument,
+  type Calendar,
+  type EventSeries,
+  type LoadedCalendar,
+} from './model/calendar.ts';
+export {
+  addDuration,
+  readEvent,
+  utcStamp,
+  wallSeconds,
+  withEditStamps,
+  withPatch,
+  type EventInfo,
+  type EventPatch,
+  type Reminder,
+} from './model/event.ts';
+export {
+  findOccurrence,
+  instantOf,
+  isRepeating,
+  keyIn,
+  occurrencesIn,
+  valueAtKey,
+  zoneOf,
+  type Occurrence,
+} from './model/occurrences.ts';
+export { shiftValue, type Scope } from './model/seriesEdits.ts';
+export {
+  calendarById,
+  createEvent,
+  deleteOccurrence,
+  editOccurrence,
+  eventCount,
+  needsScope,
+  withCalendar,
+  withoutCalendar,
+  type EditContext,
+  type NewEventFields,
+  type OccurrenceRef,
+  type Workspace,
+} from './model/workspace.ts';
+export {
+  TRASH_DAYS,
+  deleteTrashEntry,
+  emptyTrash,
+  emptyTrashDocument,
+  purgeTrash,
+  restoreTrashEntry,
+  trashEntries,
+  type TrashEntry,
+  type TrashKind,
+} from './model/trash.ts';
+export {
+  EMPTY_UNDO,
+  UNDO_LIMIT,
+  clearUndo,
+  diffStep,
+  mergeSteps,
+  pushStep,
+  redo,
+  undo,
+  type UndoResult,
+  type UndoStack,
+  type UndoStep,
+} from './model/undo.ts';
+export { checkInvariants } from './model/invariants.ts';

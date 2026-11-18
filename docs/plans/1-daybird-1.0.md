@@ -8,7 +8,7 @@ Each slice leaves `just check` green and fits one session. "Waits on" names the 
 - [x] **2. iCalendar parse and write.** Unfold/fold, escapes, parameters, components kept in order, byte-identical round-trip, bad lines kept raw, unreadable files refused (§3.2, §3.3). Corpus of fixture files from Apple, Google, Outlook, Fastmail exports (made-up data). Waits on 1.
 - [x] **3. Dates and time zones.** `PlainDate`, `PlainDateTime`, `ZonedDateTime` on `Intl`; gaps and overlaps; Windows→IANA table; VTIMEZONE read and write, including writing one for each TZID a file uses but doesn't define (§4.1, §4.3, §3.3). Waits on 1.
 - [x] **4. Recurrence.** Full RRULE expander with RDATE/EXDATE/EXRULE, ranged expansion, the 50,000 cap, every RFC 5545 example, DST and leap cases, rule-to-words (§4.4, §8.1 words). Waits on 3.
-- [ ] **5. Engine model and edits.** Calendars, series, overrides, occurrences for a range; create, edit, move, delete with This/Future/All; trash; undo steps; `checkInvariants` and random-operation tests; event ends from DTEND or DURATION, UID + RECURRENCE-ID identity, DTSTAMP/LAST-MODIFIED/SEQUENCE on edit (§3.2, §3.3, §4.1, §4.2, §7.6, §7.7, §8.2). Waits on 2, 4.
+- [x] **5. Engine model and edits.** Calendars, series, overrides, occurrences for a range; create, edit, move, delete with This/Future/All; trash; undo steps; `checkInvariants` and random-operation tests; event ends from DTEND or DURATION, UID + RECURRENCE-ID identity, DTSTAMP/LAST-MODIFIED/SEQUENCE on edit (§3.2, §3.3, §4.1, §4.2, §7.6, §7.7, §8.2). Waits on 2, 4.
 
 ## Storage
 
