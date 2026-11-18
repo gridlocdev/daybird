@@ -31,6 +31,10 @@ export interface DaybirdNative {
   };
   /** The window entered or left full screen. */
   onFullScreen(fn: (full: boolean) => void): void;
+  /** Shows a reminder as a system notification (PRD §9). */
+  notify(notification: { readonly id: string; readonly title: string; readonly body: string }): void;
+  /** A notification was clicked: its id. */
+  onNotificationClick(fn: (id: string) => void): void;
 }
 
 export function nativeBridge(): DaybirdNative | null {

@@ -28,7 +28,15 @@ export function Dialog(props: {
   // Taken while rendering: the body's own effects run first and may already have moved focus inside.
   const [previous] = useState(() => document.activeElement as HTMLElement | null);
   useLayoutEffect(() => {
-    if (props.anchor && box.current) placeBeside(box.current, props.anchor());
+    const b = box.current;
+    const anchor = props.anchor;
+    if (!anchor || !b) return;
+    placeBeside(b, anchor(), true);
+    // A popover that grows (a field added) moves to stay on screen.
+    if (typeof ResizeObserver === 'undefined') return;
+    const watch = new ResizeObserver(() => placeBeside(b, anchor(), false));
+    watch.observe(b);
+    return () => watch.disconnect();
   }, []);
   useEffect(() => {
     const root = ref.current;
@@ -105,9 +113,9 @@ function keepsOwnUndo(target: EventTarget | null): boolean {
 const GAP = 10;
 
 /** Puts a popover beside `target`: right, else left, else below, kept inside the window (§7.2). */
-function placeBeside(box: HTMLElement, target: Element | null): void {
+function placeBeside(box: HTMLElement, target: Element | null, scroll: boolean): void {
   if (!target) return;
-  target.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  if (scroll) target.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   const r = target.getBoundingClientRect();
   const w = box.offsetWidth;
   const h = box.offsetHeight;

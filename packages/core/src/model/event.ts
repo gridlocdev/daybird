@@ -32,7 +32,8 @@ import { formatRule, parseRule, type RecurrenceRule } from '../time/rrule.ts';
 
 /** A reminder (PRD §9): seconds before the start (negative: after), or an absolute UTC time. */
 export type Reminder =
-  { readonly kind: 'before'; readonly seconds: number } | { readonly kind: 'at'; readonly utc: TimeValue };
+  | { readonly kind: 'before'; readonly seconds: number; readonly fromEnd?: true }
+  | { readonly kind: 'at'; readonly utc: TimeValue };
 
 /** What a VEVENT says, as Daybird reads it. Text fields are unescaped. */
 export interface EventInfo {
@@ -99,7 +100,9 @@ function readReminders(event: ComponentNode): Reminder[] {
     const d = parseDuration(trigger.value);
     if (!d) continue;
     const seconds = (d.weeks * 7 + d.days) * SECONDS_PER_DAY + d.seconds;
-    out.push({ kind: 'before', seconds: d.negative ? seconds : -seconds });
+    const before = d.negative ? seconds : -seconds;
+    const fromEnd = paramValue(trigger, 'RELATED')?.toUpperCase() === 'END';
+    out.push(fromEnd ? { kind: 'before', seconds: before, fromEnd } : { kind: 'before', seconds: before });
   }
   return out;
 }
@@ -238,6 +241,7 @@ function alarmFor(reminder: Reminder): ComponentNode {
             days: Math.floor(Math.abs(reminder.seconds) / SECONDS_PER_DAY),
             seconds: Math.abs(reminder.seconds) % SECONDS_PER_DAY,
           }),
+          reminder.fromEnd ? [{ name: 'RELATED', values: ['END'] }] : [],
         );
   return componentNode('VALARM', [
     propertyNode('ACTION', 'DISPLAY'),

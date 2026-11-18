@@ -46,6 +46,10 @@ Press **⌘F** (**Ctrl+F**) or **/** and type: the events whose title, place or 
 
 Deleted events and calendars go to the Trash under the calendars in the sidebar, and stay 30 days. The Trash lists them newest first, each with Restore, which puts it back where it was, and Delete Permanently. Right-click **Trash**, or use the button in the Trash, to empty it. A deleted calendar is still a file in the folder's `.daybird/trash` until then.
 
+## Reminders
+
+The popover's **Add Reminder** gives an event up to five reminders: at the time, minutes, hours or days before, or **Custom…** for any number of minutes, hours, days or weeks; an all-day event's ring at 9:00 on the day, the day before or a week before. While Daybird is open, a reminder shows in the status bar at its time with **Show**, which opens its event, and as a system notification when **Show notifications** is on in Settings (the browser asks first). A reminder missed while Daybird was closed rings when it opens if it's less than an hour old. Each rings once on a device, in one window.
+
 ## Import and export
 
 **Import…** (**⇧⌘I**, **Ctrl+Shift+I**) reads an `.ics` file from another calendar app and adds its events to a calendar you choose, or to a new one named after the file; events already there are skipped, and Undo takes the import back. **Export Calendar…**, also in a calendar's menu, saves a copy of its file, and **Export All…** saves a `.zip` of every calendar.

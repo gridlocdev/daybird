@@ -11,6 +11,7 @@ import {
   after,
   every,
   listenForKeys,
+  localFiredReminders,
   localSettings,
   localSnapshots,
   memorySnapshots,
@@ -24,6 +25,7 @@ import { buildCommands } from './app/commands.ts';
 import { AppController, type FolderChooser } from './app/controller.ts';
 import { loadFolderSettings } from './app/calendarActions.ts';
 import { loadTrashedCalendars } from './app/trashActions.ts';
+import { browserNotification, startReminders, type ReminderMessage } from './app/reminders.ts';
 import { nativeBridge, type DaybirdNative, type NativeFolder } from './app/native.ts';
 import { menuSender, nativeMenu, watchMenuInputs } from './app/nativeMenu.ts';
 import pkg from '../package.json';
@@ -165,6 +167,18 @@ function desktopFolders(bridge: DaybirdNative, app: () => AppController): Deskto
   };
 }
 
+/** System notifications in the desktop app: a click there shows the event here. */
+function nativeNotifier(bridge: DaybirdNative): (message: ReminderMessage, show: () => void) => void {
+  const shows = new Map<string, () => void>();
+  bridge.onNotificationClick((id) => shows.get(id)?.());
+  return (message, show) => {
+    shows.set(message.id, show);
+    // Only recent notifications can still be clicked; forget the oldest.
+    if (shows.size > 50) shows.delete(shows.keys().next().value!);
+    bridge.notify({ id: message.id, title: message.title, body: message.body });
+  };
+}
+
 function start(): void {
   let app: AppController | null = null;
   const folders = native ? desktopFolders(native, () => app!) : null;
@@ -200,6 +214,7 @@ function start(): void {
     });
   });
   watchFolder(app);
+  startReminders(app, localFiredReminders(), native ? nativeNotifier(native) : browserNotification);
   every(CLOCK_MS, () => shown.tick());
   addEventListener('focus', () => shown.tick());
   if (import.meta.env.DEV) Object.assign(globalThis, { daybird: { app, catalog } });

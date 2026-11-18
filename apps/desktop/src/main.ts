@@ -10,13 +10,14 @@ import {
   Menu,
   nativeTheme,
   net,
+  Notification,
   protocol,
   screen,
   shell,
 } from 'electron';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { Channels, type NativeMenuItem } from './bridge.ts';
+import { Channels, type NativeMenuItem, type NativeNotification } from './bridge.ts';
 import { Folders } from './folders.ts';
 import { editMenuTemplate, toTemplate, withStandardMenus } from './menu.ts';
 import { appFile, dataPaths, isAppUrl } from './paths.ts';
@@ -164,6 +165,28 @@ function createWindow(): BrowserWindow {
   return w;
 }
 
+/** Notifications on screen, kept so they aren't collected before they're clicked. */
+const notifications = new Set<Notification>();
+
+/** A reminder as a system notification (PRD §9); a click brings the window forward and shows the event. */
+function notify(e: Electron.IpcMainEvent, n: NativeNotification): void {
+  if (!trusted(e) || headless || !Notification.isSupported()) return;
+  if (typeof n?.id !== 'string' || typeof n.title !== 'string' || typeof n.body !== 'string') return;
+  const shown = new Notification({ title: n.title, body: n.body });
+  const done = () => notifications.delete(shown);
+  shown.on('click', () => {
+    done();
+    if (!win) return;
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+    win.webContents.send(Channels.notificationClick, n.id);
+  });
+  shown.on('close', done);
+  notifications.add(shown);
+  shown.show();
+}
+
 function registerIpc(): void {
   ipcMain.on(Channels.setMenu, (e, items: readonly NativeMenuItem[]) => {
     if (!trusted(e) || !Array.isArray(items)) return;
@@ -186,6 +209,7 @@ function registerIpc(): void {
     const folder = picked.canceled ? undefined : picked.filePaths[0];
     return folder ? folders.open(folder) : null;
   });
+  ipcMain.on(Channels.notify, (e, n: NativeNotification) => notify(e, n));
   ipcMain.handle(Channels.folderUseDefault, (e) =>
     trusted(e) ? folders.open(path.join(app.getPath('documents'), 'Daybird')) : null,
   );

@@ -263,11 +263,12 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ## §9 Reminders
 
-- An event's `VALARM`s with `ACTION:DISPLAY` or `AUDIO` show as reminders; other actions (`EMAIL`) are kept but not shown or fired.
-- The popover offers: none, at time of event, 5, 10, 15, 30 minutes, 1 hour, 2 hours, 1 day, 2 days, 1 week before; Custom (minutes/hours/days before); all-day events: on the day at 9:00, the day before at 9:00, a week before at 9:00. Up to 5 per event.
-- Desktop: a native notification at the time, with the title, time and location; clicking it shows the event. Reminders missed while the app was closed fire once on start if they're less than 1 hour old, else they're skipped silently.
-- Browser: the Notification API while a tab is open, after the user turns on "Show notifications" in Settings (which asks the browser's permission). Only one tab fires (Web Lock).
-- Firing is scheduled for the next 24 hours and recomputed on every change and at midnight. A fired reminder is remembered per device so it never fires twice. `ACKNOWLEDGED` is not written in 1.0.
+- An event's `VALARM`s with `ACTION:DISPLAY` or `AUDIO` show as reminders; other actions (`EMAIL`) are kept but not shown or rung. A trigger from the end (`RELATED=END`) or at a set time is shown in words and kept, and can be removed.
+- The popover's Reminder rows offer: at time of event, 5, 10, 15, 30 minutes, 1 hour, 2 hours, 1 day, 2 days, 1 week before; Custom… (0–999 minutes, hours, days or weeks before); all-day events: on the day at 9:00, the day before at 9:00, a week before at 9:00 (9:00 on the display zone's clock). Add Reminder adds 10 minutes before (all-day: on the day at 9:00), up to 5 per event; each row has a remove button.
+- While a window is open, reminders of the shown calendars ring at their time: a sticky notice in the status bar ("Standup: Today at 3:10 PM · Room 4") with Show, which opens the event's day and selects it, and a system notification when Show notifications is on. A click on the notification brings the window forward and shows the event.
+- Desktop: a native notification. Browser: the Notification API; turning on Show notifications in Settings asks the browser's permission, and the setting reads as off until it's given. Only one window rings (Web Lock).
+- A reminder missed while no window was open rings once on opening if it's less than an hour old; older ones are skipped. Reminders up to 60 days before their event are rung.
+- The window looks at least once a minute, and again on every change to the calendars or the display zone. A rung reminder is remembered per device for 3 days, by event, occurrence and time, so it never rings twice; moving the event makes it ring again at the new time. `ACKNOWLEDGED` is not written in 1.0.
 
 ## §10 Search
 

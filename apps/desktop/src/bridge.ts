@@ -12,7 +12,16 @@ export const Channels = {
   folderCurrent: 'daybird:folder-current',
   folderChoose: 'daybird:folder-choose',
   folderUseDefault: 'daybird:folder-use-default',
+  notify: 'daybird:notify',
+  notificationClick: 'daybird:notification-click',
 } as const;
+
+/** A reminder the page asks the main process to show as a system notification (PRD §9). */
+export interface NativeNotification {
+  readonly id: string;
+  readonly title: string;
+  readonly body: string;
+}
 
 /** One item of the menu bar the page sends, as `NativeMenuItem` in @daybird/ui. */
 export interface NativeMenuItem {

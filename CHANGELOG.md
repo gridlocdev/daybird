@@ -15,6 +15,7 @@
 - Year tints each day by how busy it is and rings today. Agenda lists the events from a day on under day headings, loads 60 more days as it scrolls, and can show earlier days.
 - Search (⌘F) finds events by title, place or notes, ignoring accents and case, and lists them nearest first; Return shows the first one.
 - The Trash in the sidebar lists deleted events and calendars, which can be restored or deleted for good; calendars are kept for 30 days.
+- Reminders: up to five per event from the popover, rung at their time in the status bar and as a system notification, once per device. A reminder missed while Daybird was closed rings on opening if it's less than an hour old.
 - Import (⇧⌘I) adds the events of an `.ics` file to a calendar or a new one, skipping events already there. Export saves one calendar as an `.ics` file, and Export All saves every calendar in a zip.
 - The desktop app keeps calendars in a folder you choose, Documents/Daybird by default, and Open Calendar Folder… switches to another. Saves are atomic and take turns with other programs saving the same file.
 - In a browser without folder access, calendars are kept in the browser's own storage.

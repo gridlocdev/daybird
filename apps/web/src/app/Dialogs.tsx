@@ -18,6 +18,7 @@ import { DayListDialog } from './DayListDialog.tsx';
 import { EventPopover, ScopeDialog } from './EventPopover.tsx';
 import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
 import { RepeatDialog } from './RepeatDialog.tsx';
+import { allowBrowserNotifications, notificationsOn } from './reminders.ts';
 import { ImportDialog, TrashQuestionDialog } from './TrashDialogs.tsx';
 import { DisplayZoneSelect } from './ZoneSelect.tsx';
 import { shortcutGroups } from './shortcuts.ts';
@@ -279,6 +280,18 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
           type="checkbox"
           checked={s.weekNumbers}
           onChange={(e) => app.update({ weekNumbers: e.currentTarget.checked })}
+        />
+      </label>
+      <label class="db-field">
+        <span>Show notifications</span>
+        <input
+          type="checkbox"
+          checked={notificationsOn(app, app.folders !== null)}
+          onChange={(e) => {
+            const on = e.currentTarget.checked;
+            if (app.folders) app.update({ notifications: on });
+            else void allowBrowserNotifications(app, on);
+          }}
         />
       </label>
     </Dialog>

@@ -19,6 +19,7 @@ import type { AppController, OccurrenceRef } from './controller.ts';
 import { HOUR12, colourOf, occurrenceKey } from './eventParts.tsx';
 import { ZoneSelect } from './ZoneSelect.tsx';
 import { RepeatField } from './RepeatDialog.tsx';
+import { ReminderField } from './ReminderField.tsx';
 import { answerScope, closeEditor, deleteEvent, editEvent, editorDetails } from './eventActions.ts';
 
 const findDrawn = (ref: OccurrenceRef): Element | null =>
@@ -174,6 +175,7 @@ export function EventPopover({ app }: { readonly app: AppController }) {
               ))}
           </select>
         </label>
+        <ReminderField app={app} d={d} />
         <input type="url" aria-label="URL" placeholder="Add URL" value={o.url} onInput={text('url')} />
         <textarea
           aria-label="Notes"

@@ -1,6 +1,6 @@
 // Sandboxed preload: CommonJS, and it may only require('electron'), so the channel names from
 // bridge.ts are repeated here. Keep them in step. It exposes exactly one object, `daybirdNative`.
-import type { NativeMenuItem } from './bridge.ts';
+import type { NativeMenuItem, NativeNotification } from './bridge.ts';
 
 const { contextBridge, ipcRenderer } = require('electron') as typeof import('electron');
 
@@ -31,4 +31,7 @@ contextBridge.exposeInMainWorld('daybirdNative', {
   },
   onFullScreen: (fn: (full: boolean) => void) =>
     ipcRenderer.on('daybird:full-screen', (_e, full: boolean) => fn(full)),
+  notify: (n: NativeNotification) => ipcRenderer.send('daybird:notify', n),
+  onNotificationClick: (fn: (id: string) => void) =>
+    ipcRenderer.on('daybird:notification-click', (_e, id: string) => fn(id)),
 });

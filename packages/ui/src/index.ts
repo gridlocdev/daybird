@@ -120,3 +120,9 @@ export {
   type TrashedCalendar,
 } from './folder/calendarTrash.ts';
 export { zipFiles } from './platform/zip.ts';
+export {
+  FIRED_KEEP_SECONDS,
+  localFiredReminders,
+  memoryFiredReminders,
+  type FiredReminders,
+} from './platform/firedReminders.ts';

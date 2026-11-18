@@ -29,7 +29,7 @@ Each slice leaves `just check` green and fits one session. "Waits on" names the 
 - [x] **14. Repeat editing.** Repeat menu, Custom dialog, read-only complex rules, This/Future/All prompt (§8). Waits on 12, 5.
 - [x] **15. Time zone support setting** and display-zone picker (§4.3, §13). Waits on 12.
 - [x] **16. Trash view, search, import and export** (§7.7, §10, §11). Waits on 11, 12.
-- [ ] **17. Reminders.** VALARM editing, scheduler, desktop and browser notifications, fired-once memory (§9). Waits on 12, 7.
+- [x] **17. Reminders.** VALARM editing, scheduler, desktop and browser notifications, fired-once memory (§9). Waits on 12, 7.
 
 ## Shells and release
 

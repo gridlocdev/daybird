@@ -297,3 +297,18 @@ export {
 } from './model/repeat.ts';
 export { matchesSearch, nearestFirst, searchKey, searchRange } from './model/search.ts';
 export { importEvents, importableSeries, type ImportResult } from './model/importing.ts';
+export {
+  MAX_REMINDERS,
+  REMINDER_LAG_SECONDS,
+  REMINDER_LEAD_SECONDS,
+  customReminder,
+  firstReminder,
+  reminderAmount,
+  reminderChoices,
+  reminderInstant,
+  reminderWords,
+  remindersDue,
+  type DueReminder,
+  type ReminderFormat,
+  type ReminderUnit,
+} from './model/reminders.ts';

@@ -106,3 +106,19 @@
     width: 90px;
   }
 }
+.db-popover-reminders {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.db-popover-reminders .db-popover-value {
+  flex: 1;
+}
+.db-popover-custom {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+.db-popover-custom input {
+  width: 56px;
+}
