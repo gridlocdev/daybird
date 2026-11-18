@@ -87,3 +87,69 @@ export {
   withDaybirdStamp,
   withEventUids,
 } from './ical/calendarFile.ts';
+export {
+  SECONDS_PER_DAY,
+  addSeconds,
+  dateOf,
+  fromLocalSeconds,
+  isPlainDateTime,
+  localSecondsOfDate,
+  plainDateTime,
+  startOfDay,
+  timeOf,
+  toLocalSeconds,
+  type PlainDateTime,
+  type TimeParts,
+} from './time/dateTime.ts';
+export {
+  EXPANSION_CAP,
+  FREQUENCIES,
+  WEEKDAY_CODES,
+  expandRule,
+  formatRule,
+  formatUntil,
+  parseRule,
+  rule,
+  type ExpandOptions,
+  type Expansion,
+  type Frequency,
+  type ParsedRule,
+  type RecurrenceRule,
+  type RuleUntil,
+  type WeekdayNum,
+} from './time/rrule.ts';
+export { describeRule } from './time/ruleWords.ts';
+export { expandSet, isInSet, type RecurrenceSet, type SetExpansion } from './time/recurrenceSet.ts';
+export {
+  FLOATING,
+  UTC,
+  formatOffset,
+  ianaZone,
+  isIanaZone,
+  offsetAt,
+  parseOffset,
+  resolveTzid,
+  systemZoneId,
+  toInstant,
+  toLocal,
+  transitionsIn,
+  zoneAbbreviation,
+  type Observance,
+  type Zone,
+} from './time/zones.ts';
+export { WINDOWS_ZONES } from './time/windowsZones.ts';
+export {
+  dateTimeValue,
+  dateValue,
+  durationFromSeconds,
+  formatDuration,
+  formatTimeText,
+  parseDuration,
+  parseTimeText,
+  readTimeList,
+  readTimeProperty,
+  timeParams,
+  type Duration,
+  type TimeValue,
+} from './ical/values.ts';
+export { fileZones, readVTimezone, vtimezoneFor, withVTimezones } from './ical/vtimezone.ts';
