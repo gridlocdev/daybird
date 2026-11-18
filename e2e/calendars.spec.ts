@@ -75,7 +75,7 @@ test.describe('Sidebar calendars', () => {
   test('the mini month dots days with events, and the sidebar’s edge sets its width', async ({ page }) => {
     const sidebar = page.getByRole('complementary', { name: 'Sidebar' });
     await expect(
-      sidebar.getByRole('gridcell', { name: 'Tuesday, November 17, 2026, has events' }),
+      sidebar.getByRole('gridcell', { name: 'Tuesday, November 17, 2026, 1 event' }),
     ).toBeVisible();
     await expect(
       sidebar.getByRole('gridcell', { name: 'Thursday, November 19, 2026', exact: true }),

@@ -187,6 +187,11 @@ export class AppController {
     });
   }
 
+  /** The shown calendars' occurrences between two UTC instants (seconds), for lists wider than the view. */
+  occurrencesBetween(from: number, to: number): readonly Occurrence[] {
+    return occurrencesIn(this.shownCalendars.value, from, to, this.displayZone);
+  }
+
   select(ref: OccurrenceRef | null): void {
     this.selected.value = ref;
   }

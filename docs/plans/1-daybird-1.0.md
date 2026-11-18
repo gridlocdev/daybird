@@ -20,7 +20,7 @@ Each slice leaves `just check` green and fits one session. "Waits on" names the 
 - [x] **8. Week and Day views.** Time grid, all-day strip, now line, overlap layout, scrolling and zoom, range navigation and keys (§6.1, §6.5, §5.4). Waits on 6.
 - [x] **9. Month view.** Spanning bars, "N more" popover (§6.2). Waits on 8.
 - [x] **10. Sidebar.** Mini month, calendar list with show/hide, colours, new/rename/delete calendar, default calendar in the folder settings file, hidden calendars per device (§5.2, §5.6, §13). Waits on 8.
-- [ ] **11. Year and Agenda views.** (§6.3, §6.4). Waits on 9.
+- [x] **11. Year and Agenda views.** (§6.3, §6.4). Waits on 9.
 
 ## Editing
 

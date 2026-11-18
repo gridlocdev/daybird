@@ -1,13 +1,5 @@
 import { useRef, useState } from 'preact/hooks';
-import {
-  addMonths,
-  countsByDay,
-  dayBounds,
-  formatPlainDate,
-  monthGrid,
-  occurrencesIn,
-  startOfMonth,
-} from '@daybird/core';
+import { addMonths, countsByDay, dayBounds, formatPlainDate, monthGrid, startOfMonth } from '@daybird/core';
 import { Icon, type CommandCatalog } from '@daybird/ui';
 import { CalendarList } from './CalendarList.tsx';
 import type { AppController } from './controller.ts';
@@ -25,13 +17,7 @@ export function Sidebar({ app, catalog }: { readonly app: AppController; readonl
   const grid = monthGrid(month, app.weekStart.value);
   const from = dayBounds(grid.start, app.displayZone).start;
   const to = dayBounds(grid.end, app.displayZone).start;
-  const busy = new Set(
-    countsByDay(
-      occurrencesIn(app.shownCalendars.value, from, to, app.displayZone),
-      grid,
-      app.displayZone,
-    ).keys(),
-  );
+  const counts = countsByDay(app.occurrencesBetween(from, to), grid, app.displayZone);
   // While the edge is dragged the width lives here, and is kept once on letting go.
   const [dragWidth, setDragWidth] = useState<number | null>(null);
   const width = dragWidth ?? app.settings.value.sidebarWidth;
@@ -65,7 +51,7 @@ export function Sidebar({ app, catalog }: { readonly app: AppController; readonl
         weekStart={app.weekStart.value}
         locale={app.locale}
         shaded={app.view.value === 'year' ? undefined : app.range.value}
-        busy={busy}
+        counts={counts}
         onPick={(d) => app.goTo(d)}
       />
       <CalendarList app={app} catalog={catalog} />

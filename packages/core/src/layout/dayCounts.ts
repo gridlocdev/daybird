@@ -18,3 +18,8 @@ export function countsByDay(
   }
   return counts;
 }
+
+/** The Year view's tint for a day with `count` events: 0 for none, then 1–2, 3–5 and 6 or more (§6.3). */
+export function busyLevel(count: number): 0 | 1 | 2 | 3 {
+  return count <= 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : 3;
+}

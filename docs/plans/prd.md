@@ -180,13 +180,13 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ### §6.3 Year
 
-- Twelve mini months in a grid (4×3, or 3×4 / 2×6 when narrow). Each day tinted by how many events it has (0, 1–2, 3–5, 6+ in four steps of the accent). Today ringed.
+- Twelve mini months in a grid (4×3, or 3×4 / 2×6 when narrow). Each day tinted by how many events it has (0, 1–2, 3–5, 6+ in four steps of the accent). Today ringed. The sidebar's mini month marks busy days with a dot instead of a tint.
 - Clicking a day opens Day view on it; clicking a month name opens Month view.
 
 ### §6.4 Agenda
 
 - A list of occurrences starting at the anchor (today when opened from **Today**), grouped under sticky day headings ("Today", "Tomorrow", "Thursday, November 19"); days with nothing are skipped. Each row: time range (or "All day"), colour dot, title, location.
-- Loads 60 days at a time as it scrolls. Scrolling up past the anchor loads earlier days, shown faded like past events elsewhere, so looking back is possible but never the first thing seen; **Today** scrolls back to today's heading. Empty: "No events in the next 60 days." with the date the list reached.
+- Loads 60 more days when the end of the list scrolls into view, or with **Show 60 More Days** beside "Up to <date>" at the end. **Show Earlier** at the top adds the 60 days before, shown faded like past events elsewhere, so looking back is possible but never the first thing seen. A new anchor (**Today**, ‹ ›, a date in the mini month) starts the list again at it. Empty: "No events in the next N days. The list reaches <date>." Clicking a row selects the event.
 - Search results use the same list (§10).
 
 ### §6.5 Moving through time

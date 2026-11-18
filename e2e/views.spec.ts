@@ -187,3 +187,71 @@ test.describe('Month', () => {
     await expect(view(page, 'Day')).toBeVisible();
   });
 });
+
+test.describe('Year and Agenda', () => {
+  test.beforeEach(async ({ seed, page }) => {
+    seed('basic');
+    await openApp(page);
+    await putPrivateFiles(page, {
+      'Work.ics': icsWith('Work', '#1f6fe5', [
+        'DTSTART:20261117T150000Z\nDTEND:20261117T160000Z\nSUMMARY:Standup\nLOCATION:Room 4',
+        'DTSTART:20261117T090000Z\nDTEND:20261117T093000Z\nSUMMARY:Coffee',
+        'DTSTART;VALUE=DATE:20261119\nDTEND;VALUE=DATE:20261121\nSUMMARY:Conference',
+        'DTSTART:20261110T090000Z\nDTEND:20261110T100000Z\nSUMMARY:Last week',
+        'DTSTART:20270301T090000Z\nDTEND:20270301T100000Z\nSUMMARY:Far away',
+        ...['08', '09', '10', '11', '12', '13'].map(
+          (h) => `DTSTART:20261203T${h}0000Z\nDTEND:20261203T${h}3000Z\nSUMMARY:Call ${h}`,
+        ),
+      ]),
+    });
+  });
+
+  test('Year tints each day by how many events it has', async ({ page }) => {
+    await page.keyboard.press('y');
+    const year = view(page, 'Year');
+    // A day near a month's edge shows twice; the month's own is the later one.
+    const day = (name: string) => year.getByRole('gridcell', { name, exact: true }).last();
+    await expect(day('Tuesday, November 17, 2026, 2 events')).toHaveClass(/db-busy-1/);
+    await expect(day('Thursday, December 3, 2026, 6 events')).toHaveClass(/db-busy-3/);
+    await expect(day('Wednesday, November 18, 2026')).not.toHaveClass(/db-busy/);
+    await day('Thursday, December 3, 2026, 6 events').click();
+    await expect(view(page, 'Day')).toBeVisible();
+  });
+
+  test('Agenda lists the days with events from today, loads more at the end, and earlier on request', async ({
+    page,
+  }) => {
+    await page.keyboard.press('a');
+    const agenda = view(page, 'Agenda');
+    const headings = agenda.getByRole('heading', { level: 2 });
+    await expect(headings).toHaveText([
+      'Today',
+      'Thursday, November 19',
+      'Friday, November 20',
+      'Thursday, December 3',
+    ]);
+    const today = agenda.getByRole('region', { name: 'Today' });
+    await expect(today.getByRole('button')).toHaveText([
+      /^9:00\s?AM – 9:30\s?AM.*Coffee/,
+      /^3:00\s?PM – 4:00\s?PM.*Standup.*Room 4/,
+    ]);
+    await expect(agenda.getByRole('region', { name: 'Friday, November 20' })).toContainText('All day');
+
+    // March is past the first 60 days; the end of the list brings it in.
+    await expect(agenda.getByText('Far away')).toHaveCount(0);
+    await agenda.getByRole('button', { name: 'Show 60 More Days' }).click();
+    await agenda.getByRole('button', { name: 'Show 60 More Days' }).click();
+    await expect(agenda.getByRole('heading', { name: 'Monday, March 1, 2027' })).toBeVisible();
+
+    await agenda.getByRole('button', { name: 'Show Earlier' }).click();
+    const past = agenda.getByRole('region', { name: 'Tuesday, November 10' }).getByRole('button');
+    await expect(past).toHaveClass(/db-past/);
+    await past.click();
+    await expect(past).toHaveAttribute('aria-pressed', 'true');
+
+    // Today starts the list again at today.
+    await page.keyboard.press('ArrowRight');
+    await page.getByRole('button', { name: 'Today' }).click();
+    await expect(headings.first()).toHaveText('Today');
+  });
+});

@@ -18,6 +18,10 @@ Month shows whole weeks that stretch to fill the window. All-day and multi-day e
 
 The sidebar lists every calendar in the folder. Its checkbox, in the calendar's colour, shows or hides the calendar's events on this device only. **+** beside the heading (or **⌥⌘N**, **Ctrl+Alt+N**) adds a calendar in a file of its own. Right-click a calendar, or use the **⋯** on its row, to rename it, change its colour, make it the default for new events, or delete it. Renaming and colour changes can be undone; deleting asks first and moves the file to the folder's `.daybird/trash`. The default calendar is kept in the folder, so every device that opens it uses the same one. A file Daybird can't read shows greyed, with the reason on hover. Days with events have a dot in the mini month, and the sidebar's edge drags (or takes **←** and **→**) to make it wider or narrower.
 
+## Year and Agenda
+
+Year shows the twelve months of the year, each day tinted by how busy it is, in four steps from none to six or more events, with today ringed. Click a day to open it. Agenda lists every event from the chosen day on, grouped under day headings ("Today", "Tomorrow", "Thursday, November 19") with the time, a colour dot, the title and the location; days with nothing are left out. Scroll to the end, or click **Show 60 More Days**, to see further ahead, and **Show Earlier** at the top to look back. Click a row to select the event.
+
 ## Moving through time
 
 The arrows beside **Today** move one day, week, month or year at a time, by the view, and **Today** comes back. The title says which range you are looking at. The sidebar's mini month shades that range; click a day there, or in the Year view, to show it.

@@ -12,6 +12,7 @@
 - Week and Day show events in a time grid: overlapping events side by side, all-day events in a strip on top, events past midnight in both days, and a line at the time now. Hours can be made taller or shorter.
 - Month shows bars that wrap at week ends and a line for each timed event, as many as the window fits, with "N more" listing the rest of a day.
 - The sidebar lists the calendars: show or hide each one on this device, add, rename, recolour and delete calendars, and pick the default calendar for new events, which every device opening the folder shares. Deleted calendar files go to the folder's `.daybird/trash`. The mini month marks days with events, and the sidebar can be resized.
+- Year tints each day by how busy it is and rings today. Agenda lists the events from a day on under day headings, loads 60 more days as it scrolls, and can show earlier days.
 - The desktop app keeps calendars in a folder you choose, Documents/Daybird by default, and Open Calendar Folder… switches to another. Saves are atomic and take turns with other programs saving the same file.
 - In a browser without folder access, calendars are kept in the browser's own storage.
 - The NAS server serves the web client, and the `daybird` command prints its help and version.

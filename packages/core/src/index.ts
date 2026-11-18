@@ -253,4 +253,5 @@ export {
   type MonthMore,
   type MonthWeek,
 } from './layout/monthWeek.ts';
-export { countsByDay } from './layout/dayCounts.ts';
+export { busyLevel, countsByDay } from './layout/dayCounts.ts';
+export { agendaDays, type AgendaDay } from './layout/agenda.ts';

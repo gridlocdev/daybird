@@ -1,4 +1,12 @@
-import { addDays, datePart, formatPlainDate, monthGrid, type PlainDate, type Weekday } from '@daybird/core';
+import {
+  addDays,
+  busyLevel,
+  datePart,
+  formatPlainDate,
+  monthGrid,
+  type PlainDate,
+  type Weekday,
+} from '@daybird/core';
 
 export interface MiniMonthProps {
   /** Any date in the month to show. */
@@ -9,8 +17,9 @@ export interface MiniMonthProps {
   /** Dates shaded as the shown range, from `start` up to `end`. */
   readonly shaded?: { readonly start: PlainDate; readonly end: PlainDate };
   readonly onPick: (date: PlainDate) => void;
-  /** Days with events, which get a dot (§5.2). */
-  readonly busy?: ReadonlySet<PlainDate>;
+  /** Events per day: a dot under the day (§5.2), or with `tint` a shade of the accent by how many (§6.3). */
+  readonly counts?: ReadonlyMap<PlainDate, number>;
+  readonly tint?: boolean;
   /** Shows the month name as a heading. */
   readonly heading?: boolean;
   readonly onHeading?: () => void;
@@ -53,7 +62,7 @@ export function MiniMonth(props: MiniMonthProps) {
                 outside && 'db-outside',
                 shaded && 'db-shaded',
                 d === props.today && 'db-today',
-                props.busy?.has(d) && 'db-busy',
+                busy(props, d),
               ]
                 .filter(Boolean)
                 .join(' ');
@@ -64,7 +73,7 @@ export function MiniMonth(props: MiniMonthProps) {
                   role="gridcell"
                   class={cls}
                   tabIndex={-1}
-                  aria-label={`${formatPlainDate(d, props.locale, { dateStyle: 'full' })}${props.busy?.has(d) ? ', has events' : ''}`}
+                  aria-label={dayLabel(props, d)}
                   aria-current={d === props.today ? 'date' : undefined}
                   onClick={() => props.onPick(d)}
                 >
@@ -87,4 +96,16 @@ function weeks(days: readonly PlainDate[]): PlainDate[][] {
   const out: PlainDate[][] = [];
   for (let i = 0; i < days.length; i += 7) out.push(days.slice(i, i + 7));
   return out;
+}
+
+function busy(props: MiniMonthProps, d: PlainDate): string | false {
+  const n = props.counts?.get(d) ?? 0;
+  if (!n) return false;
+  return props.tint ? `db-busy-${busyLevel(n)}` : 'db-busy';
+}
+
+function dayLabel(props: MiniMonthProps, d: PlainDate): string {
+  const n = props.counts?.get(d) ?? 0;
+  const date = formatPlainDate(d, props.locale, { dateStyle: 'full' });
+  return n ? `${date}, ${n} ${n === 1 ? 'event' : 'events'}` : date;
 }
