@@ -3,6 +3,7 @@ import {
   calendarById,
   calendarFileName,
   countEventChanges,
+  emptyCalendarDocument,
   loadCalendar,
   nextCalendarColour,
   readCalendar,
@@ -16,7 +17,8 @@ import {
   type Workspace,
 } from '@daybird/core';
 import { NotFoundError, baseName, decodeText, type CalendarStore } from '../platform/calendarStore.ts';
-import { TRASH_PATH, type Conflict, type DiskFile } from './sessionTypes.ts';
+import type { RecoveryCopies } from './recoveryCopies.ts';
+import { TRASH_PATH, type Conflict, type DiskFile, type RecoveryOffer } from './sessionTypes.ts';
 
 /** The file as it is on disk now; null when it's gone. */
 export async function readDisk(store: CalendarStore, path: string): Promise<DiskFile | null> {
@@ -86,4 +88,55 @@ export function copyOf(ws: Workspace, path: string, stampText: string): Calendar
   const color = nextCalendarColour(ws.calendars.map((c) => c.color));
   const document = withCalendarColour(withCalendarName(calendar.document, name), color);
   return { ...calendar, id, name, color, document };
+}
+
+/** A new, empty calendar named `name` in a file of its own, with the next unused colour (§3.1, §5.2). */
+export function newCalendar(ws: Workspace, name: string): Calendar {
+  const id = calendarFileName(
+    name,
+    ws.calendars.map((c) => c.id),
+  );
+  const color = nextCalendarColour(ws.calendars.map((c) => c.color));
+  return {
+    id,
+    name,
+    color,
+    readOnly: false,
+    error: null,
+    document: emptyCalendarDocument(name, color),
+    problems: [],
+  };
+}
+
+/** Where a deleted calendar's file goes (§7.7): `.daybird/trash/<file> <stamp>.ics`. */
+export function trashedCalendarPath(path: string, stampText: string): string {
+  return `.daybird/trash/${baseName(path).replace(/\.ics$/i, '')} ${stampText}.ics`;
+}
+
+/**
+ * The trash as read from disk; null when there is none. A trash file Daybird can't read is moved aside, never
+ * written over, and a new one starts (§3.1).
+ */
+export async function readTrash(
+  store: CalendarStore,
+  stampText: string,
+): Promise<{ version: string; doc: ComponentNode } | null> {
+  const disk = await readDisk(store, TRASH_PATH);
+  if (!disk) return null;
+  const read = readCalendar(disk.text);
+  if (read.ok) return { version: disk.version, doc: read.calendar };
+  await store.move(TRASH_PATH, `.daybird/trash unreadable ${stampText}.ics`);
+  return null;
+}
+
+/** The files a closed window left unsaved changes to that differ from what this window has (§3.6). */
+export function recoveryOfferOf(ws: Workspace, copies: RecoveryCopies, appVersion: string): RecoveryOffer {
+  const files: { path: string; name: string }[] = [];
+  for (const [path, file] of copies.latestFiles()) {
+    const current = docOf(ws, path);
+    if (current && serializeDoc(path, current, appVersion) === file.text) continue;
+    if (path !== TRASH_PATH && calendarById(ws, path)?.readOnly) continue;
+    files.push({ path, name: nameOf(ws, path) });
+  }
+  return { files, savedAt: copies.savedAt() };
 }

@@ -119,7 +119,9 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* None at all: a 0.01 ms transition still turns every style change into an animation, which a paused clock
+       never finishes. */
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }

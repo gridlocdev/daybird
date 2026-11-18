@@ -11,6 +11,14 @@ Single-letter keys only work when you aren't typing in a box.
 | Undo   | **⌘Z**            | **Ctrl+Z**                     |
 | Redo   | **⇧⌘Z** or **⌘Y** | **Ctrl+Shift+Z** or **Ctrl+Y** |
 
+## Calendars
+
+| Action | macOS | Windows / Linux |
+| --- | --- | --- |
+| New calendar | **⌥⌘N** or **+** beside Calendars | **Ctrl+Alt+N** or **+** beside Calendars |
+| Show or hide a calendar | Click its checkbox | Click its checkbox |
+| Rename, colour, default or delete | Right-click it, or **⋯** on its row | Right-click it, or **⋯** on its row |
+
 ## Views
 
 | Action                   | macOS           | Windows / Linux     |

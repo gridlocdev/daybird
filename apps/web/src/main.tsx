@@ -21,6 +21,7 @@ import {
 import { App } from './app/App.tsx';
 import { buildCommands } from './app/commands.ts';
 import { AppController, type FolderChooser } from './app/controller.ts';
+import { loadFolderSettings } from './app/calendarActions.ts';
 import { nativeBridge, type DaybirdNative, type NativeFolder } from './app/native.ts';
 import { menuSender, nativeMenu, watchMenuInputs } from './app/nativeMenu.ts';
 import pkg from '../package.json';
@@ -100,15 +101,22 @@ async function openStore(
     say: (text, options) => app.say(text, options ?? {}),
   });
   app.attach(session);
+  await loadFolderSettings(app);
   return true;
+}
+
+/** Reads the folder again: its calendars and its settings (another window may have changed either). */
+function refresh(app: AppController): void {
+  void app.session.peek()?.refresh();
+  void loadFolderSettings(app);
 }
 
 /** Looks for changes made elsewhere while the window is in front, and keeps a snapshot when it goes. */
 function watchFolder(app: AppController): void {
   every(REFRESH_MS, () => {
-    if (document.hasFocus()) void app.session.peek()?.refresh();
+    if (document.hasFocus()) refresh(app);
   });
-  addEventListener('focus', () => void app.session.peek()?.refresh());
+  addEventListener('focus', () => refresh(app));
   addEventListener('pagehide', () => void app.session.peek()?.flushSnapshot());
   addEventListener('beforeunload', (e) => {
     const session = app.session.peek();

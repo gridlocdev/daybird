@@ -23,8 +23,11 @@ import {
   type Weekday,
 } from '@daybird/core';
 import {
+  DEFAULT_FOLDER_SETTINGS,
   HOUR_HEIGHTS,
   after,
+  defaultCalendarOf,
+  type FolderSettings,
   type FolderSession,
   resolveWeekStart,
   type Settings,
@@ -43,6 +46,9 @@ export const sameOccurrence = (a: OccurrenceRef | null, b: OccurrenceRef | null)
   !!a && !!b && a.calendarId === b.calendarId && a.uid === b.uid && a.key === b.key;
 
 export type DialogKind = 'commands' | 'shortcuts' | 'settings';
+
+/** A calendar's dialogs (PRD §5.2): naming a new one, renaming, its colour, and deleting it. */
+export type CalendarDialog = 'new' | 'rename' | 'colour' | 'delete';
 
 export interface Notice {
   readonly text: string;
@@ -117,6 +123,23 @@ export class AppController {
   readonly calendars = computed<readonly Calendar[]>(
     () => this.session.value?.workspace.value.calendars ?? [],
   );
+  /** The calendars this device shows (§5.2: hidden ones stay hidden on this device only). */
+  readonly shownCalendars = computed<readonly Calendar[]>(() => {
+    const hidden = new Set(this.settings.value.hiddenCalendars);
+    return this.calendars.value.filter((c) => !hidden.has(c.id));
+  });
+  /** `.daybird/settings.json` (§13). */
+  readonly folderSettings = signal<FolderSettings>(DEFAULT_FOLDER_SETTINGS);
+  /** Where new events go. */
+  readonly defaultCalendar = computed(() =>
+    defaultCalendarOf(this.calendars.value, this.folderSettings.value.defaultCalendar),
+  );
+  /** The calendar a sidebar menu or calendar dialog is about. */
+  readonly calendarTarget = signal<string | null>(null);
+  readonly calendarMenu = signal<{ readonly id: string; readonly x: number; readonly y: number } | null>(
+    null,
+  );
+  readonly calendarDialog = signal<CalendarDialog | null>(null);
   /** Every occurrence in the shown range (PRD §6). */
   readonly occurrences;
   readonly selected = signal<OccurrenceRef | null>(null);
@@ -160,7 +183,7 @@ export class AppController {
       const { start, end } = this.range.value;
       const from = dayBounds(start, this.displayZone).start;
       const to = dayBounds(addDays(end, -1), this.displayZone).end;
-      return occurrencesIn(this.calendars.value, from, to, this.displayZone);
+      return occurrencesIn(this.shownCalendars.value, from, to, this.displayZone);
     });
   }
 
@@ -245,7 +268,13 @@ export class AppController {
 
   /** A dialog is open, so plain keys and most commands wait. */
   blocked(): boolean {
-    return this.dialog.peek() !== null || this.dayList.peek() !== null || this.folderQuestion.peek();
+    return (
+      this.dialog.peek() !== null ||
+      this.dayList.peek() !== null ||
+      this.calendarDialog.peek() !== null ||
+      this.calendarMenu.peek() !== null ||
+      this.folderQuestion.peek()
+    );
   }
 
   /** The folder has loaded. */

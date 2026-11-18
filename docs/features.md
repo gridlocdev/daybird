@@ -14,6 +14,10 @@ Week and Day draw a time grid with an all-day strip on top. Events that overlap 
 
 Month shows whole weeks that stretch to fill the window. All-day and multi-day events are bars that wrap at the end of a week, and other events are one line each with a colour dot, the start time and the title. When a day has more than fits, "N more" lists the whole day. Click a day number to open that day.
 
+## Sidebar calendars
+
+The sidebar lists every calendar in the folder. Its checkbox, in the calendar's colour, shows or hides the calendar's events on this device only. **+** beside the heading (or **⌥⌘N**, **Ctrl+Alt+N**) adds a calendar in a file of its own. Right-click a calendar, or use the **⋯** on its row, to rename it, change its colour, make it the default for new events, or delete it. Renaming and colour changes can be undone; deleting asks first and moves the file to the folder's `.daybird/trash`. The default calendar is kept in the folder, so every device that opens it uses the same one. A file Daybird can't read shows greyed, with the reason on hover. Days with events have a dot in the mini month, and the sidebar's edge drags (or takes **←** and **→**) to make it wider or narrower.
+
 ## Moving through time
 
 The arrows beside **Today** move one day, week, month or year at a time, by the view, and **Today** comes back. The title says which range you are looking at. The sidebar's mini month shades that range; click a day there, or in the Year view, to show it.

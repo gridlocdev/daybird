@@ -5,6 +5,13 @@
 import type { View } from '@daybird/core';
 import { CommandCatalog, type CommandSpec } from '@daybird/ui';
 import type { AppController, DialogKind } from './controller.ts';
+import {
+  deleteCalendar,
+  openCalendarDialog,
+  setDefaultCalendar,
+  targetCalendar,
+  toggleCalendar,
+} from './calendarActions.ts';
 
 const VIEW_COMMANDS: readonly { view: View; title: string; key: string; n: number }[] = [
   { view: 'day', title: 'Day', key: 'd', n: 1 },
@@ -37,6 +44,83 @@ export function buildCommands(app: AppController): CommandCatalog {
           } satisfies CommandSpec,
         ]
       : []),
+    {
+      id: 'calendar.new',
+      title: 'New Calendar…',
+      description: 'Add a calendar, kept in a file of its own in the folder.',
+      group: 'File',
+      shortcuts: ['mod+alt+n'],
+      keywords: 'add create calendar file',
+      enabled: () => !!app.session.value,
+      run: () => openCalendarDialog(app, 'new', null),
+    },
+    // The calendar commands below act on the calendar whose ⋯ menu is open, so they show only there.
+    {
+      id: 'calendar.show',
+      title: 'Show Calendar',
+      description: 'Show or hide the calendar’s events on this device.',
+      group: 'File',
+      hidden: true,
+      checked: () => {
+        const c = targetCalendar(app);
+        return !!c && !app.settings.value.hiddenCalendars.includes(c.id);
+      },
+      run: () => {
+        const c = targetCalendar(app);
+        if (c) toggleCalendar(app, c.id);
+      },
+    },
+    {
+      id: 'calendar.rename',
+      title: 'Rename…',
+      description: 'Change the calendar’s name.',
+      group: 'File',
+      hidden: true,
+      enabled: () => !targetCalendar(app)?.readOnly,
+      run: () => openCalendarDialog(app, 'rename', targetCalendar(app)?.id ?? null),
+    },
+    {
+      id: 'calendar.colour',
+      title: 'Colour…',
+      description: 'Change the calendar’s colour.',
+      group: 'File',
+      hidden: true,
+      enabled: () => !targetCalendar(app)?.readOnly,
+      run: () => openCalendarDialog(app, 'colour', targetCalendar(app)?.id ?? null),
+    },
+    {
+      id: 'calendar.setDefault',
+      title: 'Set as Default',
+      description: 'New events go to this calendar, from every device that opens the folder.',
+      group: 'File',
+      hidden: true,
+      checked: () => app.defaultCalendar.value?.id === targetCalendar(app)?.id,
+      enabled: () => !targetCalendar(app)?.readOnly,
+      run: () => {
+        const c = targetCalendar(app);
+        app.calendarMenu.value = null;
+        if (c) void setDefaultCalendar(app, c.id);
+      },
+    },
+    {
+      id: 'calendar.delete',
+      title: 'Delete Calendar…',
+      description: 'Move the calendar’s file to the folder’s trash.',
+      group: 'File',
+      hidden: true,
+      // The last calendar new events could go to stays.
+      enabled: () =>
+        !!targetCalendar(app)?.readOnly || app.calendars.value.filter((c) => !c.readOnly).length > 1,
+      run: () => {
+        const c = targetCalendar(app);
+        if (!c) return;
+        // An unreadable file has nothing to count; it goes without asking.
+        if (c.readOnly) {
+          app.calendarMenu.value = null;
+          void deleteCalendar(app, c.id);
+        } else openCalendarDialog(app, 'delete', c.id);
+      },
+    },
     {
       id: 'app.settings',
       title: 'Settings…',
@@ -184,6 +268,10 @@ export function buildCommands(app: AppController): CommandCatalog {
   ];
   const catalog = new CommandCatalog(specs);
   // With a dialog open, only the command that toggles that dialog (or opens another one) runs.
-  catalog.gate = (c) => !app.blocked() || Object.values(DIALOG_COMMAND).includes(c.id);
+  catalog.gate = (c) =>
+    !app.blocked() ||
+    Object.values(DIALOG_COMMAND).includes(c.id) ||
+    // The ⋯ menu runs its own commands.
+    (app.calendarMenu.peek() !== null && c.id.startsWith('calendar.'));
   return catalog;
 }

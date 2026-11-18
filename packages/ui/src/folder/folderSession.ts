@@ -12,10 +12,8 @@ import {
   clearUndo,
   countEventChanges,
   diffStep,
-  emptyCalendarDocument,
   emptyTrashDocument,
   loadCalendar,
-  nextCalendarColour,
   purgeTrash,
   pushStep,
   readCalendar,
@@ -43,7 +41,11 @@ import {
   nameOf,
   parseDoc,
   readDisk,
+  newCalendar,
+  readTrash,
+  recoveryOfferOf,
   serializeDoc,
+  trashedCalendarPath,
   withDoc,
 } from './sessionFiles.ts';
 import {
@@ -129,6 +131,29 @@ export class FolderSession {
     });
     this.#edited(s, 'after');
     return true;
+  }
+
+  /** A new calendar in a file of its own (§5.2). Not an undo step: Delete Calendar takes it away. */
+  async createCalendar(name: string): Promise<Calendar> {
+    const calendar = newCalendar(this.workspace.peek(), name.trim() || 'Untitled');
+    await this.#writeNew(calendar);
+    return calendar;
+  }
+
+  /** Moves a calendar's file to `.daybird/trash/`, dropping its undo steps (§7.7); refused mid-save. */
+  async deleteCalendar(path: string): Promise<void> {
+    const rec = this.#files.get(path);
+    if (rec?.state.startsWith('saving')) throw new Error('It’s still saving. Try again.');
+    if (rec?.base !== null) await this.store.move(path, trashedCalendarPath(path, stamp(this.#now())));
+    rec?.cancelRetry?.();
+    this.#files.delete(path);
+    this.conflicts.value = this.conflicts.peek().filter((c) => c.path !== path);
+    batch(() => {
+      this.workspace.value = withoutCalendar(this.workspace.peek(), path);
+      this.undoStack.value = withoutCalendarSteps(this.undoStack.peek(), path);
+    });
+    this.#dropCopiesIfSaved();
+    this.#publish();
   }
 
   /** Undoes the last step; returns its label, or null when there's nothing to undo. */
@@ -287,16 +312,7 @@ export class FolderSession {
     let ws = this.workspace.peek();
     if (!ws.calendars.length) {
       // An empty folder gets one calendar, with no welcome card (§3.1).
-      const color = nextCalendarColour([]);
-      const calendar: Calendar = {
-        id: 'Calendar.ics',
-        name: 'Calendar',
-        color,
-        readOnly: false,
-        error: null,
-        document: emptyCalendarDocument('Calendar', color),
-        problems: [],
-      };
+      const calendar = newCalendar(ws, 'Calendar');
       ws = withCalendar(ws, calendar);
       this.#record(calendar.id);
       pending.push(calendar.id);
@@ -306,7 +322,7 @@ export class FolderSession {
     this.workspace.value = purged;
     this.#publish();
 
-    const offered = this.#recoveryOffer();
+    const offered = recoveryOfferOf(this.workspace.peek(), this.#copies, this.#appVersion);
     if (offered.files.length) {
       this.recovery.value = offered;
       const held = new Set(offered.files.map((f) => f.path));
@@ -332,29 +348,11 @@ export class FolderSession {
 
   async #loadTrash(): Promise<void> {
     const rec = this.#record(TRASH_PATH);
-    const disk = await readDisk(this.store, TRASH_PATH);
-    if (!disk) return;
-    const read = readCalendar(disk.text);
-    if (read.ok) {
-      rec.base = disk.version;
-      rec.disk = read.calendar;
-      this.workspace.value = { ...this.workspace.peek(), trash: read.calendar };
-      return;
-    }
-    // A trash file Daybird can't read is moved aside, never written over, and a new one starts.
-    await this.store.move(TRASH_PATH, `.daybird/trash unreadable ${stamp(this.#now())}.ics`);
-  }
-
-  #recoveryOffer(): RecoveryOffer {
-    const latest = this.#copies.latestFiles();
-    const files: { path: string; name: string }[] = [];
-    for (const [path, file] of latest) {
-      const current = docOf(this.workspace.peek(), path);
-      if (current && serializeDoc(path, current, this.#appVersion) === file.text) continue;
-      if (path !== TRASH_PATH && calendarById(this.workspace.peek(), path)?.readOnly) continue;
-      files.push({ path, name: nameOf(this.workspace.peek(), path) });
-    }
-    return { files, savedAt: this.#copies.savedAt() };
+    const trash = await readTrash(this.store, stamp(this.#now()));
+    if (!trash) return;
+    rec.base = trash.version;
+    rec.disk = trash.doc;
+    this.workspace.value = { ...this.workspace.peek(), trash: trash.doc };
   }
 
   #releaseHeld(): void {
@@ -409,11 +407,7 @@ export class FolderSession {
           break;
         case 'dropCopy':
           rec.unsaved = false;
-          if (![...this.#files.values()].some((r) => r.unsaved)) {
-            this.#stopSnapshots?.();
-            this.#stopSnapshots = null;
-            void this.#copies.save([]);
-          }
+          this.#dropCopiesIfSaved();
           break;
         case 'scheduleRetry':
           rec.cancelRetry = after(RETRY_DELAYS[rec.attempts - 1] ?? 600, () => {
@@ -571,22 +565,28 @@ export class FolderSession {
   /** Save Mine as a Copy: `<name> copy <stamp>.ics`, shown as its own calendar (§3.5). */
   async #writeCopy(path: string): Promise<void> {
     const copy = copyOf(this.workspace.peek(), path, stamp(this.#now()));
-    if (!copy) return;
-    const version = await this.store.write(
-      copy.id,
-      encodeText(serializeDoc(copy.id, copy.document, this.#appVersion)),
-      {
-        create: true,
-      },
-    );
-    const rec = this.#record(copy.id);
+    if (copy) await this.#writeNew(copy);
+  }
+
+  /** Writes a calendar that has no file yet and shows it; not an undo step. Throws when the write fails. */
+  async #writeNew(calendar: Calendar): Promise<void> {
+    const text = serializeDoc(calendar.id, calendar.document, this.#appVersion);
+    const version = await this.store.write(calendar.id, encodeText(text), { create: true });
+    const rec = this.#record(calendar.id);
     rec.base = version;
-    rec.disk = copy.document;
-    this.workspace.value = withCalendar(this.workspace.peek(), copy);
+    rec.disk = calendar.document;
+    this.workspace.value = withCalendar(this.workspace.peek(), calendar);
     this.#publish();
   }
 
   // ——— Snapshots ———
+
+  #dropCopiesIfSaved(): void {
+    if ([...this.#files.values()].some((r) => r.unsaved)) return;
+    this.#stopSnapshots?.();
+    this.#stopSnapshots = null;
+    void this.#copies.save([]);
+  }
 
   async #writeSnapshot(): Promise<void> {
     const files: SnapshotFile[] = [];

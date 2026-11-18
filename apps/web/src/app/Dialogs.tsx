@@ -12,6 +12,7 @@ import {
   type WeekStartSetting,
 } from '@daybird/ui';
 import type { AppController } from './controller.ts';
+import { CalendarDialogs } from './CalendarDialogs.tsx';
 import { DayListDialog } from './DayListDialog.tsx';
 import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
 import { shortcutGroups } from './shortcuts.ts';
@@ -27,6 +28,7 @@ export function Dialogs({ app, catalog }: { readonly app: AppController; readonl
   if (session && conflict) return <ConflictDialog app={app} session={session} conflict={conflict} />;
   const day = app.dayList.value;
   if (day) return <DayListDialog app={app} day={day} />;
+  if (app.calendarDialog.value) return <CalendarDialogs app={app} />;
   switch (app.dialog.value) {
     case 'commands':
       return <CommandMenu app={app} catalog={catalog} />;

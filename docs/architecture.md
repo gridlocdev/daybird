@@ -11,7 +11,7 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
                                            │ imports
      ┌──────────────────── packages/ui (Preact + signals) ─────────────────────┐
      │  CommandCatalog (keys, two-key sequences, recents) · listenForKeys        │
-     │  Dialog · ListPopup · focusTrap · Icon · settings · schedule (timers)     │
+     │  Dialog · ListPopup · PopupMenu · focusTrap · Icon · settings · schedule  │
      └─────────────────────────────────────┬───────────────────────────────────┘
                                            │
      ┌──────────────────── packages/core (pure TS) ────────────────────┐
@@ -36,7 +36,7 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
 ## Core (`packages/core`)
 
 - `plainDate.ts`: calendar dates as `YYYY-MM-DD` strings, with arithmetic on whole days so a daylight-saving change can't move a date (PRD §4.1).
-- `layout/`: where events sit (PRD §6.1, §6.2). `timeGrid.ts` cuts timed occurrences into one segment per day in wall-clock minutes of the display zone and splits each day into columns; `dayBars.ts` stacks bars that span days into rows, for the all-day strip and the month weeks; `monthWeek.ts` lays out a Month week: bars, one-line entries in the free lanes and "N more" where a day overflows.
+- `layout/`: where events sit (PRD §6.1, §6.2). `timeGrid.ts` cuts timed occurrences into one segment per day in wall-clock minutes of the display zone and splits each day into columns; `dayBars.ts` stacks bars that span days into rows, for the all-day strip and the month weeks; `monthWeek.ts` lays out a Month week: bars, one-line entries in the free lanes and "N more" where a day overflows; `dayCounts.ts` counts events per day for the mini month's dots and the Year view.
 - `views.ts`: what each view shows: its date range, the month grid, stepping, and the title (PRD §6).
 - `colours.ts`: the calendar palette and accent colours, and the text colour that reads on each (PRD §5.6).
 - `ical/`: our own iCalendar reader and writer (PRD §3.2, §3.3). `contentLine.ts` parses and formats one line, folds at 75 octets and handles text escapes. `document.ts` reads a file into an immutable tree of components and properties in file order. Each node read from disk keeps its physical lines, so an unedited file writes back byte for byte; a changed node is written fresh. Lines it can't read are kept and written back as they were; a file whose structure is broken is refused with a line number. `calendarFile.ts` reads the name and colour, fills in missing UIDs and stamps PRODID. The fixture corpus is in `packages/core/test/fixtures/ical/`. `values.ts` reads and writes DATE, DATE-TIME, DURATION and PERIOD values; `vtimezone.ts` reads a VTIMEZONE into a zone and writes one for an IANA zone from the offsets `Intl` reports across a year.
@@ -47,9 +47,9 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
 
 - `commands/`: the `CommandCatalog`. Shortcuts are parsed once; `forEvent` turns a key press into a command, a wait for the second key of a sequence, or nothing (PRD §12). `listenForKeys` is the one key listener.
 - `settings.ts`: the per-device settings and where they are kept (PRD §13).
-- `components/`: `Dialog` (modal, focus trap, Esc), `ListPopup` and the `Icon` set.
+- `components/`: `Dialog` (modal, focus trap, Esc), `ListPopup`, `PopupMenu` (right-click and ⋯ menus built from catalog commands) and the `Icon` set.
 - `platform/`: where the folder lives (PRD §3.7). `CalendarStore` is the one interface the app reads and writes files through, with folder-relative paths and a SHA-256 version per file; a conditional write refuses with `ConflictError` when the file changed or went. `MemoryStore` is for tests and as the last fallback, `BrowserStore` wraps a browser folder handle (the private folder, or one the user picked) and holds a Web Lock per file while it checks and writes. `localSnapshots.ts` keeps recovery snapshots in local storage, one per window, with a Web Lock that tells a live window's snapshot from a closed one's. The contract test in `packages/ui/test/storeContract.test.ts` runs every store through the same cases.
-- `folder/`: the open folder. `FolderSession` holds the workspace and the undo stack as signals and runs one save chart per file (below). `sessionTypes.ts` has its types and constants, `sessionFiles.ts` the pure helpers that read and write one file, and `snapshots.ts` the snapshot format.
+- `folder/`: the open folder. `FolderSession` holds the workspace and the undo stack as signals and runs one save chart per file (below). `sessionTypes.ts` has its types and constants, `sessionFiles.ts` the pure helpers that read and write one file, `snapshots.ts` the snapshot format, and `folderSettings.ts` the folder's own settings in `.daybird/settings.json` (the default calendar).
 
 ## Saving
 

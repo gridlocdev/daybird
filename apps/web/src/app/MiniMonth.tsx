@@ -9,6 +9,8 @@ export interface MiniMonthProps {
   /** Dates shaded as the shown range, from `start` up to `end`. */
   readonly shaded?: { readonly start: PlainDate; readonly end: PlainDate };
   readonly onPick: (date: PlainDate) => void;
+  /** Days with events, which get a dot (§5.2). */
+  readonly busy?: ReadonlySet<PlainDate>;
   /** Shows the month name as a heading. */
   readonly heading?: boolean;
   readonly onHeading?: () => void;
@@ -51,6 +53,7 @@ export function MiniMonth(props: MiniMonthProps) {
                 outside && 'db-outside',
                 shaded && 'db-shaded',
                 d === props.today && 'db-today',
+                props.busy?.has(d) && 'db-busy',
               ]
                 .filter(Boolean)
                 .join(' ');
@@ -61,7 +64,7 @@ export function MiniMonth(props: MiniMonthProps) {
                   role="gridcell"
                   class={cls}
                   tabIndex={-1}
-                  aria-label={formatPlainDate(d, props.locale, { dateStyle: 'full' })}
+                  aria-label={`${formatPlainDate(d, props.locale, { dateStyle: 'full' })}${props.busy?.has(d) ? ', has events' : ''}`}
                   aria-current={d === props.today ? 'date' : undefined}
                   onClick={() => props.onPick(d)}
                 >

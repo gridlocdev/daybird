@@ -13,7 +13,7 @@ export function App({ app, catalog }: { readonly app: AppController; readonly ca
     <div class="db-app">
       <Toolbar app={app} catalog={catalog} />
       <div class="db-body">
-        {shown && <Sidebar app={app} />}
+        {shown && <Sidebar app={app} catalog={catalog} />}
         <RangeView app={app} />
       </div>
       <StatusBar app={app} />

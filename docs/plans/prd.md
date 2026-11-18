@@ -127,7 +127,9 @@ Design direction, from reviewing Apple Calendar, Fantastical, Google Calendar an
 
 - 240 px wide, resizable 200–360 px, hidden with ⌘⌥S (remembered).
 - Top: a mini month. Today ringed in the accent; the days in the shown range shaded; days with events get a small dot below the number. Arrows move it a month without moving the view; clicking a day shows that day in the current view (Month view goes to that month).
-- Below: **Calendars**, one row each: a checkbox in the calendar's colour (shown/hidden), the name, and on hover a ⋯ button (the same items as right-click: Rename, Colour, Set as Default, Export, Delete Calendar). The default calendar shows "Default" in grey. **+** beside the heading adds a calendar.
+- Below: **Calendars**, one row each: a checkbox in the calendar's colour (shown/hidden), the name, and on hover a ⋯ button (the same items as right-click: Show Calendar, Rename, Colour, Set as Default, Export, Delete Calendar). The default calendar shows "Default" in grey. **+** beside the heading (⌥⌘N) adds a calendar, `Untitled` when the name is left empty, in a new file named after it.
+- Rename and Colour change the calendar inside its file (`X-WR-CALNAME`, `X-APPLE-CALENDAR-COLOR`) and are undo steps; the file keeps its name. New Calendar and Delete Calendar are not undo steps: undoing a new calendar would leave its file behind. Delete asks first ("Delete Work?", with its event count) and moves the file to `.daybird/trash/<name> <YYYY-MM-DD-HHmmss>.ics`; an unreadable calendar goes without asking. The last calendar new events could go to can't be deleted, and a calendar mid-save asks to try again.
+- The sidebar's right edge drags to resize it, and takes ← → (⇧ for bigger steps) when focused; a double-click puts it back to 240 px.
 - A greyed row for an unreadable file (§3.2), with its error on hover.
 - Bottom: **Trash** with its count when non-zero.
 

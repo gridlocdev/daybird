@@ -49,6 +49,7 @@ export { Dialog } from './components/Dialog.tsx';
 export { focusables, trapIndex, trapTab } from './components/focusTrap.ts';
 export { Icon } from './components/Icon.tsx';
 export { ListPopup, listStep } from './components/ListPopup.tsx';
+export { PopupMenu } from './components/PopupMenu.tsx';
 export {
   BrowserStore,
   ConflictError,
@@ -91,6 +92,15 @@ export {
   type SnapshotStorage,
 } from './folder/snapshots.ts';
 export { FolderSession } from './folder/folderSession.ts';
+export {
+  DEFAULT_FOLDER_SETTINGS,
+  FOLDER_SETTINGS_PATH,
+  defaultCalendarOf,
+  parseFolderSettings,
+  readFolderSettings,
+  writeFolderSettings,
+  type FolderSettings,
+} from './folder/folderSettings.ts';
 export {
   RETRY_DELAYS,
   SNAPSHOT_MS,

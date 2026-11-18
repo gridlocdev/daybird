@@ -253,3 +253,4 @@ export {
   type MonthMore,
   type MonthWeek,
 } from './layout/monthWeek.ts';
+export { countsByDay } from './layout/dayCounts.ts';
