@@ -85,3 +85,36 @@ export async function runCommand(page: Page, name: string): Promise<void> {
   await page.keyboard.press('Enter');
   await expect(menu).toBeHidden();
 }
+
+/**
+ * Put calendar files in the browser's private folder, where the browser build keeps them, then reload so the app
+ * reads them. `files` maps a file name to its text.
+ */
+export async function putPrivateFiles(page: Page, files: Record<string, string>): Promise<void> {
+  await page.evaluate(async (files) => {
+    const root = await navigator.storage.getDirectory();
+    const folder = await root.getDirectoryHandle('calendars', { create: true });
+    for (const [name, text] of Object.entries(files)) {
+      const w = await (await folder.getFileHandle(name, { create: true })).createWritable();
+      await w.write(text);
+      await w.close();
+    }
+  }, files);
+  await page.reload();
+  await waitForApp(page);
+}
+
+/** A calendar file with the given VEVENT bodies (each without BEGIN/END), made-up data. */
+export function icsWith(name: string, colour: string, events: readonly string[]): string {
+  const body = events
+    .map(
+      (e, i) =>
+        `BEGIN:VEVENT\r\nUID:e2e-${i}@example.com\r\nDTSTAMP:20261101T000000Z\r\n${e
+          .trim()
+          .split('\n')
+          .map((l) => l.trim())
+          .join('\r\n')}\r\nEND:VEVENT\r\n`,
+    )
+    .join('');
+  return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Example//Example//EN\r\nX-WR-CALNAME:${name}\r\nX-APPLE-CALENDAR-COLOR:${colour}\r\n${body}END:VCALENDAR\r\n`;
+}

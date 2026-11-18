@@ -6,6 +6,10 @@ Daybird is a calendar that keeps each calendar in a plain `.ics` file. This page
 
 Five views of the same calendars: **Day** and **Week** as a time grid, **Month** as a grid of weeks, **Year** as twelve small months, and **Agenda** as a list of the next 60 days. Switch with the buttons at the top right, the View menu, or a single key (**D**, **W**, **M**, **Y**, **A**). Daybird remembers the last view.
 
+## Week and Day
+
+Week and Day draw a time grid with an all-day strip on top. Events that overlap sit side by side, an event that runs past midnight shows in both days, and a red line marks the time now in today's column. The grid opens just before now, or at the first hour you set. **⌘=** and **⌘-** (**Ctrl+=** and **Ctrl+-**) make the hours taller or shorter, and Daybird remembers it. Click an event to select it.
+
 ## Moving through time
 
 The arrows beside **Today** move one day, week, month or year at a time, by the view, and **Today** comes back. The title says which range you are looking at. The sidebar's mini month shades that range; click a day there, or in the Year view, to show it.

@@ -140,7 +140,7 @@ Design direction, from reviewing Apple Calendar, Fantastical, Google Calendar an
 
 ### §5.4 Event chips
 
-- Timed events in Day and Week: a block with a 3 px left bar in the calendar colour, a fill of that colour at 18% (32% in dark mode) and text in a darkened (lightened in dark mode) version of it. Title, then the time when the block is 30 minutes or taller, then the location when there's room. Past events fade to 60%.
+- Timed events in Day and Week: a block with a 3 px left bar in the calendar colour, a fill of that colour at 18% (32% in dark mode) and text in a darkened (lightened in dark mode) version of it. Title, then the time when the block is 30 minutes or taller (beside the title under 45 minutes, where the time gives way first in a narrow column; under it from 45), then the location from an hour. Past events fade to 60%. A screen reader hears "Title, 9:00 AM to 10:00 AM, Location, Calendar, repeats".
 - All-day events: a filled bar in the calendar colour with white text, or black on light colours (relative luminance above 0.4, such as the palette's yellow).
 - Selected: a 2 px accent ring. Being dragged: a shadow and the original's place drawn dashed.
 - Repeating events show ↻ after the title; events with reminders don't get an icon.
@@ -159,13 +159,14 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 ### §6.1 Day and Week
 
-- An all-day strip on top (grows to 4 rows, then "+N more" which expands it), then a 24-hour time grid with hour labels at the left, half-hour lines lighter.
+- An all-day strip on top (grows to 4 rows; past that it shows 3 and a "+N more" per day, which expands it, and "Less" folds it again), then a 24-hour time grid with hour labels at the left, half-hour lines lighter.
 - Week starts on the locale's first day, or the Settings choice. Weekend columns a shade darker. Today's column header in the accent. Optional week numbers (ISO 8601) at the top left.
 - The red "now" line with a dot at the left edge of today's column, updated every 30 s. At midnight the views roll over (today moves).
 - Opening a range scrolls to 30 minutes before now when today is shown, else to the first visible hour setting (default 8:00). Hour height 48 px; ⌘+ / ⌘− zoom 32–96 px (remembered).
 - Overlapping events split the column: each cluster of overlapping events gets as many columns as its widest moment, events placed left-first in start order (ties: longer first), each widened right into free columns. Events shorter than 15 minutes draw 15 minutes tall.
 - An event crossing midnight draws in both columns, its edges squared where it continues.
 - Day view is the same grid with one column, with the selected event's details in the popover only.
+- Clicking an event selects it (one at a time, in every view).
 
 ### §6.2 Month
 

@@ -399,3 +399,197 @@
 [data-accent-swatch='pink'] {
   --db-swatch: #c4378f;
 }
+
+/* Event chips (§5.4): a tint of the calendar colour with a bar at the left, darker ink in light mode. */
+:root {
+  --db-chip-fill: 18%;
+  --db-chip-ink: black;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --db-chip-fill: 32%;
+    --db-chip-ink: white;
+  }
+}
+:root[data-theme='dark'] {
+  --db-chip-fill: 32%;
+  --db-chip-ink: white;
+}
+.db-column {
+  position: relative;
+}
+.db-event {
+  position: absolute;
+  top: calc(var(--db-top) * var(--db-hour));
+  height: calc(var(--db-len) * var(--db-hour) - 2px);
+  margin: 1px 0 0;
+  padding: 2px 4px 2px 7px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  border: 0;
+  border-left: 3px solid var(--db-c);
+  border-radius: 4px;
+  outline: 1px solid var(--db-grid);
+  background: color-mix(in srgb, var(--db-c) var(--db-chip-fill), var(--db-grid));
+  color: color-mix(in srgb, var(--db-c) 40%, var(--db-chip-ink));
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: default;
+}
+.db-event.db-short {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.db-event-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.db-event:not(.db-short) .db-event-title {
+  white-space: normal;
+}
+.db-short .db-event-title {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+/* In a narrow column the time gives way before the title does. */
+.db-short .db-event-time {
+  flex: 0 1000 auto;
+  min-width: 0;
+}
+.db-event-time,
+.db-event-place {
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.db-event.db-past,
+.db-bar.db-past {
+  opacity: 0.6;
+}
+.db-event.db-continues-before {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.db-event.db-continues-after {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.db-event.db-selected,
+.db-bar.db-selected {
+  box-shadow: 0 0 0 2px var(--db-accent);
+  z-index: 2;
+}
+.db-event:focus-visible,
+.db-bar:focus-visible,
+.db-more:focus-visible {
+  outline: 2px solid var(--db-accent);
+  outline-offset: 1px;
+  z-index: 3;
+}
+.db-now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--db-at) * var(--db-hour));
+  height: 2px;
+  margin-top: -1px;
+  background: var(--db-now);
+  z-index: 4;
+  pointer-events: none;
+}
+.db-now::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--db-now);
+}
+.db-week-label {
+  align-self: center;
+  color: var(--db-text-3);
+  font-size: 10px;
+  text-align: right;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+/* The all-day strip (§6.1) */
+.db-all-day {
+  flex: none;
+  display: flex;
+  border-bottom: 1px solid var(--db-line);
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+}
+.db-all-day-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 4px 8px 0 0;
+  box-sizing: border-box;
+  color: var(--db-text-3);
+  font-size: 10px;
+}
+.db-all-day-bars {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--db-days), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--db-rows), 20px);
+  gap: 2px 0;
+  padding: 3px 0;
+  min-height: 20px;
+}
+.db-bar {
+  margin: 0 2px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.db-bar.db-continues-before {
+  margin-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.db-bar.db-continues-after {
+  margin-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.db-more {
+  margin: 0 2px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--db-text-2);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+}
+.db-more:hover {
+  background: var(--db-hover);
+}

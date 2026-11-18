@@ -84,6 +84,9 @@ try {
     viewport: { width: 1280, height: 800 },
     colorScheme: dark ? 'dark' : 'light',
     reducedMotion: 'reduce',
+    // As in the scenarios, so a fixture's times land on the same hours.
+    locale: 'en-US',
+    timezoneId: 'UTC',
   });
   const errors = watchErrors(page);
   // The same fixed clock as the scenarios, so the fixtures' dates read the same.

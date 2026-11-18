@@ -165,3 +165,18 @@ export function localeWeekStart(locale?: string): Weekday {
     return 0;
   }
 }
+
+/** A time of day for an event chip and its label, "9:30 AM" or "09:30", on the display zone's clock. */
+export function timeLabel(
+  utcSeconds: number,
+  locale: string | undefined,
+  zone: string,
+  hour12?: boolean,
+): string {
+  return new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: zone,
+    ...(hour12 === undefined ? {} : { hour12 }),
+  }).format(utcSeconds * 1000);
+}

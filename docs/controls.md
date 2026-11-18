@@ -21,6 +21,9 @@ Single-letter keys only work when you aren't typing in a box.
 | Year                     | **Y** or **⌘4** | **Y** or **Ctrl+4** |
 | Agenda                   | **A** or **⌘5** | **A** or **Ctrl+5** |
 | Show or hide the sidebar | **⌥⌘S**         | **Ctrl+Alt+S**      |
+| Taller hours             | **⌘=**          | **Ctrl+=**          |
+| Shorter hours            | **⌘-**          | **Ctrl+-**          |
+| Select an event          | click           | click               |
 
 ## Moving through time
 

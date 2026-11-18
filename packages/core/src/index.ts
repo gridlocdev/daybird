@@ -30,6 +30,7 @@ export {
   monthGrid,
   rangeTitle,
   stepAnchor,
+  timeLabel,
   viewRange,
   type DateRange,
   type RangeTitle,
@@ -229,3 +230,16 @@ export {
 } from './model/undo.ts';
 export { checkInvariants } from './model/invariants.ts';
 export { countEventChanges } from './model/compare.ts';
+export {
+  MINUTES_PER_DAY,
+  MIN_EVENT_MINUTES,
+  dayBounds,
+  daySegments,
+  layoutDay,
+  openingMinutes,
+  wallMinutes,
+  type Placed,
+  type Segment,
+  type Timed,
+} from './layout/timeGrid.ts';
+export { dayBars, rowCount, type Bar, type DaySpan } from './layout/dayBars.ts';

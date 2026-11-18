@@ -2,15 +2,21 @@
  * The window's state as signals: the view, the anchor date, today, per-device settings, the open dialog and
  * the status-bar notice. Components read these; commands call the methods.
  */
-import { batch, computed, signal } from '@preact/signals';
+import { batch, computed, signal, type Signal } from '@preact/signals';
 import {
+  addDays,
+  dayBounds,
   localeWeekStart,
+  occurrencesIn,
+  systemZoneId,
   rangeTitle,
   stepAnchor,
   todayIn,
   viewRange,
   type Accent,
+  type Calendar,
   type DateRange,
+  type Occurrence,
   type PlainDate,
   type RangeTitle,
   type View,
@@ -25,6 +31,16 @@ import {
   type SettingsStorage,
   type Theme,
 } from '@daybird/ui';
+
+/** Which occurrence is selected: at most one in every view (PRD §6). */
+export interface OccurrenceRef {
+  readonly calendarId: string;
+  readonly uid: string;
+  readonly key: number | null;
+}
+
+export const sameOccurrence = (a: OccurrenceRef | null, b: OccurrenceRef | null): boolean =>
+  !!a && !!b && a.calendarId === b.calendarId && a.uid === b.uid && a.key === b.key;
 
 export type DialogKind = 'commands' | 'shortcuts' | 'settings';
 
@@ -47,6 +63,8 @@ export interface ControllerOptions {
   readonly now?: () => number;
   /** The locale for dates; the runtime's when left out. */
   readonly locale?: string;
+  /** The zone the views draw in (PRD §4.3); the system's when left out. */
+  readonly displayZone?: string;
   /** The desktop app: the user picks the calendar folder (PRD §3.7). Absent in the browser. */
   readonly folders?: FolderChooser;
 }
@@ -93,6 +111,17 @@ export class AppController {
   readonly weekStart;
   readonly range;
   readonly title;
+  readonly displayZone: string;
+  /** Milliseconds since the epoch, moved on by the clock every 30 s: the now line and fading past events. */
+  readonly now: Signal<number>;
+  readonly calendars = computed<readonly Calendar[]>(
+    () => this.session.value?.workspace.value.calendars ?? [],
+  );
+  /** Every occurrence in the shown range (PRD §6). */
+  readonly occurrences;
+  readonly selected = signal<OccurrenceRef | null>(null);
+  /** The Day and Week all-day strip shows every row, not just four (§6.1). */
+  readonly allDayExpanded = signal(false);
 
   readonly #storage: SettingsStorage;
   readonly #now: () => number;
@@ -106,6 +135,8 @@ export class AppController {
     this.#storage = options.settings;
     this.#now = options.now ?? Date.now;
     this.#localeWeekStart = localeWeekStart(options.locale);
+    this.displayZone = options.displayZone ?? systemZoneId();
+    this.now = signal(this.#now());
     this.settings = signal<Settings>(options.settings.load());
     const today = todayIn(this.#now());
     this.today = signal<PlainDate>(today);
@@ -121,6 +152,16 @@ export class AppController {
     this.title = computed<RangeTitle>(() =>
       rangeTitle(this.view.value, this.anchor.value, this.weekStart.value, this.locale),
     );
+    this.occurrences = computed<readonly Occurrence[]>(() => {
+      const { start, end } = this.range.value;
+      const from = dayBounds(start, this.displayZone).start;
+      const to = dayBounds(addDays(end, -1), this.displayZone).end;
+      return occurrencesIn(this.calendars.value, from, to, this.displayZone);
+    });
+  }
+
+  select(ref: OccurrenceRef | null): void {
+    this.selected.value = ref;
   }
 
   /** Changes settings and keeps them. */
@@ -172,7 +213,7 @@ export class AppController {
   }
 
   canZoom(direction: -1 | 1): boolean {
-    const h = this.settings.peek().hourHeight;
+    const h = this.settings.value.hourHeight;
     return direction > 0 ? h < HOUR_HEIGHTS.max : h > HOUR_HEIGHTS.min;
   }
 
@@ -254,6 +295,7 @@ export class AppController {
    * that was showing today follows it (PRD §6.1).
    */
   tick(): void {
+    this.now.value = this.#now();
     const today = todayIn(this.#now());
     const was = this.today.peek();
     if (today === was) return;

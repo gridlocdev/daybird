@@ -3,7 +3,6 @@ import {
   addMonths,
   datePart,
   formatPlainDate,
-  hourLabel,
   isoWeek,
   startOfYear,
   weekday,
@@ -11,6 +10,7 @@ import {
 } from '@daybird/core';
 import type { AppController } from './controller.ts';
 import { MiniMonth } from './MiniMonth.tsx';
+import { TimeGrid } from './TimeGrid.tsx';
 
 function datesIn(start: PlainDate, end: PlainDate): PlainDate[] {
   const out: PlainDate[] = [];
@@ -29,7 +29,7 @@ export function RangeView({ app }: { readonly app: AppController }) {
   return (
     <main class={`db-view db-view-${view}`} aria-label={`${view[0]!.toUpperCase()}${view.slice(1)} view`}>
       {view === 'day' || view === 'week' ? (
-        <DayColumns app={app} />
+        <TimeGrid app={app} />
       ) : view === 'month' ? (
         <MonthGrid app={app} />
       ) : view === 'year' ? (
@@ -40,65 +40,6 @@ export function RangeView({ app }: { readonly app: AppController }) {
     </main>
   );
 }
-
-function DayColumns({ app }: { readonly app: AppController }) {
-  const { start, end } = app.range.value;
-  const today = app.today.value;
-  const days = datesIn(start, end);
-  return (
-    <div class="db-columns" style={{ '--db-days': days.length }}>
-      <div class="db-column-heads">
-        <span class="db-gutter" />
-        {days.map((d) => (
-          <div
-            key={d}
-            class={`db-column-head${d === today ? ' db-today' : ''}${isWeekend(d) ? ' db-weekend' : ''}`}
-            aria-current={d === today ? 'date' : undefined}
-          >
-            <span class="db-weekday">{formatPlainDate(d, app.locale, { weekday: 'short' })}</span>
-            <span class="db-day-number">{datePart(d).day}</span>
-          </div>
-        ))}
-      </div>
-      <div
-        class="db-column-body"
-        ref={(el) => scrollToFirstHour(el, app.settings.value.firstHour * app.settings.value.hourHeight)}
-      >
-        <div class="db-time-grid">
-          <div class="db-gutter db-hours" aria-hidden="true">
-            {HOURS.map((h) => (
-              <span key={h} class="db-hour-label" style={{ '--db-at': h }}>
-                {hourLabel(h, app.locale, HOUR12[app.settings.value.timeFormat])}
-              </span>
-            ))}
-          </div>
-          {days.map((d) => (
-            <div key={d} class={`db-column${isWeekend(d) ? ' db-weekend' : ''}`} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** The labelled hours: midnight sits at the top edge, so it has none. */
-const HOURS = Array.from({ length: 23 }, (_, i) => i + 1);
-
-const HOUR12 = { locale: undefined, '12': true, '24': false } as const;
-
-const scrolled = new WeakSet<HTMLElement>();
-
-/**
- * Opening the time grid shows the first-hour setting at the top (§6.1), with room for its label; after that the
- * scroll stays put.
- */
-function scrollToFirstHour(el: HTMLElement | null, top: number): void {
-  if (!el || scrolled.has(el)) return;
-  scrolled.add(el);
-  el.scrollTop = top - LABEL_ROOM;
-}
-
-const LABEL_ROOM = 10;
 
 function MonthGrid({ app }: { readonly app: AppController }) {
   const { start, end } = app.range.value;
