@@ -68,7 +68,7 @@ The Docker image builds the client and runs the server on `/data`: `just build-d
 
 ## The CLI
 
-`apps/cli` is the `daybird` command line. For now it prints its help and version. To put `daybird` on your `PATH`, link `apps/cli/bin/daybird.mjs` there.
+`apps/cli` is the `daybird` command line: `list`, `add`, `edit`, `delete`, `calendars`, `import` and `export` on a calendar folder (`--dir`, else `DAYBIRD_DIR`, else the folder the desktop app opened last). `daybird --help` lists them and `daybird <command> --help` shows each one's options. Run it from source with `just cli <args>`, or link `apps/cli/bin/daybird.mjs` onto your `PATH`. `src/folder.ts` reads the folder and saves only the files a command changed, against the versions it read; on a conflict it runs the command again on a fresh read, once, and then exits with 2. `--json` prints JSON for scripts and agents, and `apps/cli/skill/SKILL.md` teaches an agent to use it.
 
 ## Building and packaging the desktop app
 

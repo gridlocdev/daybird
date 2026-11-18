@@ -34,5 +34,5 @@ Each slice leaves `just check` green and fits one session. "Waits on" names the 
 ## Shells and release
 
 - [x] **18. NAS server and Docker** (§15). Waits on 6.
-- [ ] **19. CLI** (§16). Waits on 5, 7.
+- [x] **19. CLI** (§16). Waits on 5, 7.
 - [ ] **20. Native menu, Finder open, window state; icon; README and docs; first release** (§14). Waits on all.

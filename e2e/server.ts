@@ -1,5 +1,5 @@
 // Where the scenarios and the driver find the app: the NAS server serving the built client over fixture data.
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import {
   cpSync,
   existsSync,
@@ -60,7 +60,40 @@ export function writeData(file: string, text: string): void {
   writeFileSync(`${DATA}/${file}`, text);
 }
 
-/** Run the app's CLI on .e2e-data and return what it prints: `cli('--version')`. */
+/**
+ * Run the app's CLI on .e2e-data, in UTC as the page shows it, and return what it prints: `cli('list', '--json')`.
+ * `cli('--version')` passes no folder.
+ */
 export function cli(...args: string[]): string {
-  return execFileSync(process.execPath, [CLI, ...args], { cwd: ROOT, encoding: 'utf8' }).replace(/\n$/, '');
+  const folder = args[0]?.startsWith('-') ? [] : ['--dir', DATA, '--zone', 'UTC'];
+  return execFileSync(process.execPath, [CLI, ...args, ...folder], { cwd: ROOT, encoding: 'utf8' }).replace(
+    /\n$/,
+    '',
+  );
+}
+
+/**
+ * Start `daybird-server --dir .e2e-data` on `port`, apart from the scenarios' own server (which has no folder),
+ * and wait until it answers. Returns its address and how to stop it.
+ */
+export async function startFolderServer(port: number): Promise<{ url: string; stop: () => void }> {
+  const server = spawn(process.execPath, [...SERVER_COMMAND, '--dir', DATA, '--port', String(port)], {
+    cwd: ROOT,
+    env: { ...process.env, DAYBIRD_STATIC: SERVER_ENV.DAYBIRD_STATIC },
+    stdio: 'ignore',
+  });
+  const url = `http://127.0.0.1:${port}/`;
+  const deadline = Date.now() + 10_000;
+  for (;;) {
+    const up = await fetch(`${url}api/info`).then(
+      (r) => r.ok,
+      () => false,
+    );
+    if (up) return { url, stop: () => server.kill() };
+    if (Date.now() > deadline) {
+      server.kill();
+      throw new Error(`The folder server didn’t start on port ${port}.`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 }

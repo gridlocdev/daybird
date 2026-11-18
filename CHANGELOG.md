@@ -25,4 +25,4 @@
 - The popover's Repeat menu makes an event repeat, and Custom… sets every few days, weeks, months or years, the weekdays, the day of the month or "the third Tuesday", the months, and an end date or count. A rule it can't show stays in words and can be replaced with a simple one.
 - Time zone support in Settings adds a picker for the zone times show in, in Settings and the toolbar, and a Time zone field in the popover. Without it, an event in another zone shows its own time in the popover. Dragging or pasting an event in another zone keeps its zone.
 - A click on the selected event no longer opens it, so double-clicking a selected event opens the popover instead of closing it again.
-- The NAS server serves the web client, and the `daybird` command prints its help and version.
+- The `daybird` command line lists the events in a range, adds, changes and deletes events (one occurrence of a repeating event with `--occurrence`), lists the calendars, and imports and exports `.ics` files, with `--json` output. It saves against what it read, so it never overwrites a change made meanwhile by the app or another program.

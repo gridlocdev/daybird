@@ -6,7 +6,16 @@ import { expect, test as base, type Page } from '@playwright/test';
 import { NOW, seedData } from './server.ts';
 
 export { expect };
-export { cli, DATA, NOW, readData, readDataIfThere, seedData, writeData } from './server.ts';
+export {
+  cli,
+  DATA,
+  NOW,
+  readData,
+  readDataIfThere,
+  seedData,
+  startFolderServer,
+  writeData,
+} from './server.ts';
 
 export const test = base.extend<{ seed: (fixture: string) => void }>({
   page: async ({ page }, use) => {

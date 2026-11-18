@@ -22,7 +22,7 @@ Daybird is a calendar app that keeps each calendar in a plain `.ics` file in a f
 | `apps/web` | The app shell, the list of commands and the Vite entry point. One static build serves the browser, the NAS server and the desktop app. |
 | `apps/server` | The NAS server (`node:http`): serves the client and `/api` over one calendar folder (`--dir`). No framework. |
 | `apps/desktop` | The Electron shell: main process, sandboxed preload bridge, native menu. |
-| `apps/cli` | The `daybird` CLI, run from source. It depends on `packages/core` and `packages/node-files` only. |
+| `apps/cli` | The `daybird` CLI, run from source: list, add, edit, delete, calendars, import, export. It depends on `packages/core` and `packages/node-files` only. `skill/SKILL.md` teaches an agent to use it. |
 
 ## Golden rules
 

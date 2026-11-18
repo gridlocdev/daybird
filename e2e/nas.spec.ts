@@ -1,44 +1,25 @@
 // The NAS server (PRD §15): the built client served by `daybird-server --dir`, on the fixture folder. The page
 // reads and saves the folder's files through the server, not the browser's storage.
-import { spawn, type ChildProcess } from 'node:child_process';
-import { DATA, expect, readData, test, waitForApp, writeData } from './fixtures.ts';
-import { ROOT } from './server.ts';
+import { expect, readData, startFolderServer, test, waitForApp, writeData } from './fixtures.ts';
 import type { Page } from '@playwright/test';
 
 /** Not the scenarios' own server's port, nor another app's. */
 const PORT = 8794;
-const URL = `http://127.0.0.1:${PORT}/`;
-let server: ChildProcess;
+let server: { url: string; stop: () => void };
 
 const event = (page: Page, name: string) => page.getByRole('button', { name: new RegExp(`^${name}`) });
 const popover = (page: Page) => page.getByRole('dialog', { name: /^Edit / });
 
 test.describe('NAS server', () => {
   test.beforeAll(async () => {
-    server = spawn(process.execPath, ['apps/server/src/main.ts', '--dir', DATA, '--port', String(PORT)], {
-      cwd: ROOT,
-      env: { ...process.env, DAYBIRD_STATIC: `${ROOT}apps/web/dist` },
-      stdio: 'ignore',
-    });
-    await expect
-      .poll(
-        () =>
-          fetch(`${URL}api/info`).then(
-            (r) => r.ok,
-            () => false,
-          ),
-        { timeout: 10_000 },
-      )
-      .toBe(true);
+    server = await startFolderServer(PORT);
   });
 
-  test.afterAll(() => {
-    server.kill();
-  });
+  test.afterAll(() => server.stop());
 
   test.beforeEach(async ({ seed, page }) => {
     seed('basic');
-    await page.goto(URL);
+    await page.goto(server.url);
     await waitForApp(page);
   });
 

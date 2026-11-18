@@ -19,7 +19,7 @@ Daybird is one TypeScript code base with three hosts and a CLI. The browser, the
      │  colours (palette, accents, text on a colour)                    │
      └──────────────────────────────────────────────────────────────────┘
      ┌──────────── packages/node-files (Node) ────────────┐
-     │  FolderStore (versions, lock files, inside only)   │◄──── apps/desktop, apps/server, later apps/cli
+     │  FolderStore (versions, lock files, inside only)   │◄──── apps/desktop, apps/server, apps/cli
      │  writeAtomic · withLockFile                        │
      └────────────────────────────────────────────────────┘
 ```
@@ -105,6 +105,10 @@ stateDiagram-v2
 - `RepeatDialog.tsx` holds the popover's Repeat field and the Custom… dialog, whose choices live in `app.repeatDialog` while it's open. In core, `repeat.ts` reads a rule as a menu item or the dialog's choices (null when the dialog can't show it) and writes it back.
 - `searchActions.ts` and `SearchView.tsx` show the search results in place of the view while the toolbar's field has text; `trashActions.ts`, `TrashView.tsx` and `TrashDialogs.tsx` are the Trash view; `importExport.ts` and `files.ts` pick, read and save files for import and export, and `fileCommands.ts` holds their commands.
 - `reminders.ts` rings reminders: it looks at least once a minute and on every change, in the one window holding the `daybird-reminders` Web Lock, and puts up a notice and a system notification (the Notification API, or the desktop bridge's `notify`). `ReminderField.tsx` is the popover's Reminder rows.
+
+## CLI (`apps/cli`)
+
+The `daybird` command on `packages/core` and `packages/node-files` only. `cli.ts` parses the command line with `node:util` `parseArgs`; `readCommands.ts` holds `list`, `calendars`, `import` and `export`, `eventCommands.ts` holds `add`, `edit` and `delete` on the engine's `createEvent`, `editOccurrence` and `deleteOccurrence`, and `times.ts` reads dates, times and lengths in `--zone`. `folder.ts` loads every calendar, the Trash and the folder settings with their versions, and `changeFolder` saves the changed files against them, running the change again once after a conflict.
 
 ## Desktop (`apps/desktop`)
 

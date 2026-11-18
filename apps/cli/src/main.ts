@@ -6,8 +6,8 @@ import { runCli } from './cli.ts';
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
   version: string;
 };
-process.exitCode = runCli(
+process.exitCode = await runCli(
   process.argv.slice(2),
   { stdout: (text) => process.stdout.write(text), stderr: (text) => process.stderr.write(text) },
-  pkg.version,
+  { version: pkg.version },
 );

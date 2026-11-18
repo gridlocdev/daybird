@@ -11,5 +11,12 @@
   "scripts": {
     "start": "node src/main.ts",
     "build": "echo 'cli runs from source (node type stripping)'"
+  },
+  "dependencies": {
+    "@daybird/core": "workspace:*",
+    "@daybird/node-files": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   }
 }

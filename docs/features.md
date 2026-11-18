@@ -74,6 +74,10 @@ Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it
 
 Run `daybird-server --dir <folder>` on a NAS, or the Docker image, and open it in any browser: every browser shares the calendars in that folder, and the status bar shows its name. Saves and changes made elsewhere work as in the desktop app, so the desktop app, the CLI and Apple Calendar can use the same folder over a network share. The server has no accounts; put it behind a reverse proxy that asks for a login.
 
+## Command line
+
+The `daybird` command lists, adds, changes and deletes events in a calendar folder, lists the calendars, and imports and exports `.ics` files, with `--json` for scripts and agents. It works on the folder the desktop app opened last unless told another. An open window picks up what it changes, as it does any change made elsewhere, and a deleted event goes to the Trash.
+
 ## Desktop, browser and NAS
 
 The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar.

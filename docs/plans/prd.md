@@ -330,11 +330,14 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar change
 
 ## §16 CLI
 
-- `daybird` on the same engine, against a folder (`--dir`, default the desktop app's last folder):
-  - `list [--from date] [--to date] [--calendar name] [--json]`: occurrences in a range (default: today).
-  - `add "<title>" --start <date-time> [--end|--duration] [--all-day] [--calendar] [--rrule] [--location]`.
-  - `edit <uid> …`, `delete <uid> [--occurrence <date-time>]` (to the Trash).
-  - `calendars` lists calendars; `import <file> --calendar <name>`; `export <calendar>`.
+- `daybird` on the same engine, against a folder (`--dir`, else `DAYBIRD_DIR`, else the desktop app's last folder from its `folder.json`). Every command takes `--zone <IANA zone>` (default: the system's), the zone times are typed and shown in, and `--json`.
+  - `list [--from date] [--to date] [--calendar name]`: occurrences from `--from` to `--to`, both included (default: today), in the order the views use. Text is one line per occurrence: when, title · location, `[calendar]`, and the uid (with `--occurrence <date-time>` for a repeating one). JSON gives `calendar, uid, occurrence, title, allDay, start, end, location, notes, url, repeating`; all-day `end` is the last day.
+  - `add "<title>" --start <date-time> [--end|--duration] [--all-day] [--calendar] [--rrule] [--location] [--notes] [--url]`. A date without a time, or `--all-day`, makes an all-day event; `--end` is then its last day. Without `--end` or `--duration`, a timed event lasts an hour and an all-day one a day. Times are written in `--zone` with its TZID (UTC as `Z`); a trailing `Z` on a typed time means UTC. Lengths are `45m`, `1h30m`, `2d` or ISO (`PT1H`). Without `--calendar` it goes to the default calendar (§13). Prints the new uid.
+  - `edit <uid> [--occurrence <date-time>] …`: the same options plus `--title`; an empty value clears a text field, `--rrule none` stops a repeat, and `--calendar` moves the event. A new `--start` keeps the length unless `--end` or `--duration` is given. Without `--occurrence` a repeating event changes as a whole (All Events); with it, only that occurrence (This Event). `--rrule` always applies to the whole event.
+  - `delete <uid> [--occurrence <date-time>]`: to the Trash, as the app's Delete does (§7.7).
+  - `--occurrence` names an occurrence by its original start on the event's own clock (a date for all-day events), as `list` prints it.
+  - `calendars` lists name, colour, file, event count, read-only and default; `import <file> [--calendar <name>]` adds the file's events, skipping uids already there (§11); `export <calendar>` prints the calendar's `.ics`. A calendar is named by its name or file name, in any case.
+- A change saves only the files it changed, each against the version read, with the lock file (§3.7). On a conflict the command runs again on a fresh read, once.
 - Exit codes: 0 ok, 1 error (message on stderr), 2 conflict after retrying once.
 
 ## §17 Accessibility
