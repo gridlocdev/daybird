@@ -1,6 +1,7 @@
 import { VIEWS, type View } from '@daybird/core';
 import { Icon, type CommandCatalog } from '@daybird/ui';
 import type { AppController } from './controller.ts';
+import { DisplayZoneSelect } from './ZoneSelect.tsx';
 
 const VIEW_TITLES: Readonly<Record<View, string>> = {
   day: 'Day',
@@ -70,6 +71,14 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
         </button>
       </div>
       <div class="db-toolbar-space" />
+      {app.settings.value.timeZoneSupport && (
+        <DisplayZoneSelect
+          class="db-toolbar-zone"
+          zone={app.displayZone}
+          systemZone={app.systemZone}
+          onChange={(displayZone) => app.update({ displayZone })}
+        />
+      )}
       <div class="db-segmented" role="group" aria-label="View">
         {VIEWS.map((v) => (
           <button

@@ -18,6 +18,7 @@ import { DayListDialog } from './DayListDialog.tsx';
 import { EventPopover, ScopeDialog } from './EventPopover.tsx';
 import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDialogs.tsx';
 import { RepeatDialog } from './RepeatDialog.tsx';
+import { DisplayZoneSelect } from './ZoneSelect.tsx';
 import { shortcutGroups } from './shortcuts.ts';
 
 /** The open dialog, if any. One at a time; a question about the folder comes before any other. */
@@ -249,6 +250,24 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
           ))}
         </select>
       </label>
+      <label class="db-field">
+        <span>Time zone support</span>
+        <input
+          type="checkbox"
+          checked={s.timeZoneSupport}
+          onChange={(e) => app.update({ timeZoneSupport: e.currentTarget.checked })}
+        />
+      </label>
+      {s.timeZoneSupport && (
+        <label class="db-field">
+          <span>Show times in</span>
+          <DisplayZoneSelect
+            zone={app.displayZone}
+            systemZone={app.systemZone}
+            onChange={(displayZone) => app.update({ displayZone })}
+          />
+        </label>
+      )}
       <label class="db-field">
         <span>Week numbers</span>
         <input

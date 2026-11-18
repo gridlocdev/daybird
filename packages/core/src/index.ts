@@ -279,6 +279,7 @@ export {
   type MoveTarget,
 } from './model/eventMoves.ts';
 export { occurrenceDetails, type OccurrenceDetails } from './model/details.ts';
+export { inDisplayZone, inFrameOf, timeZoneIds, withZone, zoneIdOf, zoneName } from './model/zoneFrames.ts';
 export {
   REPEAT_PRESETS,
   customDefaults,

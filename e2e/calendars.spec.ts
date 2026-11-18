@@ -1,23 +1,10 @@
 // The sidebar's calendars (PRD §5.2): show and hide, add, rename, colour, default and delete. Made-up calendars.
-import { expect, icsWith, openApp, putPrivateFiles, runCommand, test } from './fixtures.ts';
+import { expect, icsWith, openApp, privateText, putPrivateFiles, runCommand, test } from './fixtures.ts';
 import type { Page } from '@playwright/test';
 
 const list = (page: Page) => page.getByRole('list', { name: 'Calendars' });
 const row = (page: Page, name: string) => list(page).getByRole('listitem').filter({ hasText: name });
 const week = (page: Page) => page.getByRole('main', { name: 'Week view' });
-
-/** A file in the browser's private folder, or null. */
-const privateText = (page: Page, path: string) =>
-  page.evaluate(async (path) => {
-    let dir = await (await navigator.storage.getDirectory()).getDirectoryHandle('calendars');
-    const parts = path.split('/');
-    try {
-      for (const p of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(p);
-      return await (await (await dir.getFileHandle(parts.at(-1)!)).getFile()).text();
-    } catch {
-      return null;
-    }
-  }, path);
 
 const trashNames = (page: Page) =>
   page.evaluate(async () => {

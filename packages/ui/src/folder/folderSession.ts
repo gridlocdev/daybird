@@ -82,7 +82,7 @@ export class FolderSession {
   readonly #appVersion: string;
   readonly #now: () => number;
   readonly #makeUid: () => string;
-  readonly #displayZone: string;
+  readonly #displayZone: () => string;
   readonly #files = new Map<string, FileRecord>();
   readonly #copies: RecoveryCopies;
   /** Files that need a save after loading, held back while a recovery offer for them is open. */
@@ -99,7 +99,8 @@ export class FolderSession {
     this.#appVersion = options.appVersion;
     this.#now = options.now ?? Date.now;
     this.#makeUid = options.makeUid ?? (() => crypto.randomUUID());
-    this.#displayZone = options.displayZone ?? systemZoneId();
+    const zone = options.displayZone ?? systemZoneId();
+    this.#displayZone = typeof zone === 'function' ? zone : () => zone;
     this.#copies = new RecoveryCopies(
       options.snapshots,
       `${options.store.kind}:${options.store.where ?? options.store.name}`,
@@ -117,7 +118,7 @@ export class FolderSession {
 
   /** The context the engine's edits need. */
   editContext(): EditContext {
-    return { now: Math.floor(this.#now() / 1000), makeUid: this.#makeUid, displayZone: this.#displayZone };
+    return { now: Math.floor(this.#now() / 1000), makeUid: this.#makeUid, displayZone: this.#displayZone() };
   }
 
   stateOf(path: string): SaveState | null {

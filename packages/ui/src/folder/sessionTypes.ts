@@ -25,7 +25,8 @@ export interface SessionOptions {
   /** Milliseconds since the epoch. */
   readonly now?: () => number;
   readonly makeUid?: () => string;
-  readonly displayZone?: string;
+  /** The zone new events and edits use; a function when Settings can change it (PRD §13). */
+  readonly displayZone?: string | (() => string);
 }
 
 /** A file that changed or went on disk under unsaved changes (§3.5). */

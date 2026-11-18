@@ -118,3 +118,16 @@ export function icsWith(name: string, colour: string, events: readonly string[])
     .join('');
   return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Example//Example//EN\r\nX-WR-CALNAME:${name}\r\nX-APPLE-CALENDAR-COLOR:${colour}\r\n${body}END:VCALENDAR\r\n`;
 }
+
+/** A file in the browser's private folder, or null. */
+export const privateText = (page: Page, path: string) =>
+  page.evaluate(async (path) => {
+    let dir = await (await navigator.storage.getDirectory()).getDirectoryHandle('calendars');
+    const parts = path.split('/');
+    try {
+      for (const p of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(p);
+      return await (await (await dir.getFileHandle(parts.at(-1)!)).getFile()).text();
+    } catch {
+      return null;
+    }
+  }, path);

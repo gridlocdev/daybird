@@ -97,7 +97,7 @@ async function openStore(
     store,
     snapshots,
     appVersion: app.version,
-    displayZone: app.displayZone,
+    displayZone: () => app.displayZone,
     say: (text, options) => app.say(text, options ?? {}),
   });
   app.attach(session);

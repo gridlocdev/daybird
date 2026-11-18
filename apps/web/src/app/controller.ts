@@ -8,6 +8,7 @@ import {
   dayBounds,
   localeWeekStart,
   occurrencesIn,
+  isIanaZone,
   systemZoneId,
   rangeTitle,
   stepAnchor,
@@ -154,7 +155,7 @@ export class AppController {
   readonly weekStart;
   readonly range;
   readonly title;
-  readonly displayZone: string;
+  readonly #systemZone: string;
   /** Milliseconds since the epoch, moved on by the clock every 30 s: the now line and fading past events. */
   readonly now: Signal<number>;
   readonly calendars = computed<readonly Calendar[]>(
@@ -214,7 +215,7 @@ export class AppController {
     this.#storage = options.settings;
     this.#now = options.now ?? Date.now;
     this.#localeWeekStart = localeWeekStart(options.locale);
-    this.displayZone = options.displayZone ?? systemZoneId();
+    this.#systemZone = options.displayZone ?? systemZoneId();
     this.now = signal(this.#now());
     this.settings = signal<Settings>(options.settings.load());
     const today = todayIn(this.#now());
@@ -321,6 +322,17 @@ export class AppController {
 
   close(): void {
     this.dialog.value = null;
+  }
+
+  /** The zone times show in (PRD §4.3): the one picked while time zone support is on, else the system's. */
+  get displayZone(): string {
+    const s = this.settings.value;
+    return s.timeZoneSupport && s.displayZone && isIanaZone(s.displayZone) ? s.displayZone : this.#systemZone;
+  }
+
+  /** The system's zone, which times show in when no other is picked. */
+  get systemZone(): string {
+    return this.#systemZone;
   }
 
   /** A dialog is open, so plain keys and most commands wait. */

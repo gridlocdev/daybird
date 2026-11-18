@@ -2,10 +2,22 @@
  * The event popover (PRD §7.2): the one editor, beside the event. Every change saves as it's made and the whole
  * visit is one undo step; a repeating occurrence asks This/Future/All when it closes (§8.2).
  */
-import { whenOf, withWhen, type PlainDate, type WhenFields } from '@daybird/core';
+import {
+  inDisplayZone,
+  inFrameOf,
+  timeLabel,
+  whenOf,
+  withWhen,
+  withZone,
+  zoneIdOf,
+  zoneName,
+  type PlainDate,
+  type WhenFields,
+} from '@daybird/core';
 import { Dialog } from '@daybird/ui';
 import type { AppController, OccurrenceRef } from './controller.ts';
-import { colourOf, occurrenceKey } from './eventParts.tsx';
+import { HOUR12, colourOf, occurrenceKey } from './eventParts.tsx';
+import { ZoneSelect } from './ZoneSelect.tsx';
 import { RepeatField } from './RepeatDialog.tsx';
 import { answerScope, closeEditor, deleteEvent, editEvent, editorDetails } from './eventActions.ts';
 
@@ -35,9 +47,21 @@ export function EventPopover({ app }: { readonly app: AppController }) {
   const calendars = app.calendars.value;
   const calendar = calendars.find((c) => c.id === d.calendarId);
   const readOnly = !!calendars.find((c) => c.id === ed.ref.calendarId)?.readOnly;
-  const when = whenOf(d.start, d.end);
-  const setWhen = (change: Partial<WhenFields>) =>
-    editEvent(app, withWhen(d.start, d.end, change, app.displayZone, app.settings.peek().eventMinutes));
+  // With time zone support the fields show the event's own clock and zone; without, the display zone's (§4.3).
+  const support = app.settings.value.timeZoneSupport;
+  const own = { start: d.start, end: d.end };
+  const shown = support ? own : inDisplayZone(own, d.zones, app.displayZone);
+  const when = whenOf(shown.start, shown.end);
+  const ownZone = zoneIdOf(d.start);
+  const setWhen = (change: Partial<WhenFields>) => {
+    const next = withWhen(shown.start, shown.end, change, app.displayZone, app.settings.peek().eventMinutes);
+    editEvent(app, support ? next : inFrameOf(next, d.start, d.zones, app.displayZone));
+  };
+  const hour12 = HOUR12[app.settings.value.timeFormat];
+  const elsewhere =
+    !support && !when.allDay && ownZone !== null && ownZone !== app.displayZone
+      ? `${timeLabel(o.start, app.locale, ownZone, hour12)} to ${timeLabel(o.end, app.locale, ownZone, hour12)} ${zoneName(ownZone)} time`
+      : null;
   const onDate = (field: 'startDate' | 'endDate') => (e: Event) => {
     const v = (e.currentTarget as HTMLInputElement).value as PlainDate;
     if (v) setWhen({ [field]: v });
@@ -124,6 +148,18 @@ export function EventPopover({ app }: { readonly app: AppController }) {
             />
           )}
         </div>
+        {elsewhere && <p class="db-popover-zone">{elsewhere}</p>}
+        {support && !when.allDay && (
+          <label class="db-popover-row">
+            <span>Time zone</span>
+            <ZoneSelect
+              label="Time zone"
+              value={ownZone ?? 'floating'}
+              extra={[{ value: 'floating', label: 'Floating (the same clock time everywhere)' }]}
+              onChange={(v) => editEvent(app, withZone(own, v === 'floating' ? null : v))}
+            />
+          </label>
+        )}
         <RepeatField app={app} d={d} />
         <label class="db-popover-row">
           <span>Calendar</span>

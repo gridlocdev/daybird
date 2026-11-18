@@ -1142,3 +1142,14 @@
   margin: 0;
   color: var(--db-text-2);
 }
+
+/* Time zones (§4.3) */
+.db-toolbar-zone {
+  max-width: 200px;
+  margin-right: 8px;
+}
+.db-popover-zone {
+  margin: -4px 0 0 72px;
+  color: var(--db-text-2);
+  font-size: 12px;
+}

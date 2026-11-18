@@ -8,6 +8,8 @@ import {
   createEvent,
   editOccurrence,
   eventAsText,
+  inDisplayZone,
+  inFrameOf,
   movedTimes,
   needsScope,
   occurrenceDetails,
@@ -73,8 +75,10 @@ function showDate(app: AppController, start: TimeValue): void {
 export function dropEvent(app: AppController, ref: OccurrenceRef, target: Times, copy: boolean): void {
   const d = detailsOf(app, ref);
   if (!d) return;
-  if (copy) addCopy(app, { ...copyFields(d), ...target }, ref.calendarId, 'Copy');
-  else changeTimes(app, ref, target);
+  // The drag ran in the display zone; the event keeps its own.
+  const own = inFrameOf(target, d.start, d.zones, app.displayZone);
+  if (copy) addCopy(app, { ...copyFields(d), ...own }, ref.calendarId, 'Copy');
+  else changeTimes(app, ref, own);
 }
 
 /** The arrow keys on a selected event: minutes in Day and Week, days, or a week in Month (§7.3). */
@@ -134,8 +138,20 @@ export function pasteEvent(app: AppController, target: MoveTarget | null = null)
   const clip = app.clipboard.peek();
   if (!clip) return;
   const t = { start: clip.fields.start, end: clip.fields.end };
+  // A place on the grid is in the display zone; the copy keeps the event's own.
+  const zones = new Map<string, never>();
   const times = target
-    ? movedTimes(t, target, app.displayZone, app.settings.peek().eventMinutes)
+    ? inFrameOf(
+        movedTimes(
+          inDisplayZone(t, zones, app.displayZone),
+          target,
+          app.displayZone,
+          app.settings.peek().eventMinutes,
+        ),
+        t.start,
+        zones,
+        app.displayZone,
+      )
     : onDate(t, app.anchor.peek());
   addCopy(app, { ...clip.fields, ...times }, clip.calendarId, 'Paste');
 }

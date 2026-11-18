@@ -18,5 +18,6 @@
 - Events are made by dragging on the grid, double-clicking, or ⌘N, and edited in a popover beside them that saves as you type; a whole visit to the popover undoes in one step, and Escape takes back a new event you haven't touched.
 - Events move by dragging, in Month by days, and with the arrow keys; dragging an edge changes when one starts or ends, and Option-drag copies. Cut, copy, paste and duplicate work on the selected event, and right-clicking an event or empty grid opens a menu.
 - The popover's Repeat menu makes an event repeat, and Custom… sets every few days, weeks, months or years, the weekdays, the day of the month or "the third Tuesday", the months, and an end date or count. A rule it can't show stays in words and can be replaced with a simple one.
+- Time zone support in Settings adds a picker for the zone times show in, in Settings and the toolbar, and a Time zone field in the popover. Without it, an event in another zone shows its own time in the popover. Dragging or pasting an event in another zone keeps its zone.
 - A click on the selected event no longer opens it, so double-clicking a selected event opens the popover instead of closing it again.
 - The NAS server serves the web client, and the `daybird` command prints its help and version.

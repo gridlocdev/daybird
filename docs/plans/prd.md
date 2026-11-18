@@ -95,7 +95,8 @@ Daybird is a calendar for one person. It runs as a desktop app (Electron), in th
 
 - A `TZID` that's an IANA name (`Europe/London`) is used as is. A Windows name (`Pacific Standard Time`) is mapped through the CLDR table to IANA. Any other `TZID` uses the file's `VTIMEZONE` rules. A `TZID` with none of these is read as floating and the event's popover says "Unknown time zone <TZID>; shown in local time."
 - UTC times (`Z`) stay UTC. Floating times (no zone) show at the same clock time in every zone.
-- Times show in the display zone: the system zone, or the one chosen in Settings (§13). An event in another zone shows its own zone and clock time in the popover ("9:00 AM New York").
+- Times show in the display zone: the system zone, or the one chosen in Settings or the toolbar while time zone support is on (§13). Without time zone support the popover's fields are in the display zone, and an event in another zone also shows its own clock time ("11:00 AM to 12:00 PM New York time"); with it, the fields are on the event's own clock and a Time zone field picks its zone (or floating), keeping the clock time.
+- Dragging, resizing and pasting run in the display zone, and the result goes back on the event's own clock, so a New York event stays a New York event.
 - A time that doesn't exist (inside a spring-forward gap) moves forward by the gap; a repeated time (fall-back) takes the earlier one. RFC 5545 §3.3.5.
 - New events use the display zone. Writing a `VTIMEZONE` for an IANA zone builds `STANDARD`/`DAYLIGHT` rules from the offsets `Intl` reports, probed across the event's year.
 
@@ -307,7 +308,7 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar change
 
 ## §13 Settings
 
-- Per device: theme (auto, light, dark), accent, week starts on (locale default, Sunday, Monday, Saturday), first visible hour, hour height, show week numbers, time format (locale default, 12-hour, 24-hour), time zone support (off: everything in the system zone; on: the zone field and a display-zone picker), default event length (15, 30, 45, 60, 90, 120 minutes), show notifications, last view and anchor, sidebar width and shown.
+- Per device: theme (auto, light, dark), accent, week starts on (locale default, Sunday, Monday, Saturday), first visible hour, hour height, show week numbers, time format (locale default, 12-hour, 24-hour), time zone support (off: everything in the system zone; on: the zone field and a display-zone picker, in Settings and the toolbar, whose choice is kept per device), default event length (15, 30, 45, 60, 90, 120 minutes), show notifications, last view and anchor, sidebar width and shown.
 - Per device as well: hidden calendars. Hiding is a way of looking, like the view, so hiding Work on the laptop leaves it shown on the NAS. A hidden calendar's events don't show anywhere in that window, search included; its sidebar row stays, unchecked. A calendar whose file is new to this device is shown.
 - In the folder (`.daybird/settings.json`, follows the data): the default calendar, so a new event lands in the same calendar from the desktop, the browser, the NAS and the CLI. A default that names a missing file falls back to the first calendar by name.
 

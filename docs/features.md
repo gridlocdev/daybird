@@ -30,6 +30,10 @@ Drag an event to move it, in 15-minute steps, to another time or day, or into th
 
 The popover's Repeat menu makes an event repeat every day, every weekday, every week, every two weeks, every month or every year. Custom… opens a dialog for every few days, weeks, months or years, which weekdays, a day of the month or "the third Tuesday", which months, and when it ends: never, on a date or after a number of times, with the rule in words as you choose. A rule the dialog can't show, such as "the last Monday or Tuesday of the month", stays in words with Replace with a Simple Rule. A change to the repeat of a repeating event asks whether it starts with this occurrence or covers all of them.
 
+## Time zones
+
+Every IANA time zone works, and times show in your system's zone. Turn on Time zone support in Settings to pick another zone to show times in, from Settings or the toolbar, and to give each event its own zone, or none so it stays at the same clock time everywhere. An event in another zone shows its own time in the popover, and keeps its zone when you drag it.
+
 ## Year and Agenda
 
 Year shows the twelve months of the year, each day tinted by how busy it is, in four steps from none to six or more events, with today ringed. Click a day to open it. Agenda lists every event from the chosen day on, grouped under day headings ("Today", "Tomorrow", "Thursday, November 19") with the time, a colour dot, the title and the location; days with nothing are left out. Scroll to the end, or click **Show 60 More Days**, to see further ahead, and **Show Earlier** at the top to look back. Click a row to select the event.

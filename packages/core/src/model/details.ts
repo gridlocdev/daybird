@@ -24,6 +24,8 @@ export interface OccurrenceDetails {
   /** The series' first start and its zone: the clock its rule runs on. */
   readonly seriesStart: TimeValue;
   readonly zone: Zone;
+  /** The calendar's own zones, for turning its times into instants. */
+  readonly zones: ReadonlyMap<string, Zone>;
 }
 
 export function occurrenceDetails(
@@ -69,5 +71,6 @@ export function occurrenceDetails(
     complexRepeat: !!master && (master.rules.length > 1 || master.rDates.length > 0),
     seriesStart,
     zone: zoneOf(seriesStart, calendarZones(calendar.document)).zone,
+    zones: calendarZones(calendar.document),
   };
 }

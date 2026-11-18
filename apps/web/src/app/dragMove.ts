@@ -9,6 +9,7 @@ import {
   SNAP_MINUTES,
   addDays,
   diffDays,
+  inDisplayZone,
   movedTimes,
   shiftedTimes,
   snapDown,
@@ -156,7 +157,8 @@ export function dragHandlers(app: AppController, o: Occurrence, colour: string) 
         x: e.clientX,
         y: e.clientY,
         mode: modeAt(e, el, o.allDay),
-        times: { start: d.start, end: d.end },
+        // The grid is in the display zone, so the drag is too; the drop goes back to the event's own clock.
+        times: inDisplayZone({ start: d.start, end: d.end }, d.zones, app.displayZone),
         grabMinutes: snapDown(((e.clientY - r.top) / hour) * 60),
         grabDays: day && o.startDate ? Math.max(0, diffDays(o.startDate, day)) : 0,
         title: o.title || 'New Event',

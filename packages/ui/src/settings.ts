@@ -26,6 +26,8 @@ export interface Settings {
   readonly weekNumbers: boolean;
   readonly timeFormat: TimeFormat;
   readonly timeZoneSupport: boolean;
+  /** The zone times show in while time zone support is on; null is the system's (§4.3). */
+  readonly displayZone: string | null;
   /** Minutes a new event lasts. */
   readonly eventMinutes: number;
   readonly notifications: boolean;
@@ -46,6 +48,7 @@ export const DEFAULT_SETTINGS: Settings = {
   weekNumbers: false,
   timeFormat: 'locale',
   timeZoneSupport: false,
+  displayZone: null,
   eventMinutes: 60,
   notifications: true,
   view: 'week',
@@ -84,6 +87,11 @@ export function parseSettings(raw: unknown): Settings {
     weekNumbers: pick(o.weekNumbers, bool, d.weekNumbers),
     timeFormat: pick(o.timeFormat, oneOf<TimeFormat>(['locale', '12', '24']), d.timeFormat),
     timeZoneSupport: pick(o.timeZoneSupport, bool, d.timeZoneSupport),
+    displayZone: pick(
+      o.displayZone,
+      (v): v is string | null => v === null || typeof v === 'string',
+      d.displayZone,
+    ),
     eventMinutes: pick(o.eventMinutes, oneOf<number>(EVENT_LENGTHS), d.eventMinutes),
     notifications: pick(o.notifications, bool, d.notifications),
     view: pick(o.view, isView, d.view),
