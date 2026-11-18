@@ -32,7 +32,6 @@ const CLI = `${ROOT}apps/cli/src/main.ts`;
 export const SERVER_ENV: Record<string, string> = {
   DAYBIRD_PORT: String(PORT),
   DAYBIRD_HOST: '127.0.0.1',
-  DAYBIRD_ROOTS: `E2E=${DATA}`,
   DAYBIRD_STATIC: `${ROOT}apps/web/dist`,
 };
 

@@ -7,6 +7,7 @@ import { constants } from 'node:fs';
 import { open, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { sleep } from './atomic.ts';
+import { FolderError } from './errors.ts';
 
 export const LOCK_STALE_MS = 10_000;
 /** How long a save waits for another's lock before giving up. */
@@ -39,7 +40,7 @@ export async function withLockFile<T>(file: string, fn: () => Promise<T>, now = 
       continue;
     }
     if (now() - started > LOCK_WAIT_MS)
-      throw new Error(`“${path.basename(file)}” is being saved by another program.`);
+      throw new FolderError('busy', `“${path.basename(file)}” is being saved by another program.`);
     await sleep(wait);
   }
   try {

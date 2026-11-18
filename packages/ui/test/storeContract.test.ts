@@ -1,14 +1,17 @@
 // One contract for every CalendarStore: the folder session relies on these answers whatever the folder is
-// backed by. The NAS store joins the list when it arrives.
+// backed by.
 import { mkdtempSync, rmSync } from 'node:fs';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { FolderStore, folderResult } from '@daybird/node-files';
+import { createServer } from '@daybird/server';
 import {
   BrowserStore,
   ConflictError,
   MemoryStore,
+  NasStore,
   NativeStore,
   NotFoundError,
   decodeText,
@@ -36,7 +39,25 @@ function nativeStore(): CalendarStore {
   return new NativeStore(files, 'Calendars', disk.root);
 }
 
+/** The NAS server's store: the page's NasStore over HTTP to the server's file API, each test on a new folder. */
+const nasFolders: { folder: FolderStore | null } = { folder: null };
+const nas = createServer({
+  staticDir: null,
+  get folder() {
+    return nasFolders.folder;
+  },
+});
+await new Promise<void>((resolve) => nas.listen(0, '127.0.0.1', resolve));
+afterAll(() => new Promise((resolve) => nas.close(resolve)));
+const nasBase = `http://127.0.0.1:${(nas.address() as AddressInfo).port}/api`;
+
+function nasStore(): CalendarStore {
+  nasFolders.folder = new FolderStore(path.join(temp, `folder ${++folders}`));
+  return new NasStore('Calendars', nasBase, fetch);
+}
+
 const stores: [string, () => CalendarStore][] = [
+  ['NasStore over the server', nasStore],
   ['NativeStore over FolderStore', nativeStore],
   ['MemoryStore', () => new MemoryStore('Calendars')],
   [

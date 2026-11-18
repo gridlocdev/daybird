@@ -70,6 +70,10 @@ Settings (**⌘,** or **Ctrl+,**) chooses light, dark or the system's appearance
 
 Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it back. If a calendar file changes somewhere else while this window has changes to it that aren't saved yet, Daybird asks what to keep: your version as a copy, your version over theirs, or theirs. Changes made in other apps show up when you come back to the window. If a window closes before it can save, the next one offers to put those changes back. The desktop app keeps each calendar as an `.ics` file in a folder you choose: on first start it offers Documents/Daybird, and **Open Calendar Folder…** (**⌘O**) switches to another. In a browser that can't open a folder, calendars are kept in the browser itself, and the status bar says so.
 
+## NAS server
+
+Run `daybird-server --dir <folder>` on a NAS, or the Docker image, and open it in any browser: every browser shares the calendars in that folder, and the status bar shows its name. Saves and changes made elsewhere work as in the desktop app, so the desktop app, the CLI and Apple Calendar can use the same folder over a network share. The server has no accounts; put it behind a reverse proxy that asks for a login.
+
 ## Desktop, browser and NAS
 
 The same app runs as a desktop app for macOS, Windows and Linux, in a browser, and from a NAS server you host yourself. The desktop app has a native menu bar with every command, and on a Mac its toolbar sits in the title bar.

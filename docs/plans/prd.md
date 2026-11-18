@@ -323,7 +323,10 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar change
 
 ## §15 NAS server
 
-- `daybird-server --dir <folder> --port <n>` serves the web build and the folder's calendars over the same store interface, with version tokens and the lock file. No accounts; meant behind the user's reverse proxy. Docker image and compose example as for the other apps.
+- `daybird-server --dir <folder> --port <n>` serves the web build and the folder's calendars over the same store interface, with version tokens and the lock file. Each option can be an environment variable instead (`DAYBIRD_DIR`, `DAYBIRD_PORT`, `DAYBIRD_HOST`), which is how the Docker image sets them. Docker image and compose example as for the other apps.
+- The page asks `/api/info` on start. When the server has a folder, every browser that opens the page shares it: the status bar shows the folder's name, and changes made on the NAS are picked up as on the desktop (§3.5). Without a folder, or on a plain static host, calendars stay in the browser (§3.7).
+- The API answers only for the calendar files at the top of the folder and for `.daybird/`; other files and folders in it aren't listed or served. A save sends the version it read and gets 412 when the file changed, went or exists, which opens the same conflict dialog as on the desktop.
+- No accounts and no token: the server is meant behind the user's reverse proxy, which asks for the login. It listens on 127.0.0.1 by default, and refuses to start on an address other machines can reach unless `DAYBIRD_NO_AUTH=1` (or `--no-auth`) says such a proxy is in front. It answers only requests for localhost, an IP address or a name in `DAYBIRD_HOSTS`, so a web page can't reach it by pointing its own name at it, and a request that changes a file must carry an `X-Daybird-Request` header, which a form on another site can't send. (Heuristic: error prevention. A server that would open the calendars to the network says so and stops, instead of starting.)
 
 ## §16 CLI
 

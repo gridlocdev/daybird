@@ -7,23 +7,8 @@
 import { lstat, mkdir, readdir, readFile, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { TEMP_FILE, realFile, syncFolder, versionOf, writeAtomic } from './atomic.ts';
+import { FolderError, type FolderErrorCode } from './errors.ts';
 import { LOCK_FILE, withLockFile } from './lockFile.ts';
-
-/**
- * Why a call was refused. `changed`, `deleted` and `exists` are the conflicts of a conditional write or a move;
- * `not-found` a file that isn't there; `outside` a path that leaves the folder.
- */
-export type FolderErrorCode = 'changed' | 'deleted' | 'exists' | 'not-found' | 'outside';
-
-export class FolderError extends Error {
-  readonly code: FolderErrorCode;
-
-  constructor(code: FolderErrorCode, message: string) {
-    super(message);
-    this.name = 'FolderError';
-    this.code = code;
-  }
-}
 
 export interface FolderEntry {
   readonly path: string;

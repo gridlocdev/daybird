@@ -53,7 +53,11 @@ importers:
         specifier: 8.3.5
         version: 8.3.5(@types/node@24.19.2)(jiti@2.7.0)
 
-  apps/server: {}
+  apps/server:
+    dependencies:
+      '@daybird/node-files':
+        specifier: workspace:*
+        version: link:../../packages/node-files
 
   apps/web:
     dependencies:
@@ -100,6 +104,9 @@ importers:
       '@daybird/node-files':
         specifier: workspace:*
         version: link:../node-files
+      '@daybird/server':
+        specifier: workspace:*
+        version: link:../../apps/server
       '@preact/preset-vite':
         specifier: 2.10.6
         version: 2.10.6(@babel/core@7.29.13)(preact@11.1.1)(vite@8.3.5(@types/node@24.19.2)(jiti@2.7.0))

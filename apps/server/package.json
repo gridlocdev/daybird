@@ -4,10 +4,19 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "Serves the Daybird web client, and later a file API over calendar folders on a NAS.",
+  "description": "Serves the Daybird web client and one calendar folder, for a NAS.",
   "scripts": {
     "start": "node src/main.ts",
-    "dev": "DAYBIRD_HOST=127.0.0.1 DAYBIRD_ROOTS=Sample=../../.nas-data DAYBIRD_STATIC=../web/dist node --watch src/main.ts",
+    "dev": "DAYBIRD_DIR=../../.nas-data DAYBIRD_STATIC=../web/dist node --watch src/main.ts",
     "build": "echo 'server runs from source (node type stripping)'"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "daybird-server": "./bin/daybird-server.mjs"
+  },
+  "dependencies": {
+    "@daybird/node-files": "workspace:*"
   }
 }

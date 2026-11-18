@@ -2,14 +2,23 @@ import { readFile, stat } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { FolderStore } from '@daybird/node-files';
+import { HttpError, SECURITY_HEADERS, fileApi, httpError, sendJson } from './fileApi.ts';
 
 /**
- * The NAS server (PRD §15). For now it only serves the built web client; the file API over calendar folders
- * comes with the NAS slice.
+ * The NAS server (PRD §15): the built web client, and the file API over one calendar folder. It has no accounts:
+ * on anything but this machine it belongs behind a reverse proxy that asks for a login.
  */
 export interface ServerOptions {
   /** The built web client, or null to serve nothing but the API. */
   readonly staticDir: string | null;
+  /** The calendar folder, or null to serve the client alone (it then keeps calendars in the browser). */
+  readonly folder: FolderStore | null;
+  /**
+   * Host names answered besides localhost and IP addresses (`DAYBIRD_HOSTS`): the names the server is reached
+   * by. Any other `Host` is refused, so a web page can't reach the folder by pointing its own name here.
+   */
+  readonly allowedHosts?: readonly string[];
 }
 
 export const DEFAULT_PORT = 8796;
@@ -32,29 +41,14 @@ const MIME: Record<string, string> = {
   '.woff2': 'font/woff2',
 };
 
-const SECURITY_HEADERS = {
-  'X-Content-Type-Options': 'nosniff',
-  'Referrer-Policy': 'no-referrer',
-  'X-Frame-Options': 'DENY',
-};
-
-class HttpError extends Error {
-  readonly status: number;
-  constructor(status: number, message: string) {
-    super(message);
-    this.status = status;
-  }
-}
-
 export function createServer(opts: ServerOptions): http.Server {
   return http.createServer((req, res) => {
     handle(req, res, opts).catch((e: unknown) => {
-      const status = e instanceof HttpError ? e.status : 500;
-      if (status === 500) console.error(e);
+      const err = httpError(e);
+      if (!(err instanceof HttpError)) console.error(err);
       if (res.headersSent) return void res.end();
-      const body = JSON.stringify({ error: e instanceof HttpError ? e.message : 'Server error' });
-      res.writeHead(status, { 'Content-Type': 'application/json', ...SECURITY_HEADERS });
-      res.end(body);
+      if (err instanceof HttpError) sendJson(res, err.status, { code: err.code, message: err.message });
+      else sendJson(res, 500, { code: 'failed', message: 'Server error' });
     });
   });
 }
@@ -64,8 +58,16 @@ async function handle(
   res: http.ServerResponse,
   opts: ServerOptions,
 ): Promise<void> {
+  if (!hostAllowed(req.headers.host, opts.allowedHosts ?? []))
+    throw new HttpError(421, 'Unknown host: add it to DAYBIRD_HOSTS.');
   const url = new URL(req.url ?? '/', 'http://localhost');
-  if (url.pathname.startsWith('/api/')) throw new HttpError(404, 'Not found');
+  if (url.pathname.startsWith('/api/')) {
+    // The page asks first, to learn whether its calendars are here or in the browser.
+    if (req.method === 'GET' && url.pathname === '/api/info')
+      return sendJson(res, 200, { app: 'Daybird', name: opts.folder?.name ?? null });
+    if (!opts.folder) throw new HttpError(404, 'Not found');
+    return fileApi(req, res, url, opts.folder);
+  }
   if (req.method !== 'GET' && req.method !== 'HEAD') throw new HttpError(405, 'Method not allowed');
   if (!opts.staticDir) throw new HttpError(404, 'Not found');
   await serveStatic(res, opts.staticDir, url.pathname, req.method === 'HEAD');
@@ -109,4 +111,47 @@ async function serveStatic(
 export function parsePort(spec: string | undefined): number {
   const n = Number(spec);
   return spec && Number.isInteger(n) && n > 0 && n < 65536 ? n : DEFAULT_PORT;
+}
+
+/** Parses `DAYBIRD_HOSTS` (`nas.lan, daybird.example.com`) into lowercase host names. */
+export function parseHosts(spec: string | undefined): string[] {
+  return (spec ?? '')
+    .split(',')
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** Whether a request's `Host` is one the server answers: localhost, an IP address, or one of `allowed`. */
+export function hostAllowed(hostHeader: string | undefined, allowed: readonly string[]): boolean {
+  if (!hostHeader) return false;
+  let hostname: string;
+  try {
+    hostname = new URL(`http://${hostHeader}`).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  const bare = hostname.replace(/^\[|\]$/g, '');
+  if (bare === 'localhost' || bare.endsWith('.localhost')) return true;
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(bare) || bare.includes(':')) return true;
+  return allowed.includes(bare);
+}
+
+/** Whether a bind address is reachable only from this machine. */
+export function isLoopbackHost(host: string): boolean {
+  const bare = host.replace(/^\[|\]$/g, '').toLowerCase();
+  return bare === 'localhost' || bare === '::1' || /^127\./.test(bare);
+}
+
+/**
+ * Why the server must not start on `host`, or null when it may. With no accounts, anyone who reaches the server
+ * can read and change the calendars, so an address other machines can reach needs `noAuth`: the owner's promise
+ * that a reverse proxy in front asks for a login.
+ */
+export function bindProblem(host: string, noAuth: boolean): string | null {
+  if (noAuth || isLoopbackHost(host)) return null;
+  return (
+    `Refusing to listen on ${host || 'all addresses'}: Daybird has no accounts, so anyone who reaches it could ` +
+    'read and change your calendars. Put it behind a reverse proxy that asks for a login and set ' +
+    'DAYBIRD_NO_AUTH=1 (or --no-auth), or listen on 127.0.0.1.'
+  );
 }

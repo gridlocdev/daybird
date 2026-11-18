@@ -1,0 +1,19 @@
+# Copy to compose.yaml on the NAS and change the volume path to your calendar folder.
+services:
+  daybird:
+    build: .
+    # image: daybird:latest
+    ports:
+      - '8796:8796'
+    environment:
+      # Daybird has no accounts: anyone who reaches it can read and change the calendars. Put it behind a reverse
+      # proxy that asks for a login, then leave this on. Without it the server refuses to start on 0.0.0.0.
+      DAYBIRD_NO_AUTH: '1'
+      # The names you browse to, besides IP addresses and localhost (a name not listed gets 421):
+      # DAYBIRD_HOSTS: 'nas.lan,calendar.example.com'
+    volumes:
+      # The folder of .ics files, one per calendar.
+      - /volume1/calendars:/data
+    # The container runs as the image's `node` user (uid 1000); match your NAS share's owner:
+    # user: '1026:100'
+    restart: unless-stopped

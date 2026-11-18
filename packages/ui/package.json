@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@daybird/node-files": "workspace:*",
+    "@daybird/server": "workspace:*",
     "@preact/preset-vite": "2.10.6",
     "vite": "8.3.5"
   }

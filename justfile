@@ -10,11 +10,11 @@ default:
 
 # ── Run (dev) ─────────────────────────────────────────────────────────────
 
-# Web client dev server (http://localhost:5173) plus the NAS file server it talks to. Ctrl-C stops both.
+# Web client dev server (http://localhost:5173) plus the NAS server it talks to, on ./.nas-data. Ctrl-C stops both.
 [group('run')]
 run-web:
     mkdir -p "{{ nas_data }}"
-    VITE_DAYBIRD_NAS=1 pnpm --parallel --filter @daybird/server --filter @daybird/web run dev
+    pnpm --parallel --filter @daybird/server --filter @daybird/web run dev
 
 # NAS file server only (http://localhost:8796), serving ./.nas-data; restarts when its source changes.
 [group('run')]
@@ -35,9 +35,9 @@ run-desktop-headless dir=(justfile_directory() / ".headless-data"): build-deskto
 
 # The built web client served by the NAS server, as it runs on a NAS (http://localhost:8796).
 [group('run')]
-preview-web: build-web-nas
+preview-web: build-web
     mkdir -p "{{ nas_data }}"
-    DAYBIRD_HOST=127.0.0.1 DAYBIRD_ROOTS="Sample={{ nas_data }}" DAYBIRD_STATIC="{{ justfile_directory() }}/apps/web/dist" node apps/server/src/main.ts
+    DAYBIRD_STATIC="{{ justfile_directory() }}/apps/web/dist" node apps/server/src/main.ts --dir "{{ nas_data }}"
 
 # Run the daybird CLI from source (paths resolve from where you run it; quoting is kept).
 [group('run')]
@@ -57,11 +57,6 @@ build:
 [group('build')]
 build-web:
     pnpm --filter @daybird/web build
-
-# Build the web client for the NAS server (shows NAS open/save; `build-web` leaves it out).
-[group('build')]
-build-web-nas:
-    VITE_DAYBIRD_NAS=1 pnpm --filter @daybird/web build
 
 # Build the desktop app's main process and copy the web client into apps/desktop/out.
 [group('build')]
@@ -104,6 +99,17 @@ install-desktop: package-desktop-dir
     if [ -n "$trashed" ]; then "$lsregister" -u "$trashed" 2>/dev/null || true; fi
     "$lsregister" -f "$target"
     echo "Installed $target"
+
+# Build the NAS Docker image.
+[group('build')]
+build-docker tag="daybird:latest":
+    docker build -t {{ tag }} .
+
+# Run the NAS Docker image against ./.nas-data (http://localhost:8796).
+[group('run')]
+run-docker tag="daybird:latest":
+    mkdir -p "{{ nas_data }}"
+    docker run --rm -p 127.0.0.1:8796:8796 -e DAYBIRD_NO_AUTH=1 -v "{{ nas_data }}:/data" {{ tag }}
 
 # ── Quality ───────────────────────────────────────────────────────────────
 
@@ -160,28 +166,27 @@ fuzz runs="500":
 # `just --list` shows only the last line of a recipe's comment, so the summary goes last.
 # `--project=web` with the `=`: `--project` takes several names, so `just e2e editing` would read "editing" as one.
 # `"$@"` keeps quoting, so `just e2e -g "two words"` stays one pattern.
-# These recipes build with build-web-nas; an app whose one build serves the NAS too depends on build-web.
 # Browser scenarios against the built client and the NAS server, on fixture data in ./.e2e-data.
 [group('quality')]
 [positional-arguments]
-e2e *args: build-web-nas
+e2e *args: build-web
     pnpm exec playwright test -c e2e/playwright.config.ts --project=web "$@"
 
 # Accept the current screenshots as the new baseline (macOS; look at the diff in .e2e-results first).
 [group('quality')]
 [positional-arguments]
-e2e-update *args: build-web-nas
+e2e-update *args: build-web
     pnpm exec playwright test -c e2e/playwright.config.ts --project=web --update-snapshots=changed "$@"
 
 # Drive the app headlessly for a quick look: just drive cmd:"Month" key:KeyT shot:after aria
 [group('quality')]
 [positional-arguments]
-drive *steps: build-web-nas
+drive *steps: build-web
     node e2e/drive.ts "$@"
 
 # Long random runs on new seeds, on this machine: before a release, or while you're away. No CI minutes.
 [group('quality')]
-soak runs="1000": build-web-nas
+soak runs="1000": build-web
     #!/usr/bin/env bash
     # No `set -e`: a failure in the first half must not skip random use. Both run; the recipe fails at the end.
     set -uo pipefail
@@ -194,7 +199,6 @@ soak runs="1000": build-web-nas
     FUZZ_RUNS=25 FUZZ_SEED_BASE=$base pnpm exec playwright test -c e2e/playwright.config.ts --project=web -g random --output=".e2e-soak/$base" || status=1
     exit $status
 
-# Its build-web leaves apps/web/dist without NAS: run scenarios with `just e2e`, which rebuilds, not Playwright directly.
 # Desktop smoke test: the built Electron app, headless, with a throwaway profile.
 [group('quality')]
 e2e-desktop: build-desktop

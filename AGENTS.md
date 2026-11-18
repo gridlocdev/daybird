@@ -20,7 +20,7 @@ Daybird is a calendar app that keeps each calendar in a plain `.ics` file in a f
 | `packages/core` | The pure engine: dates and time zones, the iCalendar format, recurrence, views, edits and undo. No DOM or Node (ESLint enforces it). |
 | `packages/ui` | Preact and signals: components, the command catalog, dialogs, ⌘K, and the store adapters. |
 | `apps/web` | The app shell, the list of commands and the Vite entry point. One static build serves the browser, the NAS server and the desktop app. |
-| `apps/server` | The NAS server (`node:http`): serves the client and `/api` for the configured roots. No framework. |
+| `apps/server` | The NAS server (`node:http`): serves the client and `/api` over one calendar folder (`--dir`). No framework. |
 | `apps/desktop` | The Electron shell: main process, sandboxed preload bridge, native menu. |
 | `apps/cli` | The `daybird` CLI, run from source. It depends on `packages/core` and `packages/node-files` only. |
 
@@ -31,7 +31,7 @@ Daybird is a calendar app that keeps each calendar in a plain `.ics` file in a f
 3. **One command catalog.** The command menu, shortcuts, context menus, the Electron menu bar, the Keyboard Shortcuts window and `docs/controls.md` all read it. Don't wire a key or a menu item past it.
 4. **The UI reaches files only through the store interface.** It never knows whether data is in memory, in the browser, on the NAS or on disk.
 5. **Never lose data.** Saves are atomic everywhere. A conflict is shown and the user chooses; nothing merges or overwrites silently. Deleting goes to the trash.
-6. **Security.** The Electron renderer is sandboxed with context isolation; its only native access is the `daybirdNative` bridge, and only to files the user granted. The server confines every path to its root, symlinks included, and checks `Host` when there is no token.
+6. **Security.** The Electron renderer is sandboxed with context isolation; its only native access is the `daybirdNative` bridge, and only to files the user granted. The server confines every path to its root, symlinks included, and checks `Host` against localhost, IP addresses and `DAYBIRD_HOSTS`.
 7. **Dependencies.** The runtime dependencies are Preact and `@preact/signals`. Don't add a package without the owner's approval. Pin versions exactly.
 8. **Nothing left to interpretation.** If a behaviour isn't in the PRD, stop and ask, then record the answer in the PRD.
 

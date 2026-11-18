@@ -62,7 +62,9 @@ Every action is a command in `apps/web/src/app/commands.ts`: an id, a title, a o
 
 ## The NAS server
 
-`apps/server` is a `node:http` server with no framework. For now it serves the built web client; the file API over calendar folders comes later. Its settings are environment variables: `DAYBIRD_STATIC` (the built client), `DAYBIRD_HOST` (default `127.0.0.1`) and `DAYBIRD_PORT` (default 8796).
+`apps/server` is a `node:http` server with no framework: `daybird-server --dir <folder> [--port <n>] [--host <address>] [--no-auth]`, or `node apps/server/src/main.ts` with the same options. It serves the built web client and, with `--dir`, the file API in `src/fileApi.ts` over that folder. Each option has an environment variable: `DAYBIRD_DIR`, `DAYBIRD_PORT` (default 8796), `DAYBIRD_HOST` (default `127.0.0.1`) and `DAYBIRD_NO_AUTH=1`; `DAYBIRD_HOSTS` lists the names it is reached by and `DAYBIRD_STATIC` points at the built client. On any address but this machine it starts only with `DAYBIRD_NO_AUTH=1`, since it has no accounts: put a reverse proxy with a login in front.
+
+The Docker image builds the client and runs the server on `/data`: `just build-docker`, then `just run-docker` to try it on `./.nas-data`. Copy `compose.example.yaml` to `compose.yaml` on the NAS and set the volume to the calendar folder.
 
 ## The CLI
 

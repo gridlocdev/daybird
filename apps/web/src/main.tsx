@@ -7,6 +7,7 @@ import {
   BrowserStore,
   FolderSession,
   MemoryStore,
+  NasStore,
   NativeStore,
   after,
   every,
@@ -15,6 +16,7 @@ import {
   localSettings,
   localSnapshots,
   memorySnapshots,
+  nasInfo,
   persistStorage,
   privateFolder,
   type CalendarStore,
@@ -131,6 +133,12 @@ function watchFolder(app: AppController): void {
 }
 
 async function startBrowser(app: AppController): Promise<void> {
+  // Served by a Daybird server with a calendar folder (PRD §15): that folder, for every browser that opens it.
+  const nas = await nasInfo();
+  if (nas) {
+    await openStore(app, new NasStore(nas.name), windowSnapshots());
+    return;
+  }
   const { store, snapshots, kept } = await browserStore();
   await openStore(app, store, snapshots);
   if (!kept)
