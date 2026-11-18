@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The mini month marks the visible days as one rounded band, squared off where it wraps to the next row.
+
 ## 1.0.0 - 2026-11-17
 
 The first release.

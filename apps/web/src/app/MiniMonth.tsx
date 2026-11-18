@@ -25,6 +25,9 @@ export interface MiniMonthProps {
   readonly onHeading?: () => void;
 }
 
+const isShaded = (props: MiniMonthProps, d: PlainDate) =>
+  !!props.shaded && d >= props.shaded.start && d < props.shaded.end;
+
 /** A small month of day numbers: the sidebar's (PRD §5.2) and each of Year view's twelve (§6.3). */
 export function MiniMonth(props: MiniMonthProps) {
   const { start, end } = monthGrid(props.month, props.weekStart);
@@ -56,11 +59,15 @@ export function MiniMonth(props: MiniMonthProps) {
           <div role="row" class="db-mini-row" key={week[0]}>
             {week.map((d) => {
               const outside = datePart(d).month !== month;
-              const shaded = props.shaded && d >= props.shaded.start && d < props.shaded.end;
+              const shaded = isShaded(props, d);
               const cls = [
                 'db-mini-day',
                 outside && 'db-outside',
                 shaded && 'db-shaded',
+                // The shaded range is a band with round ends where it starts and stops; where it wraps
+                // to the next week row, both edges stay square.
+                shaded && !isShaded(props, addDays(d, -1)) && 'db-shade-start',
+                shaded && !isShaded(props, addDays(d, 1)) && 'db-shade-end',
                 d === props.today && 'db-today',
                 busy(props, d),
               ]

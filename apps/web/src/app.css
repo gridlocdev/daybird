@@ -138,15 +138,40 @@
 .db-mini-day.db-outside {
   color: var(--db-text-3);
 }
+/* The shown range: a band with round ends where it starts and stops, square where it wraps to the next row. */
 .db-mini-day.db-shaded {
+  margin-inline: 0;
   border-radius: 0;
   background: var(--db-pressed);
+}
+.db-mini-day.db-shade-start {
+  border-start-start-radius: 999px;
+  border-end-start-radius: 999px;
+}
+.db-mini-day.db-shade-end {
+  border-start-end-radius: 999px;
+  border-end-end-radius: 999px;
 }
 .db-mini-day.db-today {
   border-radius: 50%;
   background: var(--db-accent);
   color: var(--db-accent-text);
   font-weight: 650;
+}
+/* Today inside the band: its circle sits on the band, which runs on behind it. */
+.db-mini-day.db-shaded.db-today {
+  border-radius: 0;
+  background:
+    radial-gradient(circle closest-side, var(--db-accent) calc(100% - 1.5px), transparent 100%),
+    var(--db-pressed);
+}
+.db-mini-day.db-shaded.db-today.db-shade-start {
+  border-start-start-radius: 999px;
+  border-end-start-radius: 999px;
+}
+.db-mini-day.db-shaded.db-today.db-shade-end {
+  border-start-end-radius: 999px;
+  border-end-end-radius: 999px;
 }
 
 /* The view area (§6) */
