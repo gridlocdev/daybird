@@ -22,8 +22,14 @@
   background: var(--db-window);
 }
 .db-range-title {
+  /* Its width is set to the widest title the view can show, so ‹ Today › after it stays put. */
+  flex: 0 1 auto;
+  box-sizing: content-box;
   margin: 0 8px 0 4px;
-  font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  font-size: var(--db-title-size);
   font-weight: 400;
   white-space: nowrap;
   letter-spacing: -0.01em;

@@ -7,6 +7,7 @@ import {
   addMonths,
   datePart,
   diffDays,
+  plainDate,
   startOfMonth,
   startOfWeek,
   startOfYear,
@@ -149,6 +150,20 @@ export function rangeTitle(view: View, anchor: PlainDate, weekStart: Weekday, lo
     case 'year':
       return { main: '', year: String(year) };
   }
+}
+
+/**
+ * Every title a view can show over a year, each once. The toolbar keeps room for the widest, so the controls
+ * after the title don't move as it changes (PRD §5.1).
+ */
+export function titlesOfYear(view: View, year: number, weekStart: Weekday, locale?: string): RangeTitle[] {
+  const seen = new Map<string, RangeTitle>();
+  const end = plainDate(year + 1, 1, 1);
+  for (let d = plainDate(year, 1, 1); d < end; d = addDays(d, 1)) {
+    const t = rangeTitle(view, d, weekStart, locale);
+    seen.set(`${t.main}|${t.year}`, t);
+  }
+  return [...seen.values()];
 }
 
 /** The locale's first day of the week, or Sunday when the runtime can't say. */

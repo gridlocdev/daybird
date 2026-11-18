@@ -1,7 +1,9 @@
-import { VIEWS, type View } from '@daybird/core';
+import { useMemo } from 'preact/hooks';
+import { VIEWS, datePart, titlesOfYear, type View } from '@daybird/core';
 import { Icon, type CommandCatalog } from '@daybird/ui';
 import type { AppController } from './controller.ts';
 import { SearchField } from './SearchView.tsx';
+import { widestTitle } from './titleWidth.ts';
 import { DisplayZoneSelect } from './ZoneSelect.tsx';
 
 const VIEW_TITLES: Readonly<Record<View, string>> = {
@@ -21,13 +23,20 @@ function tip(catalog: CommandCatalog, id: string, title?: string): string {
 }
 
 /**
- * The toolbar row (PRD §5.1): sidebar toggle, the range title, ‹ Today ›, then the view switcher. In the
+ * The toolbar row (PRD §5.1): sidebar toggle, the range title in room for its widest form, ‹ Today › centred in
+ * the space after it, then the view switcher. In the
  * desktop app on macOS it is the title bar too, and its empty space drags the window.
  */
 export function Toolbar({ app, catalog }: { readonly app: AppController; readonly catalog: CommandCatalog }) {
   const title = app.title.value;
   const view = app.view.value;
   const sidebar = app.settings.value.sidebarShown;
+  const year = datePart(app.anchor.value).year;
+  const weekStart = app.weekStart.value;
+  const titleWidth = useMemo(
+    () => widestTitle(titlesOfYear(view, year, weekStart, app.locale)),
+    [view, year, weekStart, app.locale],
+  );
   return (
     <header class="db-toolbar">
       <button
@@ -40,9 +49,14 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
       >
         <Icon name="panel-left" />
       </button>
-      <h1 class="db-range-title" aria-live="polite">
+      <h1
+        class="db-range-title"
+        aria-live="polite"
+        style={titleWidth ? { width: `${titleWidth}px` } : undefined}
+      >
         {title.main && <strong>{title.main}</strong>} <span>{title.year}</span>
       </h1>
+      <div class="db-toolbar-space" />
       <div class="db-nav" role="group" aria-label="Move through time">
         <button
           type="button"

@@ -120,7 +120,7 @@ Design direction, from reviewing Apple Calendar, Fantastical, Google Calendar an
 ### §5.1 Window
 
 - One toolbar row across the top. On macOS it's the title bar (hidden title bar, traffic lights inset), and empty toolbar space drags the window.
-- Toolbar, left to right: sidebar toggle; the range title ("November 2026", "Nov 16 – 22, 2026", "Tuesday, November 17, 2026"; bold month, light year); ‹ **Today** ›; flexible space; the view switcher (Day, Week, Month, Year, Agenda, as a segmented control); the search field; **+** (new event).
+- Toolbar, left to right: sidebar toggle; the range title ("November 2026", "Nov 16 – 22, 2026", "Tuesday, November 17, 2026"; bold month, light year), in room as wide as the widest title the view shows that year; ‹ **Today** ›, centred between that room and the view switcher, so it never moves as the title changes; flexible space; the view switcher (Day, Week, Month, Year, Agenda, as a segmented control); the search field; **+** (new event).
 - Below: the sidebar (left) and the view.
 - A status bar along the bottom holds notices (§5.5) and the save state. It's 24 px and empty most of the time.
 

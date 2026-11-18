@@ -31,6 +31,7 @@ export {
   rangeTitle,
   stepAnchor,
   timeLabel,
+  titlesOfYear,
   viewRange,
   type DateRange,
   type RangeTitle,

@@ -17,6 +17,29 @@ test.describe('Calendar views', () => {
     await expect(title(page)).toContainText('2026');
   });
 
+  test('the previous, Today and next buttons stay put as the title changes width', async ({ page }) => {
+    const nav = page.getByRole('group', { name: 'Move through time' });
+    const where = async () => {
+      const names = ['Previous', 'Today', 'Next'];
+      const boxes = await Promise.all(names.map((n) => nav.getByRole('button', { name: n }).boundingBox()));
+      return boxes.map((b) => Math.round(b!.x));
+    };
+    const stepsKeepThemPut = async (titles: readonly string[]) => {
+      const before = await where();
+      for (const t of titles) {
+        await nav.getByRole('button', { name: 'Next' }).click();
+        await expect(title(page)).toContainText(t);
+        expect(await where()).toEqual(before);
+      }
+    };
+    await page.keyboard.press('d');
+    await expect(title(page)).toContainText('Tuesday, November 17');
+    await stepsKeepThemPut(['Wednesday, November 18', 'Thursday, November 19', 'Friday, November 20']);
+    await page.keyboard.press('m');
+    await expect(title(page)).toContainText('November');
+    await stepsKeepThemPut(['December']);
+  });
+
   test('a single key switches the view', async ({ page }) => {
     for (const [key, name] of [
       ['d', 'Day'],
