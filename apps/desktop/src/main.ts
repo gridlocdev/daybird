@@ -36,7 +36,16 @@ const MIN_SIZE = { width: 640, height: 440 };
 const unified = process.platform === 'darwin';
 /** DAYBIRD_HEADLESS=1: render offscreen and never show a window or Dock icon (automated checks). */
 const headless = process.env.DAYBIRD_HEADLESS === '1';
-if (headless) app.dock?.hide();
+if (headless) {
+  app.dock?.hide();
+  // A crash would otherwise show Electron's error dialog on the screen; log it and stop instead.
+  const fail = (e: unknown) => {
+    console.error(e);
+    process.exit(1);
+  };
+  process.on('uncaughtException', fail);
+  process.on('unhandledRejection', fail);
+}
 
 const paths = dataPaths(process.env);
 if (paths.userData) app.setPath('userData', paths.userData);
@@ -228,7 +237,8 @@ function registerIpc(): void {
   ipcMain.handle(Channels.folderCurrent, (e) => (trusted(e) ? folders.current() : null));
   // Both answer the folder now open, or null when the user cancelled.
   ipcMain.handle(Channels.folderChoose, async (e) => {
-    if (!trusted(e) || !win) return null;
+    // A headless run shows no dialog: there is no one to answer it.
+    if (!trusted(e) || !win || headless) return null;
     const picked = await dialog.showOpenDialog(win, {
       title: 'Open Calendar Folder',
       buttonLabel: 'Open',
