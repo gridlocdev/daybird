@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 - 2026-11-22
+
 - The browser build opens a folder of calendars from your computer with **Open Calendar Folder…** (⌘O). Chrome and Edge save to it. Firefox and Safari open it read-only: you can look at, search and export it, and the commands that would change it are off and say why.
 - A dialog whose fields are all off still takes the keyboard, so Escape closes it.
 

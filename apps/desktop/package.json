@@ -1,7 +1,7 @@
 {
   "name": "@daybird/desktop",
   "productName": "Daybird",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "license": "MIT",
