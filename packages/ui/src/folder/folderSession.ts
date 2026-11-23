@@ -132,7 +132,7 @@ export class FolderSession {
   commit(label: string, next: Workspace, group?: string): boolean {
     const diff = diffStep(label, this.workspace.peek(), next);
     const s = diff && group !== undefined ? { ...diff, group } : diff;
-    if (!s) return false;
+    if (!s || this.store.readOnly) return false;
     batch(() => {
       this.workspace.value = next;
       this.undoStack.value = pushStep(this.undoStack.peek(), s);
@@ -305,8 +305,8 @@ export class FolderSession {
   // ——— Loading ———
 
   async #load(): Promise<void> {
-    // The snapshots come first: nothing may be written before a crashed window's changes are known.
-    await this.#copies.load();
+    // The snapshots come first. A read-only folder (§3.7) writes nothing and offers no recovery: none is its own.
+    if (!this.store.readOnly) await this.#copies.load();
     const pending: string[] = [];
     for (const path of await calendarPaths(this.store)) {
       const disk = await readDisk(this.store, path);
@@ -314,7 +314,7 @@ export class FolderSession {
     }
     await this.#loadTrash();
     let ws = this.workspace.peek();
-    if (!ws.calendars.length) {
+    if (!ws.calendars.length && !this.store.readOnly) {
       // An empty folder gets one calendar, with no welcome card (§3.1).
       const calendar = newCalendar(ws, 'Calendar');
       ws = withCalendar(ws, calendar);
@@ -325,6 +325,7 @@ export class FolderSession {
     if (purged !== ws) pending.push(TRASH_PATH);
     this.workspace.value = purged;
     this.#publish();
+    if (this.store.readOnly) return;
 
     const offered = recoveryOfferOf(this.workspace.peek(), this.#copies, this.#appVersion);
     if (offered.files.length) {

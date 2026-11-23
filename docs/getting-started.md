@@ -30,7 +30,7 @@ just setup     # enable corepack and install the dependencies
 just run-web   # the app on http://localhost:5173, with the NAS server on :8796
 ```
 
-`just run-desktop` runs the desktop app from source instead. In a browser that can't open a folder, calendars are kept in the browser itself, and the status bar says so.
+`just run-desktop` runs the desktop app from source instead. In the browser, calendars are kept in the browser itself, and the status bar says so. **Open Calendar Folder…** (⌘O) opens a folder from your computer instead: Chrome and Edge save to it, and Firefox and Safari open it read-only.
 
 ## Run it on a NAS (Docker)
 

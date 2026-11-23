@@ -39,6 +39,11 @@ export interface CalendarStore {
   readonly where?: string;
   /** "Stored in this browser" (§3.7): the folder isn't one the user can see on disk. */
   readonly isPrivate: boolean;
+  /**
+   * The folder can be read but not written (§3.7): Firefox and Safari hand over a snapshot of its files. Every write
+   * rejects with ReadOnlyError, and the app turns off what would write.
+   */
+  readonly readOnly?: boolean;
   /** The entries directly in `dir` (`''` for the folder itself). A missing folder lists as empty. */
   list(dir: string): Promise<Entry[]>;
   read(path: string): Promise<FileData>;
@@ -70,6 +75,14 @@ export class NotFoundError extends Error {
   constructor(path: string) {
     super(`“${path}” isn’t in the folder any more.`);
     this.name = 'NotFoundError';
+  }
+}
+
+/** A write to a folder that was opened read-only. */
+export class ReadOnlyError extends Error {
+  constructor(folder: string) {
+    super(`“${folder}” is open read-only.`);
+    this.name = 'ReadOnlyError';
   }
 }
 

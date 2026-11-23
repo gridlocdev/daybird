@@ -153,6 +153,12 @@ export class AppController {
 
   /** The open calendar folder; null until it has loaded. */
   readonly session = signal<FolderSession | null>(null);
+  /** Why the open folder can't be changed (PRD §3.7), or null when it can. */
+  readonly readOnly = computed(() =>
+    this.session.value?.store.readOnly
+      ? `${this.session.value.store.name} is open read-only: this browser can’t save to a folder opened this way. To change it, use the Daybird desktop app or a Daybird server.`
+      : null,
+  );
   readonly canUndo = computed(() => (this.session.value?.undoStack.value.done.length ?? 0) > 0);
   readonly canRedo = computed(() => (this.session.value?.undoStack.value.undone.length ?? 0) > 0);
   /** The desktop app asks which folder to use. */
@@ -390,7 +396,7 @@ export class AppController {
     });
   }
 
-  /** ⌘O in the desktop app: another calendar folder. */
+  /** ⌘O: another calendar folder. */
   openFolder(): void {
     this.folders?.choose().catch((e: unknown) => this.#couldNotOpen(e));
   }

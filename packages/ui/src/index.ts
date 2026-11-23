@@ -53,11 +53,13 @@ export { PopupMenu } from './components/PopupMenu.tsx';
 export {
   BrowserStore,
   ConflictError,
+  FileListStore,
   MemoryStore,
   NasStore,
   NativeStore,
   nasInfo,
   NotFoundError,
+  ReadOnlyError,
   baseName,
   decodeText,
   encodeText,

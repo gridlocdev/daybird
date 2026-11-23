@@ -33,7 +33,7 @@ const DIALOG_COMMAND: Readonly<Record<DialogKind, string>> = {
 
 export function buildCommands(app: AppController): CommandCatalog {
   const specs: CommandSpec[] = [
-    // Only the desktop app opens folders on disk; the browser keeps its calendars in its own storage.
+    // The NAS serves one folder; the desktop app and the browser open one the user picks (PRD §3.7).
     ...(app.folders
       ? [
           {
@@ -43,12 +43,15 @@ export function buildCommands(app: AppController): CommandCatalog {
             group: 'File',
             shortcuts: ['mod+o'],
             keywords: 'folder directory switch location',
+            // A Daybird server serves the one folder it was started with (§15).
+            enabled: () => app.session.value?.store.kind !== 'nas',
             run: () => app.openFolder(),
           } satisfies CommandSpec,
         ]
       : []),
     {
       id: 'event.new',
+      writes: true,
       title: 'New Event',
       description: 'Add an event at the next half hour, in the default calendar.',
       group: 'File',
@@ -59,6 +62,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'calendar.new',
+      writes: true,
       title: 'New Calendar…',
       description: 'Add a calendar, kept in a file of its own in the folder.',
       group: 'File',
@@ -85,6 +89,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'calendar.rename',
+      writes: true,
       title: 'Rename…',
       description: 'Change the calendar’s name.',
       group: 'File',
@@ -94,6 +99,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'calendar.colour',
+      writes: true,
       title: 'Colour…',
       description: 'Change the calendar’s colour.',
       group: 'File',
@@ -103,6 +109,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'calendar.setDefault',
+      writes: true,
       title: 'Set as Default',
       description: 'New events go to this calendar, from every device that opens the folder.',
       group: 'File',
@@ -117,6 +124,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'calendar.delete',
+      writes: true,
       title: 'Delete Calendar…',
       description: 'Move the calendar’s file to the folder’s trash.',
       group: 'File',
@@ -146,6 +154,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'edit.undo',
+      writes: true,
       title: 'Undo',
       description: 'Take back the last change.',
       group: 'Edit',
@@ -156,6 +165,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
     {
       id: 'edit.redo',
+      writes: true,
       title: 'Redo',
       description: 'Make the last change you took back again.',
       group: 'Edit',
@@ -282,6 +292,7 @@ export function buildCommands(app: AppController): CommandCatalog {
     },
   ];
   const catalog = new CommandCatalog(specs);
+  catalog.readOnly = () => app.readOnly.value;
   // With a dialog open, only the command that toggles that dialog (or opens another one) runs.
   catalog.gate = (c) =>
     !app.blocked() ||

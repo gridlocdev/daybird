@@ -26,6 +26,8 @@ export interface CommandSpec {
   readonly keywords?: string;
   readonly run: () => void | Promise<void>;
   readonly enabled?: () => boolean;
+  /** It changes the folder, so it's off while the folder is open read-only (PRD §3.7). */
+  readonly writes?: boolean;
   /** Left out of the command menu (the command menu itself, say). */
   readonly hidden?: boolean;
   /** In an event's right-click menu. */
@@ -77,6 +79,9 @@ export class CommandCatalog {
   /** Asked before every run; returning false cancels it. */
   gate: ((c: Command) => boolean) | null = null;
 
+  /** Why the folder can't be written right now, or null when it can: commands that write are off until then. */
+  readOnly: (() => string | null) | null = null;
+
   constructor(specs: readonly CommandSpec[]) {
     this.all = specs.map((s) => ({ ...s, sequences: (s.shortcuts ?? []).map(parseSequence) }));
     this.#byId = new Map(this.all.map((c) => [c.id, c]));
@@ -88,7 +93,13 @@ export class CommandCatalog {
   }
 
   isEnabled(c: Command): boolean {
+    if (this.whyDisabled(c)) return false;
     return c.enabled?.() ?? true;
+  }
+
+  /** The reason a command is off that the user can't see for themselves (a read-only folder), or null. */
+  whyDisabled(c: Command): string | null {
+    return c.writes ? (this.readOnly?.() ?? null) : null;
   }
 
   /** Runs `id` if it is enabled and the gate lets it. */

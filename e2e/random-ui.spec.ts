@@ -27,6 +27,7 @@ const SKIP = [
   /import/i,
   /download/i,
   /^save as/i,
+  /open calendar folder/i,
   /^(cut|copy|paste)\b/i,
 ];
 

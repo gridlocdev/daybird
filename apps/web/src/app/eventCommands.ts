@@ -56,6 +56,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.cut',
+      writes: true,
       title: 'Cut',
       description: 'Copy the selected event and move it to the Trash.',
       group: 'Edit',
@@ -76,6 +77,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.paste',
+      writes: true,
       title: 'Paste',
       description: 'Add the copied event at the same time on the day shown.',
       group: 'Edit',
@@ -86,6 +88,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.duplicate',
+      writes: true,
       title: 'Duplicate',
       description: 'Add a copy of the selected event at the same time, or a day later in Month.',
       group: 'Edit',
@@ -96,6 +99,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.newHere',
+      writes: true,
       title: 'New Event Here',
       description: 'Add an event where you right-clicked.',
       group: 'Edit',
@@ -109,6 +113,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.delete',
+      writes: true,
       title: 'Delete Event',
       description: 'Move the selected event to the Trash.',
       group: 'Edit',
@@ -130,6 +135,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.earlier',
+      writes: true,
       title: 'Move Earlier',
       description: 'Move the selected event 15 minutes earlier, or a week in Month.',
       group: 'Edit',
@@ -141,6 +147,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.later',
+      writes: true,
       title: 'Move Later',
       description: 'Move the selected event 15 minutes later, or a week in Month.',
       group: 'Edit',
@@ -152,6 +159,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.hourEarlier',
+      writes: true,
       title: 'Move an Hour Earlier',
       description: 'Move the selected event an hour earlier.',
       group: 'Edit',
@@ -163,6 +171,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.hourLater',
+      writes: true,
       title: 'Move an Hour Later',
       description: 'Move the selected event an hour later.',
       group: 'Edit',
@@ -174,6 +183,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.dayEarlier',
+      writes: true,
       title: 'Move a Day Earlier',
       description: 'Move the selected event to the day before.',
       group: 'Edit',
@@ -185,6 +195,7 @@ export function eventCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'event.dayLater',
+      writes: true,
       title: 'Move a Day Later',
       description: 'Move the selected event to the day after.',
       group: 'Edit',

@@ -68,7 +68,11 @@ Settings (**⌘,** or **Ctrl+,**) chooses light, dark or the system's appearance
 
 ## Saving
 
-Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it back. If a calendar file changes somewhere else while this window has changes to it that aren't saved yet, Daybird asks what to keep: your version as a copy, your version over theirs, or theirs. Changes made in other apps show up when you come back to the window. If a window closes before it can save, the next one offers to put those changes back. The desktop app keeps each calendar as an `.ics` file in a folder you choose: on first start it offers Documents/Daybird, and **Open Calendar Folder…** (**⌘O**) switches to another. In a browser that can't open a folder, calendars are kept in the browser itself, and the status bar says so.
+Every change is saved as soon as you make it, and **⌘Z** (**Ctrl+Z**) takes it back. If a calendar file changes somewhere else while this window has changes to it that aren't saved yet, Daybird asks what to keep: your version as a copy, your version over theirs, or theirs. Changes made in other apps show up when you come back to the window. If a window closes before it can save, the next one offers to put those changes back. The desktop app keeps each calendar as an `.ics` file in a folder you choose: on first start it offers Documents/Daybird, and **Open Calendar Folder…** (**⌘O**) switches to another. In a browser with no folder open, calendars are kept in the browser itself, and the status bar says so.
+
+## Opening a folder in the browser
+
+**Open Calendar Folder…** (**⌘O**, **Ctrl+O**) opens a folder of calendar files from your computer in the browser too. In Chrome and Edge Daybird saves to it as it does on the desktop. Firefox and Safari can only hand over a copy of the folder's files, so there it opens read-only: you can look at, search and export every calendar, and the commands that would change one are off, with the reason on hover. The browser keeps no access to the folder, so a reload goes back to the calendars kept in the browser, and you pick the folder again on the next visit. To change the files, use the desktop app or a Daybird server.
 
 ## NAS server
 

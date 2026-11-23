@@ -5,6 +5,7 @@ import './app.css';
 import './lists.css';
 import {
   BrowserStore,
+  FileListStore,
   FolderSession,
   MemoryStore,
   NasStore,
@@ -31,6 +32,7 @@ import { browserNotification, startReminders, type ReminderMessage } from './app
 import { nativeBridge, type DaybirdNative, type NativeFolder } from './app/native.ts';
 import { menuSender, nativeMenu, watchMenuInputs } from './app/nativeMenu.ts';
 import { importOpenedFiles } from './app/openedFiles.ts';
+import { folderPicking, pickFolderFiles, pickFolderHandle } from './app/folderInput.ts';
 import pkg from '../package.json';
 
 /** How often the clock checks for midnight (PRD §6.1). */
@@ -149,6 +151,45 @@ async function startBrowser(app: AppController): Promise<void> {
     );
 }
 
+/**
+ * A folder on the computer, picked in the browser (PRD §3.7): one Daybird can save to where the browser has
+ * `showDirectoryPicker`, else a read-only snapshot through the folder input. The browser keeps no access to it,
+ * so the next visit starts with the browser's own calendars again.
+ */
+function browserFolders(app: () => AppController): FolderChooser {
+  const snapshots = windowSnapshots();
+  const useBrowser = async () => {
+    const { store, snapshots: own } = await browserStore();
+    await openStore(app(), store, own);
+  };
+  return {
+    choose: async () => {
+      switch (folderPicking()) {
+        case 'handle': {
+          const handle = await pickFolderHandle();
+          if (handle) await openStore(app(), new BrowserStore(handle), snapshots);
+          return;
+        }
+        case 'files': {
+          const files = await pickFolderFiles();
+          if (!files) return;
+          const store = new FileListStore(files);
+          if (!(await openStore(app(), store, memorySnapshots('read-only')))) return;
+          const none = app().calendars.peek().length ? '' : ' It has no calendar files.';
+          app().say(`Opened ${store.name} read-only.${none} You pick it again on each visit.`);
+          return;
+        }
+        case 'none':
+          app().say(
+            'This browser can’t open a folder on your computer. To keep calendars in a folder, use the Daybird desktop app or a Daybird server.',
+            { tone: 'error' },
+          );
+      }
+    },
+    useDefault: useBrowser,
+  };
+}
+
 interface DesktopFolders extends FolderChooser {
   /** Opens the folder used last, or asks for one. */
   start(): Promise<void>;
@@ -194,7 +235,7 @@ function start(): void {
   app = new AppController({
     settings: localSettings(),
     version: native?.version ?? pkg.version,
-    ...(folders ? { folders } : {}),
+    ...(folders ? { folders } : { folders: browserFolders(() => app!) }),
   });
   const catalog = buildCommands(app);
   render(<App app={app} catalog={catalog} />, root);

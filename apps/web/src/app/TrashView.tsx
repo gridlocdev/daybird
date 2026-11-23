@@ -13,6 +13,7 @@ const KIND_TEXT: Readonly<Record<TrashEntry['kind'], string>> = {
 /** The Trash view (PRD §7.7): deleted events and calendars, newest first, each with Restore and Delete Permanently. */
 export function TrashView({ app }: { readonly app: AppController }) {
   const ws = app.session.value?.workspace.value;
+  const readOnly = app.readOnly.value;
   const entries = ws ? trashEntries(ws.trash) : [];
   const names = new Map(app.calendars.value.map((c) => [c.id, c.name]));
   const date = (ms: number) =>
@@ -24,6 +25,7 @@ export function TrashView({ app }: { readonly app: AppController }) {
         <TrashRow
           key={`e-${e.id}`}
           title={e.title || 'New Event'}
+          readOnly={readOnly}
           detail={`${KIND_TEXT[e.kind]} from ${names.get(e.calendarId) ?? e.calendarId.replace(/\.ics$/i, '')}, deleted ${date(e.deleted * 1000)}`}
           onRestore={() => restoreEntry(app, e.id)}
           onDelete={() =>
@@ -38,6 +40,7 @@ export function TrashView({ app }: { readonly app: AppController }) {
         <TrashRow
           key={`c-${t.path}`}
           title={t.name}
+          readOnly={readOnly}
           detail={`Calendar, deleted ${date(t.deleted)}`}
           onRestore={() => void restoreCalendar(app, t)}
           onDelete={() => (app.trashQuestion.value = { kind: 'calendar', calendar: t })}
@@ -54,7 +57,8 @@ export function TrashView({ app }: { readonly app: AppController }) {
           <button
             type="button"
             class="db-button"
-            disabled={trashCount(app) === 0}
+            disabled={trashCount(app) === 0 || !!readOnly}
+            title={readOnly ?? undefined}
             onClick={() => (app.trashQuestion.value = { kind: 'empty' })}
           >
             Empty Trash…
@@ -73,6 +77,8 @@ export function TrashView({ app }: { readonly app: AppController }) {
 function TrashRow(props: {
   readonly title: string;
   readonly detail: string;
+  /** Why the folder can't be changed, when it can't: both buttons are off. */
+  readonly readOnly: string | null;
   readonly onRestore: () => void;
   readonly onDelete: () => void;
 }) {
@@ -80,10 +86,22 @@ function TrashRow(props: {
     <li class="db-trash-row" aria-label={props.title}>
       <span class="db-trash-title">{props.title}</span>
       <span class="db-trash-detail">{props.detail}</span>
-      <button type="button" class="db-button" onClick={props.onRestore}>
+      <button
+        type="button"
+        class="db-button"
+        disabled={!!props.readOnly}
+        title={props.readOnly ?? undefined}
+        onClick={props.onRestore}
+      >
         Restore
       </button>
-      <button type="button" class="db-button" onClick={props.onDelete}>
+      <button
+        type="button"
+        class="db-button"
+        disabled={!!props.readOnly}
+        title={props.readOnly ?? undefined}
+        onClick={props.onDelete}
+      >
         Delete Permanently…
       </button>
     </li>

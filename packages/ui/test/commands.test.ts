@@ -165,6 +165,27 @@ describe('the catalog', () => {
     expect(c.recentIds).toEqual(['undo', 'extend', 'down', 'today', 'inbox']);
   });
 
+  it('turns off commands that write while the folder is read-only, and says why', () => {
+    let why: string | null = 'Read-only.';
+    const spec = (id: string, writes: boolean): CommandSpec => ({
+      id,
+      title: id,
+      description: id,
+      group: 'Edit',
+      writes,
+      run: () => undefined,
+    });
+    const c = new CommandCatalog([spec('add', true), spec('look', false)]);
+    c.readOnly = () => why;
+    const add = c.get('add')!;
+    const look = c.get('look')!;
+    expect([c.isEnabled(add), c.whyDisabled(add)]).toEqual([false, 'Read-only.']);
+    expect([c.isEnabled(look), c.whyDisabled(look)]).toEqual([true, null]);
+    expect(c.run('add')).toBe(false);
+    why = null;
+    expect([c.isEnabled(add), c.whyDisabled(add)]).toEqual([true, null]);
+  });
+
   it('refuses duplicate ids', () => {
     expect(
       () =>

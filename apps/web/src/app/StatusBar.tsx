@@ -45,6 +45,11 @@ export function StatusBar({ app }: { readonly app: AppController }) {
           Stored in this browser
         </span>
       )}
+      {store && store.kind === 'browser' && !store.isPrivate && (
+        <span class="db-where" title={app.readOnly.value ?? undefined}>
+          {app.readOnly.value ? `${store.name} (read-only)` : store.name}
+        </span>
+      )}
       {store?.where && (
         <span class="db-where" title={store.where}>
           {store.name}

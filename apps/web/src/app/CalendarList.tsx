@@ -40,8 +40,8 @@ export function CalendarList({
           type="button"
           class="db-icon-button db-small"
           aria-label="New Calendar"
-          title="New Calendar"
-          disabled={!app.session.value}
+          title={app.readOnly.value ?? 'New Calendar'}
+          disabled={!app.session.value || !!app.readOnly.value}
           onClick={() => catalog.run('calendar.new')}
         >
           <Icon name="plus" />

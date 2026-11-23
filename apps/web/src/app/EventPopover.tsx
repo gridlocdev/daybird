@@ -47,7 +47,8 @@ export function EventPopover({ app }: { readonly app: AppController }) {
   const o = d.occurrence;
   const calendars = app.calendars.value;
   const calendar = calendars.find((c) => c.id === d.calendarId);
-  const readOnly = !!calendars.find((c) => c.id === ed.ref.calendarId)?.readOnly;
+  const folderReadOnly = app.readOnly.value;
+  const readOnly = !!folderReadOnly || !!calendars.find((c) => c.id === ed.ref.calendarId)?.readOnly;
   // With time zone support the fields show the event's own clock and zone; without, the display zone's (§4.3).
   const support = app.settings.value.timeZoneSupport;
   const own = { start: d.start, end: d.end };
@@ -185,7 +186,7 @@ export function EventPopover({ app }: { readonly app: AppController }) {
           onInput={text('notes')}
         />
       </fieldset>
-      {readOnly && <p class="db-popover-note">This calendar can’t be changed.</p>}
+      {readOnly && <p class="db-popover-note">{folderReadOnly ?? 'This calendar can’t be changed.'}</p>}
       {d.problems.length > 0 && (
         <ul class="db-popover-problems" aria-label="Couldn’t read">
           {d.problems.map((p) => (

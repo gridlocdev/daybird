@@ -133,7 +133,8 @@ export async function readTrash(
   if (!disk) return null;
   const read = readCalendar(disk.text);
   if (read.ok) return { version: disk.version, doc: read.calendar };
-  await store.move(TRASH_PATH, `.daybird/trash unreadable ${stampText}.ics`);
+  // A read-only folder can't move it aside, and starts no new trash either: nothing is written there.
+  if (!store.readOnly) await store.move(TRASH_PATH, `.daybird/trash unreadable ${stampText}.ics`);
   return null;
 }
 

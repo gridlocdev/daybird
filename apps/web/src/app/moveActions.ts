@@ -41,7 +41,7 @@ export function detailsOf(app: AppController, ref: OccurrenceRef): OccurrenceDet
 export function canChange(app: AppController, ref: OccurrenceRef): boolean {
   const ws = app.session.peek()?.workspace.peek();
   const calendar = ws && calendarById(ws, ref.calendarId);
-  return !!calendar && !calendar.readOnly;
+  return !!calendar && !calendar.readOnly && !app.readOnly.peek();
 }
 
 /** Gives an occurrence new times: a drag, a resize or an arrow key. */

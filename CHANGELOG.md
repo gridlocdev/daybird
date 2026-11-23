@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The browser build opens a folder of calendars from your computer with **Open Calendar Folder…** (⌘O). Chrome and Edge save to it. Firefox and Safari open it read-only: you can look at, search and export it, and the commands that would change it are off and say why.
+- A dialog whose fields are all off still takes the keyboard, so Escape closes it.
+
 ## 1.0.1 - 2026-11-17
 
 - The ‹ Today › buttons in the toolbar stay put as the title changes width: the title keeps room for its longest form, and the buttons sit centred between it and the view buttons.

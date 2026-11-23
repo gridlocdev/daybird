@@ -47,6 +47,11 @@ export function newEventAt(app: AppController, times: { start: TimeValue; end: T
   const session = app.session.peek();
   const calendar = app.defaultCalendar.peek();
   if (!session) return;
+  const readOnly = app.readOnly.peek();
+  if (readOnly) {
+    app.say(readOnly);
+    return;
+  }
   if (!calendar) {
     app.say('There’s no calendar new events can go to. Add one first.', { tone: 'error' });
     return;

@@ -40,9 +40,13 @@ export function Dialog(props: {
   }, []);
   useEffect(() => {
     const root = ref.current;
+    // A disabled field can't take focus (a read-only event's popover), and focus left outside misses Escape.
     const first =
-      root?.querySelector<HTMLElement>('[data-autofocus]') ??
-      root?.querySelector<HTMLElement>('input, select, textarea, button');
+      root?.querySelector<HTMLElement>('[data-autofocus]:not(:disabled)') ??
+      root?.querySelector<HTMLElement>(
+        'input:not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled)',
+      ) ??
+      box.current;
     if (!root?.contains(document.activeElement)) first?.focus();
     return () => {
       if (previous?.isConnected && previous !== document.body) previous.focus();

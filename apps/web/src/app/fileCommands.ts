@@ -11,6 +11,7 @@ export function fileCommands(app: AppController): CommandSpec[] {
   return [
     {
       id: 'file.import',
+      writes: true,
       title: 'Import…',
       description: 'Add the events of an .ics file to a calendar.',
       group: 'File',
@@ -63,6 +64,7 @@ export function fileCommands(app: AppController): CommandSpec[] {
     },
     {
       id: 'trash.empty',
+      writes: true,
       title: 'Empty Trash…',
       description: 'Delete everything in the Trash for good.',
       group: 'File',
