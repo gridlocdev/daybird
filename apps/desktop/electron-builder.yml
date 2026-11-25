@@ -9,6 +9,8 @@ files:
   # The window icon on Linux and Windows (macOS takes the bundle's icon.icns).
   - build/icon.png
 asar: true
+# Electron fuses are flipped before signing (RunAsNode and friends off).
+afterPack: scripts/fuses.mjs
 # Opening an .ics file from the Finder or the Explorer offers to import it (PRD §14).
 fileAssociations:
   - ext: ics

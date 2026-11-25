@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The desktop app turns off the Electron switches it never uses, so nothing can start it as plain Node or attach a debugger to it from the command line.
 - If you build Daybird yourself: `just install-desktop` offers to quit a running Daybird, installs, and opens it again.
 
 ## 1.1.0 - 2026-11-22
