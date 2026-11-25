@@ -290,6 +290,8 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 
 Every action is a command in one catalog feeding the keyboard, ⌘K, context menus, the native menu bar, toolbar buttons, the Keyboard Shortcuts window (⌘/) and `docs/controls.md`. Single-letter keys work only when focus isn't in a text field.
 
+The Keyboard Shortcuts window has **Press a Shortcut…**: until it stops, every key press is looked up in the catalog instead of run, and the window shows the keys and the command they're bound to (every one, when two share a key, and whether or not it's on right now), the wait for a sequence's second key, or "No command". No command runs meanwhile, from the keyboard or the menu bar. Escape is never taken: the first one leaves the mode, the next closes the window. The Stop button, closing the window, or an error in the lookup also end it, and each removes the key capture.
+
 | Key               | Command                                              |
 | ----------------- | ---------------------------------------------------- |
 | D / W / M / Y / A | Day / Week / Month / Year / Agenda view (also ⌘1–⌘5) |

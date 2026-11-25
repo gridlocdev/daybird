@@ -52,6 +52,12 @@ export type KeyFocus = 'text' | 'control' | 'list';
 export type KeyResult =
   { readonly kind: 'run'; readonly command: Command } | { readonly kind: 'wait' } | null;
 
+/** What a key press is bound to, ignoring focus and whether the command is on right now (the shortcut finder). */
+export type KeyLookup =
+  | { readonly kind: 'run'; readonly commands: readonly Command[] }
+  | { readonly kind: 'wait'; readonly first: Shortcut }
+  | null;
+
 /** One entry in the command menu: a command, or something made on the fly (Go to <calendar>). */
 export interface MenuEntry {
   readonly id: string;
@@ -174,6 +180,41 @@ export class CommandCatalog {
             return { kind: 'wait' };
           }
         }
+    return null;
+  }
+
+  /**
+   * Which commands a key press is bound to, for the Keyboard Shortcuts window's finder: every command whose
+   * best-matching shortcut it is (two can share a key), the first key of a two-key sequence, or nothing.
+   * After a `wait`, pass its `first` with the next key. Unlike `forEvent` it keeps no state and runs nothing.
+   */
+  lookup(e: ShortcutEvent, first: Shortcut | null = null, mac = isMac): KeyLookup {
+    if (isComposingKey(e)) return null;
+    if (first) {
+      const commands = this.all.filter((c) =>
+        c.sequences.some(
+          ([a, b, ...rest]) => a && b && !rest.length && same(a, first) && matchRank(b, e, mac) > 0,
+        ),
+      );
+      return commands.length ? { kind: 'run', commands } : null;
+    }
+    let best = Infinity;
+    let commands: Command[] = [];
+    for (const c of this.all) {
+      const rank = Math.min(
+        ...c.sequences.map(
+          ([only, ...rest]) => (only && !rest.length ? matchRank(only, e, mac) : 0) || Infinity,
+        ),
+      );
+      if (rank < best) {
+        best = rank;
+        commands = [c];
+      } else if (rank === best && rank !== Infinity) commands.push(c);
+    }
+    if (commands.length) return { kind: 'run', commands };
+    for (const c of this.all)
+      for (const [a, b] of c.sequences)
+        if (a && b && matchRank(a, e, mac) > 0) return { kind: 'wait', first: a };
     return null;
   }
 

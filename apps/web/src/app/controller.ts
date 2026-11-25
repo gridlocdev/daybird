@@ -32,15 +32,20 @@ import {
   DEFAULT_FOLDER_SETTINGS,
   HOUR_HEIGHTS,
   after,
+  captureKeys,
   defaultCalendarOf,
+  isMac,
+  type CommandCatalog,
   type FolderSettings,
   type FolderSession,
   resolveWeekStart,
   type Settings,
   type SettingsStorage,
+  type KeyTarget,
   type Theme,
   type TrashedCalendar,
 } from '@daybird/ui';
+import { findKey, type FoundKey } from './shortcuts.ts';
 
 /** Which occurrence is selected: at most one in every view (PRD §6). */
 export interface OccurrenceRef {
@@ -147,6 +152,10 @@ export class AppController {
   readonly today;
   readonly anchor;
   readonly dialog = signal<DialogKind | null>(null);
+  /** The Keyboard Shortcuts window is waiting for a key to look up: no command runs, not even from the menu bar. */
+  readonly findingKey = signal(false);
+  /** What the last key pressed while finding runs, or null before the first. */
+  readonly foundKey = signal<FoundKey | null>(null);
   readonly notice = signal<Notice | null>(null);
   /** What the polite live region reads out; the notice text, and other changes worth hearing. */
   readonly announcement = signal('');
@@ -238,6 +247,7 @@ export class AppController {
   readonly #now: () => number;
   readonly #localeWeekStart: Weekday;
   #clearNotice: (() => void) | null = null;
+  #stopFinding: (() => void) | null = null;
 
   constructor(options: ControllerOptions) {
     this.version = options.version;
@@ -346,16 +356,48 @@ export class AppController {
     return direction > 0 ? h < HOUR_HEIGHTS.max : h > HOUR_HEIGHTS.min;
   }
 
+  /**
+   * Press a Shortcut (PRD §12): key presses on `target` are looked up in `catalog` instead of run, until
+   * `stopFindingKey`. Escape is never taken, and an error in the lookup stops it too.
+   */
+  findKeys(catalog: CommandCatalog, target: KeyTarget): void {
+    this.stopFindingKey();
+    let pending: FoundKey['pending'] = null;
+    this.foundKey.value = null;
+    this.findingKey.value = true;
+    this.#stopFinding = captureKeys(
+      target,
+      (e) => {
+        const next = findKey(catalog, e, pending, isMac);
+        if (!next) return;
+        pending = next.pending;
+        this.foundKey.value = next;
+      },
+      () => this.stopFindingKey(),
+    );
+  }
+
+  /** Ends Press a Shortcut and gives the keys back; does nothing when it isn't on. */
+  stopFindingKey(): void {
+    const stop = this.#stopFinding;
+    this.#stopFinding = null;
+    stop?.();
+    this.findingKey.value = false;
+  }
+
   open(kind: DialogKind): void {
+    this.stopFindingKey();
     this.dialog.value = kind;
   }
 
   /** Opens `kind`, or closes it when it's the one open (⌘K, ⌘/ and ⌘, toggle their own window). */
   toggle(kind: DialogKind): void {
+    this.stopFindingKey();
     this.dialog.value = this.dialog.peek() === kind ? null : kind;
   }
 
   close(): void {
+    this.stopFindingKey();
     this.dialog.value = null;
   }
 

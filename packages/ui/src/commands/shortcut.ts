@@ -147,6 +147,26 @@ export function matchRank(s: Shortcut, e: ShortcutEvent, mac = isMac): number {
   return (NAMES[k] ?? k) === s.key && e.shiftKey === s.shift ? 1 : 0;
 }
 
+/** True for a press of Shift, ⌘, Ctrl, ⌥ or Caps Lock alone: half of a chord, not a key of its own. */
+export function isModifierKey(e: Pick<ShortcutEvent, 'key'>): boolean {
+  return ['Shift', 'Meta', 'Control', 'Alt', 'AltGraph', 'CapsLock', 'OS', 'Fn'].includes(e.key);
+}
+
+/** How a key press reads in the shortcut notation's labels (⇧⌘K, Ctrl+Shift+K), whatever it is bound to. */
+export function eventLabel(e: ShortcutEvent, mac = isMac): string {
+  const k = e.key.toLowerCase();
+  return formatShortcut(
+    {
+      key: NAMES[k] ?? k,
+      mod: mac ? e.metaKey : e.ctrlKey,
+      shift: e.shiftKey,
+      alt: e.altKey,
+      ctrl: mac ? e.ctrlKey : false,
+    },
+    mac,
+  );
+}
+
 export function matches(s: Shortcut, e: ShortcutEvent, mac = isMac): boolean {
   return matchRank(s, e, mac) > 0;
 }

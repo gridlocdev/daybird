@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nativeMenu, shortcutGroups } from '../src/index.ts';
+import { findKey, nativeMenu, shortcutGroups } from '../src/index.ts';
 import { makeApp } from './helpers.ts';
 
 describe('the app commands', () => {
@@ -34,6 +34,61 @@ describe('the app commands', () => {
     expect(app.dialog.value).toBe('shortcuts');
     catalog.run('help.shortcuts');
     expect(app.dialog.value).toBeNull();
+  });
+
+  it('run nothing, not even from the menu bar, while the shortcuts window looks up a key', async () => {
+    const { app, catalog } = await makeApp();
+    // A plain EventTarget stands in for the window: it dispatches key events the same way.
+    const target = new EventTarget() as unknown as Window;
+    const press = (key: string, metaKey = false) => {
+      const e = Object.assign(new Event('keydown', { cancelable: true }), {
+        key,
+        code: '',
+        metaKey,
+        ctrlKey: false,
+        altKey: false,
+        shiftKey: false,
+      });
+      target.dispatchEvent(e);
+      return e;
+    };
+    catalog.run('help.shortcuts');
+    app.findKeys(catalog, target);
+    expect(press('m').defaultPrevented).toBe(true);
+    expect(app.foundKey.value?.text).toBe('Month');
+    expect(app.view.value).toBe('week');
+    expect(catalog.run('help.commands')).toBe(false);
+    expect(catalog.run('help.shortcuts')).toBe(false);
+    expect(press('Escape').defaultPrevented).toBe(false);
+    app.close();
+    expect(app.findingKey.value).toBe(false);
+    expect(press('m').defaultPrevented).toBe(false);
+    expect(catalog.run('view.month')).toBe(true);
+  });
+
+  it('say what a key press runs in the shortcuts window', async () => {
+    const { catalog } = await makeApp();
+    const press = (key: string, more: { metaKey?: boolean; shiftKey?: boolean } = {}) => ({
+      key,
+      code: '',
+      metaKey: false,
+      ctrlKey: false,
+      altKey: false,
+      shiftKey: false,
+      ...more,
+    });
+    expect(findKey(catalog, press('k', { metaKey: true }), null, true)).toEqual({
+      keys: ['⌘K'],
+      text: 'Command Menu',
+      none: false,
+      pending: null,
+    });
+    expect(findKey(catalog, press('Shift', { shiftKey: true }), null, true)).toBeNull();
+    expect(findKey(catalog, press('q', { metaKey: true, shiftKey: true }), null, true)).toMatchObject({
+      keys: ['⇧⌘Q'],
+      text: 'No command',
+      none: true,
+    });
   });
 
   it('toggle the sidebar and the theme', async () => {

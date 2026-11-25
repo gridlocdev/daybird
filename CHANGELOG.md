@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Press a Shortcut…** in the Keyboard Shortcuts window (**⌘/**) tells you what a key does: press it and the window names the command, or says there is none, without running it. **Esc** or **Stop** ends it.
 - The desktop app turns off the Electron switches it never uses, so nothing can start it as plain Node or attach a debugger to it from the command line.
 - If you build Daybird yourself: `just install-desktop` offers to quit a running Daybird, installs, and opens it again.
 

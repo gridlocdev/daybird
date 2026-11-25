@@ -7,6 +7,7 @@ export {
   type CommandGroup,
   type CommandSpec,
   type KeyFocus,
+  type KeyLookup,
   type KeyResult,
   type MenuEntry,
   type NativeMenuItem,
@@ -15,7 +16,9 @@ export {
   SEQUENCE_MS,
   formatSequence,
   formatShortcut,
+  eventLabel,
   isComposingKey,
+  isModifierKey,
   isSubmitKey,
   isUndoKey,
   isMac,
@@ -28,4 +31,4 @@ export {
   type Shortcut,
   type ShortcutEvent,
 } from './shortcut.ts';
-export { keyFocus, listenForKeys } from './keys.ts';
+export { captureKeys, keyFocus, listenForKeys, type KeyTarget } from './keys.ts';

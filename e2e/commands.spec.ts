@@ -42,4 +42,46 @@ test.describe('Command menu and shortcuts', () => {
     await page.keyboard.press('ControlOrMeta+Slash');
     await expect(dialog).toBeHidden();
   });
+
+  test('Press a Shortcut says what a key runs, runs nothing, and Escape gives the keys back', async ({
+    page,
+  }) => {
+    await page.keyboard.press('ControlOrMeta+Slash');
+    const dialog = page.getByRole('dialog', { name: 'Keyboard Shortcuts' });
+    await dialog.getByRole('button', { name: 'Press a Shortcut…' }).click();
+    const finder = dialog.getByRole('status');
+    await expect(finder).toContainText('Press any keys');
+    await page.keyboard.press('ControlOrMeta+KeyK');
+    await expect(finder).toContainText('Command Menu');
+    await expect(commandMenu(page)).toBeHidden();
+    await page.keyboard.press('m');
+    await expect(finder).toContainText('Month');
+    await page.keyboard.press('ControlOrMeta+Shift+KeyQ');
+    await expect(finder).toContainText('No command');
+    await expect(page.getByRole('main', { name: 'Week view' })).toBeVisible();
+    // The first Escape leaves the finder, the second closes the window.
+    await page.keyboard.press('Escape');
+    await expect(dialog.getByRole('button', { name: 'Press a Shortcut…' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await page.keyboard.press('d');
+    await expect(page.getByRole('main', { name: 'Day view' })).toBeVisible();
+  });
+
+  test('Press a Shortcut stops with its button, and closing the window gives the keys back', async ({
+    page,
+  }) => {
+    await page.keyboard.press('ControlOrMeta+Slash');
+    const dialog = page.getByRole('dialog', { name: 'Keyboard Shortcuts' });
+    await dialog.getByRole('button', { name: 'Press a Shortcut…' }).click();
+    await dialog.getByRole('button', { name: 'Stop' }).click();
+    await page.keyboard.press('ControlOrMeta+Slash');
+    await expect(dialog).toBeHidden();
+    await page.keyboard.press('ControlOrMeta+Slash');
+    await dialog.getByRole('button', { name: 'Press a Shortcut…' }).click();
+    await dialog.getByRole('button', { name: 'Close' }).click();
+    await expect(dialog).toBeHidden();
+    await page.keyboard.press('m');
+    await expect(page.getByRole('main', { name: 'Month view' })).toBeVisible();
+  });
 });

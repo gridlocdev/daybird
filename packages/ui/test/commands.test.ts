@@ -1,11 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   CommandCatalog,
   SEQUENCE_MS,
+  captureKeys,
+  eventLabel,
   filterEntries,
   formatSequence,
   isSubmitKey,
   isUndoKey,
+  listenForKeys,
   listStep,
   parseSequence,
   sequenceAccelerator,
@@ -253,5 +256,129 @@ describe('list popups', () => {
     expect(listStep(k('Tab'), 0, 0)).toBe(0);
     expect(listStep({ ...k('Tab'), ctrlKey: true }, 0, 3)).toBeUndefined();
     expect(listStep(k('Enter'), 0, 3)).toBeUndefined();
+  });
+});
+
+describe('the shortcut finder', () => {
+  it('names every command a key is bound to, whatever has focus or is on', () => {
+    const { c, ran } = catalog([
+      {
+        id: 'off',
+        title: 'off',
+        description: '',
+        group: 'Edit',
+        shortcuts: ['mod+k'],
+        enabled: () => false,
+        run: () => {},
+      },
+    ]);
+    const found = c.lookup(key({ key: 'k', metaKey: true }), null, true);
+    expect(found?.kind === 'run' && found.commands.map((x) => x.id)).toEqual(['menu', 'off']);
+    expect(c.lookup(key({ key: 'x' }), null, true)).toBeNull();
+    // Plain Space is Complete, even though it would type a space in a text field.
+    const space = c.lookup(key({ key: ' ' }), null, true);
+    expect(space?.kind === 'run' && space.commands[0]?.id).toBe('complete');
+    expect(ran).toEqual([]);
+  });
+
+  it('waits for the second key of a sequence, and keeps no state of its own', () => {
+    const { c } = catalog();
+    const g = c.lookup(key({ key: 'g' }), null, true);
+    expect(g?.kind).toBe('wait');
+    const first = g?.kind === 'wait' ? g.first : null;
+    const i = c.lookup(key({ key: 'i' }), first, true);
+    expect(i?.kind === 'run' && i.commands.map((x) => x.id)).toEqual(['inbox']);
+    expect(c.lookup(key({ key: 'z' }), first, true)).toBeNull();
+    // The real key handler has no pending g from the finder.
+    expect(c.forEvent(key({ key: 'i' }), 'list', 0, true)).toBeNull();
+  });
+
+  it('labels any key press like the shortcut list does', () => {
+    expect(eventLabel(key({ key: 'K', metaKey: true, shiftKey: true }), true)).toBe('⇧⌘K');
+    expect(eventLabel(key({ key: 'k', ctrlKey: true, shiftKey: true }), false)).toBe('Ctrl+Shift+K');
+    expect(eventLabel(key({ key: 'ArrowDown' }), true)).toBe('↓');
+    expect(eventLabel(key({ key: ' ' }), false)).toBe('Space');
+  });
+});
+
+/** A key press that a listener can cancel and stop, like the browser's. */
+class FakeKey extends Event {
+  readonly key: string;
+  readonly code = '';
+  readonly metaKey: boolean;
+  readonly ctrlKey = false;
+  readonly shiftKey = false;
+  readonly altKey = false;
+  constructor(key: string, metaKey = false) {
+    super('keydown', { cancelable: true });
+    this.key = key;
+    this.metaKey = metaKey;
+  }
+}
+
+/** A window with no focused element, so keys go to the calendar. */
+function fakeWindow() {
+  return Object.assign(new EventTarget(), { document: { activeElement: null } }) as unknown as Window;
+}
+
+describe('capturing keys for the finder', () => {
+  function setup() {
+    const target = fakeWindow();
+    const { c, ran } = catalog();
+    const press = (k: string, meta = false) => {
+      const e = new FakeKey(k, meta);
+      target.dispatchEvent(e);
+      return e;
+    };
+    return { target, c, ran, press };
+  }
+
+  it('takes every key before the app, except Escape, until stopped', () => {
+    const { target, c, ran, press } = setup();
+    const seen: string[] = [];
+    const stop = captureKeys(
+      target,
+      (e) => void seen.push(e.key),
+      () => {},
+    );
+    listenForKeys(target, c, () => false);
+    expect(press('k', true).defaultPrevented).toBe(true);
+    expect(press('Escape').defaultPrevented).toBe(false);
+    expect(seen).toEqual(['k']);
+    expect(ran).toEqual([]);
+    stop();
+    stop();
+    press('k', true);
+    expect(seen).toEqual(['k']);
+    expect(ran).toEqual(['menu']);
+  });
+
+  it('lets keys reach the app again after the finder throws', async () => {
+    const { target, c, ran, press } = setup();
+    const ended = vi.fn();
+    captureKeys(
+      target,
+      () => {
+        throw new Error('lookup failed');
+      },
+      ended,
+    );
+    listenForKeys(target, c, () => false);
+    // Node reports a listener's error as uncaught on the next tick, as a browser reports it to the console.
+    const errors: unknown[] = [];
+    const onError = (e: unknown) => void errors.push(e);
+    process.on('uncaughtException', onError);
+    try {
+      press('x');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    } finally {
+      process.off('uncaughtException', onError);
+    }
+    expect(errors).toEqual([new Error('lookup failed')]);
+    expect(ended).toHaveBeenCalledOnce();
+    press('k', true);
+    press('k', true);
+    expect(ran).toEqual(['menu', 'menu']);
+    expect(ended).toHaveBeenCalledOnce();
   });
 });

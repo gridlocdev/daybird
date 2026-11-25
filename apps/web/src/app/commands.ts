@@ -293,13 +293,14 @@ export function buildCommands(app: AppController): CommandCatalog {
   ];
   const catalog = new CommandCatalog(specs);
   catalog.readOnly = () => app.readOnly.value;
-  // With a dialog open, only the command that toggles that dialog (or opens another one) runs.
+  // While the shortcuts window looks up a key, nothing runs. With a dialog open, only the command that toggles that dialog (or opens another one) runs.
   catalog.gate = (c) =>
-    !app.blocked() ||
-    Object.values(DIALOG_COMMAND).includes(c.id) ||
-    // The ⋯ menu runs its own commands.
-    (app.calendarMenu.peek() !== null && c.id.startsWith('calendar.')) ||
-    (app.eventMenu.peek() !== null && c.id.startsWith('event.')) ||
-    (app.trashMenu.peek() !== null && c.id.startsWith('trash.'));
+    !app.findingKey.peek() &&
+    (!app.blocked() ||
+      Object.values(DIALOG_COMMAND).includes(c.id) ||
+      // The ⋯ menu runs its own commands.
+      (app.calendarMenu.peek() !== null && c.id.startsWith('calendar.')) ||
+      (app.eventMenu.peek() !== null && c.id.startsWith('event.')) ||
+      (app.trashMenu.peek() !== null && c.id.startsWith('trash.')));
   return catalog;
 }

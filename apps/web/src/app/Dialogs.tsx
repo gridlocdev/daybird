@@ -21,6 +21,7 @@ import { RepeatDialog } from './RepeatDialog.tsx';
 import { allowBrowserNotifications, notificationsOn } from './reminders.ts';
 import { ImportDialog, TrashQuestionDialog } from './TrashDialogs.tsx';
 import { DisplayZoneSelect } from './ZoneSelect.tsx';
+import { ShortcutFinder } from './ShortcutFinder.tsx';
 import { shortcutGroups } from './shortcuts.ts';
 
 /** The open dialog, if any. One at a time; a question about the folder comes before any other. */
@@ -145,12 +146,15 @@ function ShortcutsDialog({
       title="Keyboard Shortcuts"
       class="db-dialog-wide"
       onClose={() => app.close()}
+      // Escape leaves Press a Shortcut first, then closes the window.
+      onEscape={() => (app.findingKey.peek() ? app.stopFindingKey() : app.close())}
       actions={
         <button type="button" class="db-button db-button-primary" onClick={() => app.close()}>
           Close
         </button>
       }
     >
+      <ShortcutFinder app={app} catalog={catalog} />
       <div class="db-shortcuts">
         {groups.map((g) => (
           <section key={g.title}>

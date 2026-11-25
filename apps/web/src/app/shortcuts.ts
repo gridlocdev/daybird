@@ -1,5 +1,13 @@
 /** What the Keyboard Shortcuts window lists (PRD §12): every command with a key, plus keys that aren't commands. */
-import { COMMAND_GROUPS, type CommandCatalog, type CommandGroup } from '@daybird/ui';
+import {
+  COMMAND_GROUPS,
+  eventLabel,
+  isModifierKey,
+  type CommandCatalog,
+  type CommandGroup,
+  type Shortcut,
+  type ShortcutEvent,
+} from '@daybird/ui';
 
 export interface ShortcutLine {
   readonly title: string;
@@ -44,4 +52,41 @@ export function shortcutGroups(catalog: CommandCatalog, mac: boolean): ShortcutG
       }));
     return { title: GROUP_TITLES[group], lines: [...lines, ...(more[group] ?? [])] };
   }).filter((g) => g.lines.length > 0);
+}
+
+/** The finder's answer to the keys pressed so far: the keys as labels, and what they run. */
+export interface FoundKey {
+  readonly keys: readonly string[];
+  /** The commands' titles, "No command", or a prompt for the second key of a sequence. */
+  readonly text: string;
+  readonly none: boolean;
+  /** Set while the keys so far are the first of a two-key sequence: pass it back with the next key. */
+  readonly pending: { readonly first: Shortcut; readonly label: string } | null;
+}
+
+/**
+ * Press a shortcut (PRD §12): what a key press runs, read from the same catalog the keyboard uses. A
+ * modifier pressed on its own changes nothing (null). It doesn't care where focus is or whether the
+ * command is on right now: it says what the key is for.
+ */
+export function findKey(
+  catalog: CommandCatalog,
+  e: ShortcutEvent,
+  pending: FoundKey['pending'],
+  mac: boolean,
+): FoundKey | null {
+  if (isModifierKey(e)) return null;
+  const label = eventLabel(e, mac);
+  const keys = pending ? [pending.label, label] : [label];
+  const found = catalog.lookup(e, pending?.first ?? null, mac);
+  if (found?.kind === 'wait')
+    return { keys, text: 'Press the second key…', none: false, pending: { first: found.first, label } };
+  if (found?.kind === 'run')
+    return {
+      keys,
+      text: found.commands.map((c) => c.title.replace(/…$/, '')).join(' / '),
+      none: false,
+      pending: null,
+    };
+  return { keys, text: 'No command', none: true, pending: null };
 }

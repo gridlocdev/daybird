@@ -439,6 +439,31 @@ kbd {
 }
 
 /* Keyboard Shortcuts */
+.db-finder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  min-height: 32px;
+}
+.db-finder-on {
+  justify-content: space-between;
+  padding: 6px 6px 6px 12px;
+  border: 1px solid var(--db-accent);
+  border-radius: 8px;
+}
+.db-finder-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.db-finder-hint,
+.db-finder-none {
+  color: var(--db-text-2);
+}
+.db-finder-command {
+  font-weight: 600;
+}
 .db-shortcuts {
   columns: 2 260px;
   column-gap: 28px;

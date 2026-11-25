@@ -11,6 +11,12 @@ export {
 } from './app/controller.ts';
 export { buildCommands } from './app/commands.ts';
 export { menuSender, nativeMenu } from './app/nativeMenu.ts';
-export { shortcutGroups, type ShortcutGroup, type ShortcutLine } from './app/shortcuts.ts';
+export {
+  findKey,
+  shortcutGroups,
+  type FoundKey,
+  type ShortcutGroup,
+  type ShortcutLine,
+} from './app/shortcuts.ts';
 export { importOpenedFiles, type OpenedFileSource } from './app/openedFiles.ts';
 export type { OpenedFile } from './app/native.ts';

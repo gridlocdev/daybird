@@ -30,3 +30,49 @@ export function listenForKeys(target: Window, catalog: CommandCatalog, blocked: 
   target.addEventListener('keydown', onKey);
   return () => target.removeEventListener('keydown', onKey);
 }
+
+/** The part of a window or element `captureKeys` needs, so it can be tested without a page. */
+export interface KeyTarget {
+  addEventListener(type: 'keydown', listener: (e: KeyboardEvent) => void, options: { capture: true }): void;
+  removeEventListener(
+    type: 'keydown',
+    listener: (e: KeyboardEvent) => void,
+    options: { capture: true },
+  ): void;
+}
+
+/**
+ * Takes every key press on `target` before anything else sees it and hands it to `onKey` (the Keyboard
+ * Shortcuts window's finder). Escape is never taken: it goes on as usual, so the window can always leave
+ * the mode. If `onKey` throws, the capture stops for good and `onEnd` runs, so an error can't leave every
+ * key swallowed. Returns a function that stops it; calling it again does nothing.
+ */
+export function captureKeys(
+  target: KeyTarget,
+  onKey: (e: KeyboardEvent) => void,
+  onEnd: () => void,
+): () => void {
+  let on = true;
+  const stop = () => {
+    if (!on) return;
+    on = false;
+    target.removeEventListener('keydown', listener, { capture: true });
+  };
+  const listener = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    let handled = false;
+    try {
+      onKey(e);
+      handled = true;
+    } finally {
+      if (!handled) {
+        stop();
+        onEnd();
+      }
+    }
+  };
+  target.addEventListener('keydown', listener, { capture: true });
+  return stop;
+}
