@@ -77,7 +77,7 @@ just build                # the web client and the desktop main process
 just build-desktop        # the desktop app only, into apps/desktop/out
 just package-desktop      # a .dmg and .zip (macOS), AppImage (Linux) or installer (Windows)
 just package-desktop-dir  # an unpacked app only, faster for local testing
-just install-desktop      # macOS: package and install into /Applications
+just install-desktop      # macOS: package and install into /Applications (offers to quit and reopen a running copy)
 ```
 
 The app icon's source is `assets/icon.svg`. `just icons` renders it into `apps/desktop/build` (`icon.icns`, `icon.ico` and `icon.png`) with Inkscape and macOS's `iconutil`; commit the files it writes, so packaging needs neither.
