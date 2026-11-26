@@ -17,7 +17,7 @@ See [Getting started](docs/getting-started.md) for running it from source, on a 
 ## Learn more
 
 - [Features](docs/features.md) · [Controls](docs/controls.md) · [Working from the keyboard](docs/guides/working-from-the-keyboard.md)
-- [All documentation](docs/README.md) · [Working on the code](docs/development.md) · [Glossary](GLOSSARY.md)
+- [All documentation](docs/README.md) · [Working on the code](docs/development.md)
 
 ## License
 
