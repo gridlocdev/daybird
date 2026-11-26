@@ -15,7 +15,6 @@
   "devDependencies": {
     "@daybird/node-files": "workspace:*",
     "@daybird/web": "workspace:*",
-    "@electron/fuses": "2.1.3",
     "electron": "45.2.3",
     "electron-builder": "26.18.0",
     "vite": "8.3.5"
