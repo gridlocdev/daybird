@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findKey, nativeMenu, shortcutGroups } from '../src/index.ts';
+import { dayStep, findKey, nativeMenu, shortcutGroups } from '../src/index.ts';
 import { makeApp } from './helpers.ts';
 
 describe('the app commands', () => {
@@ -117,5 +117,20 @@ describe('the app commands', () => {
     const groups = shortcutGroups(catalog, true);
     const views = groups.find((g) => g.title === 'Views');
     expect(views?.lines.find((l) => l.title === 'Month')?.keys).toEqual([['M'], ['⌘3']]);
+  });
+});
+
+describe('the mini month keys', () => {
+  it('move a day, a week or a month, and to the ends of the week', () => {
+    // Wednesday 18 November 2026, weeks starting on Monday (1).
+    expect(dayStep('ArrowLeft', '2026-11-18', 1)).toBe('2026-11-17');
+    expect(dayStep('ArrowRight', '2026-11-30', 1)).toBe('2026-12-01');
+    expect(dayStep('ArrowUp', '2026-11-18', 1)).toBe('2026-11-11');
+    expect(dayStep('ArrowDown', '2026-11-18', 1)).toBe('2026-11-25');
+    expect(dayStep('PageUp', '2026-11-18', 1)).toBe('2026-10-18');
+    expect(dayStep('PageDown', '2026-11-18', 1)).toBe('2026-12-18');
+    expect(dayStep('Home', '2026-11-18', 1)).toBe('2026-11-16');
+    expect(dayStep('End', '2026-11-18', 1)).toBe('2026-11-22');
+    expect(dayStep('Enter', '2026-11-18', 1)).toBeNull();
   });
 });

@@ -12,10 +12,13 @@ export function trapIndex(count: number, current: number, backwards: boolean): n
   return (current + (backwards ? count - 1 : 1)) % count;
 }
 
-/** The elements inside `root` that Tab stops on, in document order, skipping hidden ones. */
+/**
+ * The elements inside `root` that Tab stops on, in document order, skipping hidden ones and those taken out of the
+ * Tab order (`tabIndex` -1: the other choices of a radio group, whose one stop is the chosen one).
+ */
 export function focusables(root: HTMLElement): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
-    (el) => !el.closest('[hidden], [inert]') && el.getClientRects().length > 0,
+    (el) => el.tabIndex >= 0 && !el.closest('[hidden], [inert]') && el.getClientRects().length > 0,
   );
 }
 

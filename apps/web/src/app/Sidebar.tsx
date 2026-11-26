@@ -54,6 +54,8 @@ export function Sidebar({ app, catalog }: { readonly app: AppController; readonl
         shaded={app.view.value === 'year' ? undefined : app.range.value}
         counts={counts}
         onPick={(d) => app.goTo(d)}
+        focus={app.anchor.value}
+        onMove={(d) => app.goTo(d)}
       />
       <CalendarList app={app} catalog={catalog} />
       <TrashRow app={app} catalog={catalog} />

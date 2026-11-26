@@ -31,7 +31,7 @@ function YearGrid({ app }: { readonly app: AppController }) {
   // Each day tinted by how many events it has (§6.3).
   const counts = countsByDay(app.occurrences.value, app.range.value, app.displayZone);
   return (
-    <div class="db-year">
+    <div class="db-year" data-roving>
       {months.map((m) => (
         <MiniMonth
           key={m}
@@ -47,6 +47,9 @@ function YearGrid({ app }: { readonly app: AppController }) {
             app.setView('month');
           }}
           onPick={(d) => app.openDay(d)}
+          focus={app.anchor.value}
+          onMove={(d) => app.goTo(d)}
+          scope={false}
         />
       ))}
     </div>

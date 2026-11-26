@@ -7,6 +7,8 @@ import {
   THEMES,
   filterEntries,
   isMac,
+  radioKeys,
+  takeStop,
   type CommandCatalog,
   type MenuEntry,
   type Theme,
@@ -210,13 +212,21 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
     >
       <div class="db-field">
         <span id="db-theme-label">Appearance</span>
-        <div class="db-segmented" role="radiogroup" aria-labelledby="db-theme-label">
+        <div
+          class="db-segmented"
+          role="radiogroup"
+          aria-labelledby="db-theme-label"
+          data-roving
+          onKeyDown={(e) => radioKeys(e, THEMES, s.theme, (t) => app.setTheme(t))}
+        >
           {THEMES.map((t) => (
             <button
               key={t}
               type="button"
               role="radio"
               aria-checked={s.theme === t}
+              tabIndex={s.theme === t ? 0 : -1}
+              ref={s.theme === t ? takeStop : undefined}
               onClick={() => app.setTheme(t)}
             >
               {THEME_TITLES[t]}
@@ -226,7 +236,13 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
       </div>
       <div class="db-field">
         <span id="db-accent-label">Accent colour</span>
-        <div class="db-swatches" role="radiogroup" aria-labelledby="db-accent-label">
+        <div
+          class="db-swatches"
+          role="radiogroup"
+          aria-labelledby="db-accent-label"
+          data-roving
+          onKeyDown={(e) => radioKeys(e, ACCENTS, s.accent, (a) => app.setAccent(a))}
+        >
           {ACCENTS.map((a: Accent) => (
             <button
               key={a}
@@ -235,6 +251,8 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
               class="db-swatch"
               data-accent-swatch={a}
               aria-checked={s.accent === a}
+              tabIndex={s.accent === a ? 0 : -1}
+              ref={s.accent === a ? takeStop : undefined}
               aria-label={a[0]!.toUpperCase() + a.slice(1)}
               title={a[0]!.toUpperCase() + a.slice(1)}
               onClick={() => app.setAccent(a)}

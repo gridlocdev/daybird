@@ -62,6 +62,10 @@ The arrows beside **Today** move one day, week, month or year at a time, by the 
 
 **⌘K** (**Ctrl+K**) opens the command menu: type part of a command's name and press Return. **⌘/** (**Ctrl+/**) lists every shortcut, and [Controls](controls.md) has the same list. In that window, **Press a Shortcut…** tells you what any key does: press it and the window names the command, or says there is none, without running anything. **Esc** or **Stop** ends it.
 
+## Keyboard focus
+
+What has keyboard focus is what the app has chosen. Tab onto an event and it is selected; select one by clicking, and focus goes to it. After a keyboard move, an undo or closing the event's popover, focus is back on the selected event. In the mini month and the year, one day takes Tab: the day you are looking at, and the arrows move it. Settings' appearance and accent, and a calendar's colours, work the same way: Tab reaches the chosen one and the arrows choose another. The focus ring is the accent colour, in light and dark.
+
 ## Appearance
 
 Settings (**⌘,** or **Ctrl+,**) chooses light, dark or the system's appearance, an accent colour, the first day of the week (or your region's), and whether to show week numbers.

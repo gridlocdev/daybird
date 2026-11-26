@@ -12,13 +12,13 @@
   color: var(--db-text-2);
 }
 .db-search:focus-within {
-  border-color: var(--db-accent);
-  box-shadow: 0 0 0 2px var(--db-accent-soft);
+  outline: var(--db-focus-ring);
+  outline-offset: -1px;
 }
 .db-search input {
   width: 160px;
   border: 0;
-  outline: 0;
+  outline: 0; /* the field's box shows the ring */
   background: transparent;
   color: var(--db-text);
   font: inherit;

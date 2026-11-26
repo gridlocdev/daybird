@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { PALETTE, seriesOf } from '@daybird/core';
-import { Dialog } from '@daybird/ui';
+import { Dialog, radioKeys, takeStop } from '@daybird/ui';
 import type { AppController } from './controller.ts';
 import {
   closeCalendarDialog,
@@ -10,6 +10,8 @@ import {
   renameCalendar,
   targetCalendar,
 } from './calendarActions.ts';
+
+const HEXES = PALETTE.map((p) => p.hex);
 
 const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
 
@@ -46,7 +48,10 @@ export function CalendarDialogs({ app }: { readonly app: AppController }) {
           }}
         />
       );
-    case 'colour':
+    case 'colour': {
+      const chosen = calendar!.color.toLowerCase();
+      // A colour from outside the palette (set in another app) leaves the first swatch as the tab stop.
+      const stop = HEXES.includes(chosen) ? chosen : HEXES[0];
       return (
         <Dialog
           title={`Colour of ${calendar!.name}`}
@@ -57,7 +62,13 @@ export function CalendarDialogs({ app }: { readonly app: AppController }) {
             </button>
           }
         >
-          <div class="db-swatches db-calendar-swatches" role="radiogroup" aria-label="Colour">
+          <div
+            class="db-swatches db-calendar-swatches"
+            role="radiogroup"
+            aria-label="Colour"
+            data-roving
+            onKeyDown={(e) => radioKeys(e, HEXES, chosen, (hex) => recolourCalendar(app, calendar!.id, hex))}
+          >
             {PALETTE.map((p) => (
               <button
                 key={p.hex}
@@ -65,10 +76,12 @@ export function CalendarDialogs({ app }: { readonly app: AppController }) {
                 role="radio"
                 class="db-swatch"
                 style={{ '--db-swatch': p.hex }}
-                aria-checked={calendar!.color.toLowerCase() === p.hex}
+                aria-checked={chosen === p.hex}
                 aria-label={p.name}
                 title={p.name}
-                data-autofocus={calendar!.color.toLowerCase() === p.hex ? true : undefined}
+                tabIndex={stop === p.hex ? 0 : -1}
+                ref={stop === p.hex ? takeStop : undefined}
+                data-autofocus={stop === p.hex ? true : undefined}
                 onClick={() => {
                   recolourCalendar(app, calendar!.id, p.hex);
                   close();
@@ -78,6 +91,7 @@ export function CalendarDialogs({ app }: { readonly app: AppController }) {
           </div>
         </Dialog>
       );
+    }
     case 'delete': {
       const count = seriesOf(calendar!.document).length;
       return (

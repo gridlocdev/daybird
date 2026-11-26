@@ -21,6 +21,9 @@
   --db-accent: var(--db-accent-light);
   --db-accent-soft: color-mix(in srgb, var(--db-accent) 14%, transparent);
   --db-accent-text: #ffffff;
+  /* The one focus ring (PRD §5.3): the accent, so it follows the theme and the accent choice. */
+  --db-focus: var(--db-accent);
+  --db-focus-ring: 2px solid var(--db-focus);
   --db-now: #e5484d;
   --db-danger: #d13438;
   --db-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -150,8 +153,13 @@ textarea {
   font: inherit;
   color: inherit;
 }
+/* The browser's own focus outline never shows: keyboard focus gets the theme's ring, and lists, grids and groups
+   draw their current item from the app's state (the selected event, the shown day, the chosen colour). */
+:focus {
+  outline: none;
+}
 :focus-visible {
-  outline: 2px solid var(--db-accent);
+  outline: var(--db-focus-ring);
   outline-offset: 1px;
 }
 kbd {
@@ -298,9 +306,6 @@ kbd {
 .db-backdrop-top {
   align-items: flex-start;
   padding-top: 12vh;
-}
-.db-dialog:focus {
-  outline: none;
 }
 .db-dialog {
   width: 440px;

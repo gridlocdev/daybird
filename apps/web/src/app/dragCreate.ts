@@ -39,6 +39,11 @@ function capture(e: PointerEvent): HTMLElement {
   return el;
 }
 
+/** Lets go of the keyboard at the end of a press: an empty column has no focus to show, and a new event takes it. */
+function release(el: HTMLElement): void {
+  if (el.ownerDocument.activeElement === el) el.blur();
+}
+
 function cancelOnEscape(e: KeyboardEvent): void {
   if (e.key !== 'Escape' || !cancelPress()) return;
   e.preventDefault();
@@ -72,11 +77,15 @@ export function useTimeDrag(app: AppController, hourHeight: number) {
           },
           up: (u) => {
             setDraft(null);
+            release(column);
             if (!p.moved) return app.select(null);
             const { from, to } = span(at, minuteAt(column, u));
             newEventAt(app, timedTimes(day, from, to, app.displayZone));
           },
-          cancel: () => setDraft(null),
+          cancel: () => {
+            setDraft(null);
+            release(column);
+          },
         });
       },
       onKeyDown: cancelOnEscape,
@@ -113,7 +122,7 @@ export function useDayDrag(app: AppController, dayAt: (e: MouseEvent) => PlainDa
       onPointerDown: (e: PointerEvent) => {
         const day = begins(e) ? dayAt(e) : null;
         if (!day) return;
-        capture(e);
+        const row = capture(e);
         const p: Press = { x: e.clientX, y: e.clientY, moved: false };
         trackPress(e, {
           move: (m) => {
@@ -121,11 +130,15 @@ export function useDayDrag(app: AppController, dayAt: (e: MouseEvent) => PlainDa
           },
           up: (u) => {
             setDraft(null);
+            release(row);
             if (!p.moved) return app.select(null);
             const { first, last } = span(day, dayAt(u) ?? day);
             newEventAt(app, allDayTimes(first, last));
           },
-          cancel: () => setDraft(null),
+          cancel: () => {
+            setDraft(null);
+            release(row);
+          },
         });
       },
       onKeyDown: cancelOnEscape,

@@ -18,5 +18,6 @@ export {
   type ShortcutGroup,
   type ShortcutLine,
 } from './app/shortcuts.ts';
+export { dayStep } from './app/MiniMonth.tsx';
 export { importOpenedFiles, type OpenedFileSource } from './app/openedFiles.ts';
 export type { OpenedFile } from './app/native.ts';

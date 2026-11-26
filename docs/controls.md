@@ -69,6 +69,7 @@ Single-letter keys only work when you aren't typing in a box.
 | Next day, week, month or year | **→** or **J** | **Right** or **J** |
 | Today | **T** | **T** |
 | Show a day | Click it in the mini month or the year | Click it in the mini month or the year |
+| Move the day in the mini month or the year (when it has focus) | **←** **→** a day, **↑** **↓** a week, **Page Up** **Page Down** a month, **Home** **End** the week's ends | **Left** **Right** a day, **Up** **Down** a week, **Page Up** **Page Down** a month, **Home** **End** the week's ends |
 
 ## App and help
 

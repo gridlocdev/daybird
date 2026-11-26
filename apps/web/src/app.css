@@ -385,7 +385,6 @@
   opacity: 0.6;
 }
 .db-line:focus-visible {
-  outline: 2px solid var(--db-accent);
   outline-offset: -1px;
 }
 .db-dot {
@@ -684,8 +683,6 @@
 .db-event:focus-visible,
 .db-bar:focus-visible,
 .db-more:focus-visible {
-  outline: 2px solid var(--db-accent);
-  outline-offset: 1px;
   z-index: 3;
 }
 .db-now {
@@ -854,7 +851,6 @@
   transform: rotate(-45deg);
 }
 .db-calendar-check:focus-visible {
-  outline: 2px solid var(--db-accent);
   outline-offset: 2px;
 }
 .db-calendar-name {
@@ -913,6 +909,8 @@
 .db-menu-item:is(:hover, :focus):not([disabled]) {
   background: var(--db-accent);
   color: #fff;
+}
+.db-menu-item:focus-visible {
   outline: none;
 }
 .db-menu-item[disabled] {
@@ -976,11 +974,6 @@
 }
 
 /* Creating by dragging (§7.1) */
-.db-column:focus,
-.db-all-day-bars:focus,
-.db-month-week:focus {
-  outline: none;
-}
 .db-event.db-draft {
   --db-c: var(--db-accent);
   left: 0;

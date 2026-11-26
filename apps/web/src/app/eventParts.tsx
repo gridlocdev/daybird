@@ -20,12 +20,24 @@ export const colourOf = (calendar: Calendar | undefined): string => calendar?.co
 export function pickEvent(app: AppController, o: Occurrence) {
   const ref = { calendarId: o.calendarId, uid: o.uid, key: o.key };
   const calendar = app.calendars.peek().find((c) => c.id === o.calendarId);
+  const key = occurrenceKey(ref);
   return {
-    'data-occurrence': occurrenceKey(ref),
+    'data-occurrence': key,
+    // Keyboard focus and the selection are one thing: focusing an event selects it, and the selected event takes
+    // focus when it is drawn again (moved, undone) while focus was in the view.
+    'data-focus-key': key,
+    ref: sameOccurrence(app.selected.value, o) ? takeSelected : undefined,
+    onFocus: () => {
+      if (!sameOccurrence(app.selected.peek(), o)) app.select(ref);
+    },
     // A click selects and a double-click opens: opening on a click of the selected event would put the
     // popover's backdrop under the double-click's second click, which closes it again.
-    onClick: () => {
-      if (!justDragged()) app.select(ref);
+    // Enter or Space on the focused event (a click with no pointer, detail 0) opens it, as Open does.
+    onClick: (e: MouseEvent) => {
+      if (justDragged()) return;
+      if (e.detail === 0) return openEditor(app, ref);
+      app.select(ref);
+      (e.currentTarget as HTMLElement).focus();
     },
     onDblClick: () => openEditor(app, ref),
     onContextMenu: (e: MouseEvent) => {
@@ -36,6 +48,18 @@ export function pickEvent(app: AppController, o: Occurrence) {
     },
     ...dragHandlers(app, o, colourOf(calendar)),
   };
+}
+
+/**
+ * The selected event's ref: it takes keyboard focus when focus is in the view (on the event it replaces) or was lost
+ * with it, so a keyboard move, an undo or a drag leaves focus on the event the app has selected. Focus in a field,
+ * the toolbar or the sidebar stays there.
+ */
+function takeSelected(el: HTMLElement | null): void {
+  if (!el) return;
+  const active = el.ownerDocument.activeElement;
+  if (active === el) return;
+  if (!active || active === el.ownerDocument.body || active.closest('main.db-view')) el.focus();
 }
 
 /** The words a screen reader hears for an event, and the tooltip. */

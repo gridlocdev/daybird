@@ -1,12 +1,15 @@
 import {
   addDays,
+  addMonths,
   busyLevel,
   datePart,
   formatPlainDate,
   monthGrid,
+  startOfWeek,
   type PlainDate,
   type Weekday,
 } from '@daybird/core';
+import { moveStop, takeStop } from '@daybird/ui';
 
 export interface MiniMonthProps {
   /** Any date in the month to show. */
@@ -20,6 +23,17 @@ export interface MiniMonthProps {
   /** Events per day: a dot under the day (§5.2), or with `tint` a shade of the accent by how many (§6.3). */
   readonly counts?: ReadonlyMap<PlainDate, number>;
   readonly tint?: boolean;
+  /**
+   * The day the keyboard is on: the one tab stop, when it is in this month. Arrow keys, Page Up and Down, Home and
+   * End call `onMove` with the next day, and focus follows once the app shows it.
+   */
+  readonly focus?: PlainDate;
+  readonly onMove?: (date: PlainDate) => void;
+  /**
+   * The keys' scope, `data-roving` (§5.2): the month itself, or false when its parent is one (Year view's twelve,
+   * where the keys cross from one month into the next).
+   */
+  readonly scope?: boolean;
   /** Shows the month name as a heading. */
   readonly heading?: boolean;
   readonly onHeading?: () => void;
@@ -35,14 +49,33 @@ export function MiniMonth(props: MiniMonthProps) {
   const days: PlainDate[] = [];
   for (let d = start; d < end; d = addDays(d, 1)) days.push(d);
   const label = formatPlainDate(props.month, props.locale, { month: 'long', year: 'numeric' });
+  const inMonth = (d: PlainDate) =>
+    datePart(d).month === month && datePart(d).year === datePart(props.month).year;
+  // The tab stop: the keyboard's day when it is in this month, else (in the sidebar, paged away) the 1st.
+  const stop =
+    props.focus && inMonth(props.focus) ? props.focus : props.scope === false ? null : days.find(inMonth)!;
   return (
-    <div class="db-mini">
+    <div class="db-mini" data-roving={props.scope === false ? undefined : ''}>
       {props.heading && (
         <button type="button" class="db-mini-heading" onClick={props.onHeading}>
           {formatPlainDate(props.month, props.locale, { month: 'long' })}
         </button>
       )}
-      <div class="db-mini-grid" role="grid" aria-label={label}>
+      <div
+        class="db-mini-grid"
+        role="grid"
+        aria-label={label}
+        onKeyDown={(e) => {
+          const from = (e.target as HTMLElement).dataset.day as PlainDate | undefined;
+          const to =
+            from && !e.altKey && !e.ctrlKey && !e.metaKey ? dayStep(e.key, from, props.weekStart) : null;
+          if (!to || !props.onMove) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const move = props.onMove;
+          moveStop(e.currentTarget, () => move(to));
+        }}
+      >
         <div role="row" class="db-mini-row">
           {days.slice(0, 7).map((d) => (
             <span
@@ -79,7 +112,10 @@ export function MiniMonth(props: MiniMonthProps) {
                   type="button"
                   role="gridcell"
                   class={cls}
-                  tabIndex={-1}
+                  tabIndex={d === stop && !outside ? 0 : -1}
+                  ref={d === stop && !outside ? takeStop : undefined}
+                  data-day={d}
+                  aria-selected={d === props.focus && !outside}
                   aria-label={dayLabel(props, d)}
                   aria-current={d === props.today ? 'date' : undefined}
                   onClick={() => props.onPick(d)}
@@ -93,6 +129,30 @@ export function MiniMonth(props: MiniMonthProps) {
       </div>
     </div>
   );
+}
+
+/** The day a key moves the keyboard to in a month grid, or null for another key. */
+export function dayStep(key: string, d: PlainDate, weekStart: Weekday): PlainDate | null {
+  switch (key) {
+    case 'ArrowLeft':
+      return addDays(d, -1);
+    case 'ArrowRight':
+      return addDays(d, 1);
+    case 'ArrowUp':
+      return addDays(d, -7);
+    case 'ArrowDown':
+      return addDays(d, 7);
+    case 'PageUp':
+      return addMonths(d, -1);
+    case 'PageDown':
+      return addMonths(d, 1);
+    case 'Home':
+      return startOfWeek(d, weekStart);
+    case 'End':
+      return addDays(startOfWeek(d, weekStart), 6);
+    default:
+      return null;
+  }
 }
 
 function weekdayName(d: PlainDate, locale: string | undefined): string {

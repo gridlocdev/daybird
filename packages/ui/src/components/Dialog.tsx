@@ -48,9 +48,7 @@ export function Dialog(props: {
       ) ??
       box.current;
     if (!root?.contains(document.activeElement)) first?.focus();
-    return () => {
-      if (previous?.isConnected && previous !== document.body) previous.focus();
-    };
+    return () => returnFocus(previous, props.anchor?.() ?? null);
   }, []);
   return (
     <div
@@ -144,4 +142,21 @@ function placeBeside(box: HTMLElement, target: Element | null, scroll: boolean):
   // The arrow points at the middle of the element, as far as the popover's own edge allows.
   const arrow = side === 'below' ? r.left + r.width / 2 - left : r.top + r.height / 2 - top;
   box.style.setProperty('--db-arrow', `${Math.max(16, Math.min(arrow, (side === 'below' ? w : h) - 16))}px`);
+}
+
+/**
+ * Where focus goes when a dialog closes: a popover's own item (the event it edits, which the app has selected), else
+ * where focus was before, else that item drawn again while the dialog was open, found by its `data-focus-key`.
+ */
+function returnFocus(previous: HTMLElement | null, anchor: Element | null): void {
+  const key = previous?.dataset.focusKey;
+  const back =
+    anchor instanceof HTMLElement && anchor.isConnected
+      ? anchor
+      : previous?.isConnected && previous !== document.body
+        ? previous
+        : key
+          ? document.querySelector<HTMLElement>(`[data-focus-key="${CSS.escape(key)}"]`)
+          : null;
+  back?.focus();
 }

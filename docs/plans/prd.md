@@ -350,7 +350,9 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar change
 
 ## §17 Accessibility
 
-- The time grid is a `grid` with labelled cells; events are buttons labelled "Lunch, Tuesday November 17, 12:00 to 1:00 PM, Work calendar, repeats". Every drag has a keyboard equivalent (§7.3). Focus is always visible. Colour is never the only signal (selected and today also differ in weight and ring). Contrast AA in both themes.
+- The time grid is a `grid` with labelled cells; events are buttons labelled "Lunch, Tuesday November 17, 12:00 to 1:00 PM, Work calendar, repeats". Every drag has a keyboard equivalent (§7.3). Focus is always visible.
+- Focus comes from the app's state, never the browser's own outline: one ring from the `--db-focus` token (the accent) on `:focus-visible`, in both themes. Focusing an event selects it, and the selected event takes focus when it is drawn again after a keyboard move, an undo or a drag, if focus was in the view or lost. A closing popover gives focus back to its event; any other dialog gives it back where it was, or to the same item drawn again (`data-focus-key`).
+- Grids and groups of choices have one tab stop, the item the state picks, and the arrows change the state (roving tab index): the mini month and the year's months (the shown day; ← → a day, ↑ ↓ a week, Page Up/Down a month, Home/End the week's ends), and the radio groups in Settings and a calendar's colours (the chosen one; the arrows choose). An empty column pressed to start a drag lets go of focus when the press ends. Colour is never the only signal (selected and today also differ in weight and ring). Contrast AA in both themes.
 
 ## §18 Decisions and the heuristics behind them
 
