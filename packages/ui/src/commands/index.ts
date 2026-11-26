@@ -31,4 +31,4 @@ export {
   type Shortcut,
   type ShortcutEvent,
 } from './shortcut.ts';
-export { captureKeys, keyFocus, listenForKeys, type KeyTarget } from './keys.ts';
+export { CAPTURE_IDLE_MS, captureKeys, keyFocus, listenForKeys, type KeyTarget } from './keys.ts';

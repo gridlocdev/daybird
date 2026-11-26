@@ -1,5 +1,9 @@
 /** The page's one keyboard listener: every key goes through the command catalog (PRD §12). */
 import type { CommandCatalog, KeyFocus } from './command.ts';
+import { after } from '../schedule.ts';
+
+/** How long key capture waits for a key press before it stops by itself (PRD §12). */
+export const CAPTURE_IDLE_MS = 15_000;
 
 /** Where keyboard focus is, for deciding which keys are commands. */
 export function keyFocus(el: Element | null): KeyFocus {
@@ -44,22 +48,34 @@ export interface KeyTarget {
 /**
  * Takes every key press on `target` before anything else sees it and hands it to `onKey` (the Keyboard
  * Shortcuts window's finder). Escape is never taken: it goes on as usual, so the window can always leave
- * the mode. If `onKey` throws, the capture stops for good and `onEnd` runs, so an error can't leave every
- * key swallowed. Returns a function that stops it; calling it again does nothing.
+ * the mode. If `onKey` throws, or no key is pressed for `idleMs`, the capture stops for good and `onEnd` runs,
+ * so neither an error nor a forgotten mode can leave every key swallowed. Returns a function that stops it;
+ * calling it again does nothing.
  */
 export function captureKeys(
   target: KeyTarget,
   onKey: (e: KeyboardEvent) => void,
   onEnd: () => void,
+  idleMs: number = CAPTURE_IDLE_MS,
 ): () => void {
   let on = true;
+  let cancelIdle = (): void => {};
   const stop = () => {
     if (!on) return;
     on = false;
+    cancelIdle();
     target.removeEventListener('keydown', listener, { capture: true });
+  };
+  const waitForKey = () => {
+    cancelIdle();
+    cancelIdle = after(idleMs, () => {
+      stop();
+      onEnd();
+    });
   };
   const listener = (e: KeyboardEvent) => {
     if (e.key === 'Escape') return;
+    waitForKey();
     e.preventDefault();
     e.stopImmediatePropagation();
     let handled = false;
@@ -74,5 +90,6 @@ export function captureKeys(
     }
   };
   target.addEventListener('keydown', listener, { capture: true });
+  waitForKey();
   return stop;
 }

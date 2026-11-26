@@ -60,7 +60,7 @@ The arrows beside **Today** move one day, week, month or year at a time, by the 
 
 ## Command menu and shortcuts
 
-**⌘K** (**Ctrl+K**) opens the command menu: type part of a command's name and press Return. **⌘/** (**Ctrl+/**) lists every shortcut, and [Controls](controls.md) has the same list. In that window, **Press a Shortcut…** tells you what any key does: press it and the window names the command, or says there is none, without running anything. **Esc** or **Stop** ends it.
+**⌘K** (**Ctrl+K**) opens the command menu: type part of a command's name and press Return. **⌘/** (**Ctrl+/**) lists every shortcut, and [Controls](controls.md) has the same list. In that window, **Press a Shortcut…** tells you what any key does: press it and the window names the command, or says there is none, without running anything. **Esc** or **Stop** ends it, and so do 15 seconds without a key press.
 
 ## Keyboard focus
 

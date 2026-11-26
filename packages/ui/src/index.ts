@@ -3,6 +3,7 @@ export {
   CommandCatalog,
   MAX_RECENT,
   SEQUENCE_MS,
+  CAPTURE_IDLE_MS,
   captureKeys,
   eventLabel,
   filterEntries,

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   CommandCatalog,
   SEQUENCE_MS,
+  CAPTURE_IDLE_MS,
   captureKeys,
   eventLabel,
   filterEntries,
@@ -351,6 +352,45 @@ describe('capturing keys for the finder', () => {
     press('k', true);
     expect(seen).toEqual(['k']);
     expect(ran).toEqual(['menu']);
+  });
+
+  it('stops by itself when no key is pressed for a while, and each key press restarts the wait', () => {
+    vi.useFakeTimers();
+    try {
+      const { target, c, ran, press } = setup();
+      const seen: string[] = [];
+      const ended = vi.fn();
+      captureKeys(target, (e) => void seen.push(e.key), ended);
+      listenForKeys(target, c, () => false);
+      vi.advanceTimersByTime(CAPTURE_IDLE_MS - 1);
+      press('k', true);
+      vi.advanceTimersByTime(CAPTURE_IDLE_MS - 1);
+      expect(ended).not.toHaveBeenCalled();
+      expect(seen).toEqual(['k']);
+      vi.advanceTimersByTime(1);
+      expect(ended).toHaveBeenCalledOnce();
+      press('k', true);
+      expect(seen).toEqual(['k']);
+      expect(ran).toEqual(['menu']);
+      vi.advanceTimersByTime(CAPTURE_IDLE_MS * 2);
+      expect(ended).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('stopped by hand, it never ends by itself later', () => {
+    vi.useFakeTimers();
+    try {
+      const { target } = setup();
+      const ended = vi.fn();
+      const stop = captureKeys(target, () => {}, ended);
+      stop();
+      vi.advanceTimersByTime(CAPTURE_IDLE_MS * 2);
+      expect(ended).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('lets keys reach the app again after the finder throws', async () => {
