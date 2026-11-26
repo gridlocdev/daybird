@@ -13,3 +13,4 @@ These pages cover using Daybird and working on its code.
 
 - [Development](development.md): setting up, every `just` recipe, checking your work, adding a command, the NAS server, the CLI and releasing.
 - [Architecture](architecture.md): how the code is organized and its layer rules.
+- [Glossary](../GLOSSARY.md): the words Daybird uses for its own ideas, one word for each, and the words to avoid.

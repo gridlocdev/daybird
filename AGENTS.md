@@ -10,6 +10,7 @@ Daybird is a calendar app that keeps each calendar in a plain `.ics` file in a f
 - When the owner corrects something, turn the correction into a rule in `test/architecture.test.ts` or a test, not a comment or a line here.
 - Never add to `test/architecture-baseline.json`. Fix the violation; lower or delete its entry when you do. A comment is never permission: a deliberate exception (`ignoreError(promise, 'why')`, an `eslint-disable`, a `@ts-expect-error`) goes in `test/architecture-exceptions.json` only after the owner agrees.
 - Look at the running app with `just drive` (steps such as `cmd:"Month" key:KeyT shot:after aria`), on fixture data. Features are named as in [docs/features.md](docs/features.md); keep it and the scenarios in step.
+- Use the terms in [GLOSSARY.md](GLOSSARY.md) in code, docs and commit messages, and add a term there when a new concept appears.
 - Reports on UI changes include the screenshots that show the change, and what wasn't checked.
 - Check UI changes headlessly (a browser driven in the background, or the desktop app with `DAYBIRD_HEADLESS=1`). Never open a visible window to check your work. Scenarios use the fixtures in `e2e/fixtures/` only, never real data.
 
