@@ -51,6 +51,21 @@ test.describe('Creating and editing events', () => {
     await expect(event(page, 'Dentist')).toBeVisible();
   });
 
+  test("the popover's Delete is quiet text at the far left, and Done is the filled button", async ({
+    page,
+  }) => {
+    await event(page, 'Standup').dblclick();
+    const del = popover(page).getByRole('button', { name: 'Delete' });
+    const done = popover(page).getByRole('button', { name: 'Done' });
+    const look = (b: typeof del) =>
+      b.evaluate((el) => ({ fill: getComputedStyle(el).backgroundColor, x: el.getBoundingClientRect().x }));
+    const [d, n] = [await look(del), await look(done)];
+    expect(d.fill).toBe('rgba(0, 0, 0, 0)');
+    expect(n.fill).not.toBe('rgba(0, 0, 0, 0)');
+    const box = (await popover(page).boundingBox())!;
+    expect(d.x - box.x).toBeLessThan(40);
+  });
+
   test('Escape on a new event nobody changed takes it away, with nothing to undo', async ({ page }) => {
     await page.keyboard.press('d');
     await dragDay(page, 16, 17);

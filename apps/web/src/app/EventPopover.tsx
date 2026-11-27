@@ -84,7 +84,7 @@ export function EventPopover({ app }: { readonly app: AppController }) {
       actions={
         <>
           {!readOnly && (
-            <button type="button" class="db-button db-button-danger" onClick={() => deleteEvent(app, ed.ref)}>
+            <button type="button" class="db-button db-button-quiet" onClick={() => deleteEvent(app, ed.ref)}>
               Delete
             </button>
           )}

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The event popover's **Delete** is now quiet red text at the left, so it no longer looks as weighty as **Done**.
 - **Press a Shortcut…** in the Keyboard Shortcuts window (**⌘/**) tells you what a key does: press it and the window names the command, or says there is none, without running it. **Esc** or **Stop** ends it, and so do 15 seconds without a key press.
 - Keyboard focus follows what you have chosen. Tab onto an event to select it, and a selected event keeps focus after you move it with the keys, undo, or close its popover. **Return** on a focused event opens it. The mini month and the year take the arrow keys, and so do the choices in Settings and a calendar's colours. The focus ring is your accent colour, and a click no longer leaves the browser's outline behind.
 - The desktop app turns off the Electron switches it never uses, so nothing can start it as plain Node or attach a debugger to it from the command line, and it won't start if its app files have been changed.

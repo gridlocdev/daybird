@@ -252,6 +252,16 @@ kbd {
   background: var(--db-danger);
   color: #fff;
 }
+/* A button that throws work away, beside the main action: text only, at the far start of the row, so it never
+   looks like the default. */
+.db-button-quiet {
+  border-color: transparent;
+  background: none;
+  color: var(--db-danger);
+}
+.db-dialog-actions > .db-button-quiet:first-child {
+  margin-right: auto;
+}
 .db-link-button {
   padding: 0;
   border: 0;
