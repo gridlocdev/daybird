@@ -314,7 +314,7 @@ The Keyboard Shortcuts window has **Press a Shortcut…**: until it stops, every
 | ⌘O                | Open Calendar Folder… (desktop)                      |
 | ⇧⌘I               | Import…                                              |
 
-Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar changes in the popover); empty grid (New Event Here, Paste); a calendar row (Rename, Colour ▸, Set as Default, Show Only This Calendar, Export, Delete Calendar); the Trash row (Empty Trash).
+Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar changes in the popover); empty grid (New Event Here, Paste); a calendar row (Rename, Colour ▸, Set as Default, Show Only This Calendar, Export, Delete Calendar); the Trash row (Empty Trash). Each item shows its command's keys on the right, as the command menu does. The Keyboard Shortcuts window adds "with an event selected" to the keys that move an event, since the same arrows move through time when nothing is selected.
 
 ## §13 Settings
 

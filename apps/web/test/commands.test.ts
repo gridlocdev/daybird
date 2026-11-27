@@ -117,6 +117,8 @@ describe('the app commands', () => {
     const groups = shortcutGroups(catalog, true);
     const views = groups.find((g) => g.title === 'Views');
     expect(views?.lines.find((l) => l.title === 'Month')?.keys).toEqual([['M'], ['⌘3']]);
+    const editing = groups.find((g) => g.title === 'Editing')?.lines.map((l) => l.title);
+    expect(editing).toContain('Move a Day Earlier, with an event selected');
   });
 });
 

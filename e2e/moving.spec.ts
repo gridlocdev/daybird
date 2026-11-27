@@ -117,6 +117,7 @@ test.describe('Moving and copying events', () => {
     await event(page, 'Standup').click({ button: 'right' });
     const menu = page.getByRole('menu', { name: 'Event menu' });
     await expect(menu.getByRole('menuitem', { name: 'Open Event' })).toBeFocused();
+    await expect(menu.getByRole('menuitem', { name: 'Copy', exact: true }).locator('kbd')).toHaveText(/C$/);
     await menu.getByRole('menuitem', { name: 'Delete Event' }).click();
     await expect(event(page, 'Standup')).toHaveCount(0);
     const spot = await at(page, 'Friday, November 20', 15);

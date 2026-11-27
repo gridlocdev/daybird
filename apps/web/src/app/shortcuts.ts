@@ -47,7 +47,9 @@ export function shortcutGroups(catalog: CommandCatalog, mac: boolean): ShortcutG
     const lines: ShortcutLine[] = catalog.all
       .filter((c) => c.group === group && c.sequences.length > 0)
       .map((c) => ({
-        title: c.title.replace(/…$/, ''),
+        title:
+          c.title.replace(/…$/, '') +
+          (c.id.startsWith('event.') && c.keysOnly ? ', with an event selected' : ''),
         keys: c.sequences.map((_, i) => catalog.keys({ ...c, sequences: [c.sequences[i]!] }, mac)),
       }));
     return { title: GROUP_TITLES[group], lines: [...lines, ...(more[group] ?? [])] };

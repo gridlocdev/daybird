@@ -930,6 +930,16 @@
 .db-menu-item[disabled] {
   color: var(--db-text-3);
 }
+.db-menu-keys {
+  margin-left: auto;
+  padding-left: 16px;
+  color: var(--db-text-3);
+  font: inherit;
+  font-size: 0.85em;
+}
+.db-menu-item:is(:hover, :focus):not([disabled]) .db-menu-keys {
+  color: inherit;
+}
 .db-menu-check {
   width: 16px;
   display: inline-flex;

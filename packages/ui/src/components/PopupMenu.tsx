@@ -3,7 +3,7 @@ import { Icon } from './Icon.tsx';
 
 /**
  * A right-click or ⋯ menu made of catalog commands (`|` is a separator), so titles, ticks and enabled states
- * match every other way in. ↑ ↓ Home End move, Enter or Space runs, Escape or a click outside closes. It
+ * match every other way in, with each command's keys on the right. ↑ ↓ Home End move, Enter or Space runs, Escape or a click outside closes. It
  * focuses its first item as it arrives (a ref callback, not an effect) and keeps itself inside the window.
  */
 export function PopupMenu(props: {
@@ -55,6 +55,7 @@ export function PopupMenu(props: {
           const c = catalog.get(id);
           if (!c) return null;
           const checked = c.checked?.();
+          const keys = catalog.keys(c).join(' ');
           return (
             <button
               key={id}
@@ -70,6 +71,11 @@ export function PopupMenu(props: {
             >
               <span class="db-menu-check">{checked && <Icon name="check" />}</span>
               <span class="db-menu-title">{c.title}</span>
+              {keys && (
+                <kbd class="db-menu-keys" aria-hidden="true">
+                  {keys}
+                </kbd>
+              )}
             </button>
           );
         })}
