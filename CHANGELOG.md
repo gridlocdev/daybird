@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The Trash shows when each deleted event was, not only when it was deleted. The mini months label the days with two letters (Mo, Tu, We), and in Month a long title is cut short instead of the event's time.
 - Right-click menus show each command's keys, such as **⌘C** for Copy. The Keyboard Shortcuts window says the arrow keys move an event only when one is selected.
 - Settings has **Time format** (12-hour or 24-hour) and **Day starts at**, the hour Week and Day open at. **Time zone support** is now called **Show events in other time zones**.
 - An empty week or day says how to add an event: press **N**, or drag in the grid.

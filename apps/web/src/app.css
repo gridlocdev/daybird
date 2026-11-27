@@ -409,9 +409,7 @@
   background: var(--db-c);
 }
 .db-line-time {
-  flex: 0 1000 auto;
-  min-width: 0;
-  overflow: hidden;
+  flex: 0 0 auto;
   color: var(--db-text-2);
   font-variant-numeric: tabular-nums;
 }

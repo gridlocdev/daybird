@@ -195,10 +195,16 @@ test.describe('Month', () => {
           (h) => `DTSTART:20261117T${h}0000Z\nDTEND:20261117T${h}3000Z\nSUMMARY:Call ${h}`,
         ),
         'DTSTART:20261125T150000Z\nDTEND:20261125T160000Z\nSUMMARY:Dentist',
+        'DTSTART:20261126T100000Z\nDTEND:20261126T110000Z\nSUMMARY:Design review with a very long title indeed',
       ]),
     });
     await page.keyboard.press('m');
     const month = view(page, 'Month');
+    // A long title is cut short, and its time stays whole.
+    const review = month.getByRole('button', { name: /^Design review/ });
+    const fits = (sel: string) => review.locator(sel).evaluate((el) => el.scrollWidth <= el.clientWidth);
+    expect(await fits('.db-line-time')).toBe(true);
+    expect(await fits('.db-line-title')).toBe(false);
     await expect(
       page.getByRole('group', { name: 'View' }).getByRole('button', { name: 'Month' }),
     ).toHaveAttribute('aria-pressed', 'true');
