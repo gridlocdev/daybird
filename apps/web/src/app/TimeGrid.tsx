@@ -82,6 +82,12 @@ export function TimeGrid({ app }: { readonly app: AppController }) {
         ))}
       </div>
       <AllDayStrip app={app} days={days} items={allDay} colours={colours} />
+      {occurrences.length === 0 && (
+        // An empty range says how to fill it (§6.1); it sits over the grid, so the grid never shifts.
+        <p class="db-empty db-grid-hint">
+          No events this {days.length === 1 ? 'day' : 'week'}. Press N, or drag in the grid, to add one.
+        </p>
+      )}
       <div
         class="db-column-body"
         // A new range opens at its own hour (§6.1); within one range the scroll stays where the user left it.

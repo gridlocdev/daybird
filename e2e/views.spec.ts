@@ -114,6 +114,23 @@ test.describe('Week and Day', () => {
     await openApp(page);
   });
 
+  test('an empty week or day says how to add an event, and a week with events says nothing', async ({
+    page,
+  }) => {
+    await putPrivateFiles(page, {
+      'Work.ics': icsWith('Work', '#1f6fe5', [
+        'DTSTART:20261117T090000Z\nDTEND:20261117T100000Z\nSUMMARY:Standup',
+      ]),
+    });
+    const hint = page.locator('.db-grid-hint');
+    await page.keyboard.press('w');
+    await expect(hint).toHaveCount(0);
+    await page.keyboard.press('j');
+    await expect(hint).toHaveText('No events this week. Press N, or drag in the grid, to add one.');
+    await page.keyboard.press('d');
+    await expect(hint).toHaveText('No events this day. Press N, or drag in the grid, to add one.');
+  });
+
   test('Week shows timed events side by side, all-day bars on top and the now line in today', async ({
     page,
   }) => {

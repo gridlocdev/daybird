@@ -202,10 +202,24 @@
 
 /* Day and Week (§6.1) */
 .db-columns {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+.db-grid-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: var(--db-radius);
+  background: var(--db-raised);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
 }
 .db-column-heads,
 .db-column-body {

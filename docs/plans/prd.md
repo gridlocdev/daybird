@@ -173,6 +173,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 - Opening a range scrolls to 30 minutes before now when today is shown, else to the first visible hour setting (default 8:00). Hour height 48 px; ⌘+ / ⌘− zoom 32–96 px (remembered).
 - Overlapping events split the column: each cluster of overlapping events gets as many columns as its widest moment, events placed left-first in start order (ties: longer first), each widened right into free columns. Events shorter than 15 minutes draw 15 minutes tall.
 - An event crossing midnight draws in both columns, its edges squared where it continues.
+- A range with no events shows one quiet line over the bottom of the grid: "No events this week. Press N, or drag in the grid, to add one." ("this day" in Day view). It never shifts the grid and takes no clicks.
 - Day view is the same grid with one column, with the selected event's details in the popover only.
 - Clicking an event selects it (one at a time, in every view).
 
