@@ -105,6 +105,7 @@ test.describe('Keyboard focus', () => {
   test('the mini month has one tab stop, the shown day, and the arrows move it', async ({ page }) => {
     const days = sidebar(page).getByRole('gridcell');
     const stop = sidebar(page).locator('[role="gridcell"][tabindex="0"]');
+    await expect(sidebar(page).locator('.db-mini-weekday')).toContainText(['Tu', 'We', 'Th']);
     await expect(stop).toHaveCount(1);
     await expect(stop).toHaveAccessibleName(/November 17, 2026/);
     await stop.focus();

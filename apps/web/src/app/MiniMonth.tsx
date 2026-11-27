@@ -84,7 +84,7 @@ export function MiniMonth(props: MiniMonthProps) {
               class="db-mini-weekday"
               aria-label={weekdayName(d, props.locale)}
             >
-              {formatPlainDate(d, props.locale, { weekday: 'narrow' })}
+              {formatPlainDate(d, props.locale, { weekday: 'short' }).slice(0, 2)}
             </span>
           ))}
         </div>
