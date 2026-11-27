@@ -22,6 +22,28 @@ test.describe('Trash', () => {
     await page.keyboard.press('w');
   });
 
+  test("the toolbar says Trash, and ‹ Today › say why they're off until the Trash closes", async ({
+    page,
+  }) => {
+    await trashRow(page).click();
+    await expect(trash(page)).toBeVisible();
+    await expect(page.locator('h1.db-range-title')).toHaveText('Trash');
+    const today = page.getByRole('button', { name: 'Today', exact: true });
+    await expect(today).toBeDisabled();
+    await expect(today).toHaveAttribute('title', 'Close the Trash to move through time.');
+    await expect(page.getByRole('group', { name: 'View' }).locator('[aria-pressed="true"]')).toHaveCount(0);
+    await page.keyboard.press('ControlOrMeta+k');
+    await page.keyboard.type('Empty Trash');
+    await expect(page.getByRole('option', { name: /Empty Trash/ })).toHaveAttribute(
+      'title',
+      'The Trash is empty.',
+    );
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('w');
+    await expect(today).toBeEnabled();
+    await expect(page.locator('h1.db-range-title')).toContainText('Nov 15');
+  });
+
   test('a deleted event can be restored from the Trash', async ({ page }) => {
     await week(page)
       .getByRole('button', { name: /^Standup/ })

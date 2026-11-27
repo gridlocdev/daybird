@@ -26,6 +26,8 @@ export interface CommandSpec {
   readonly keywords?: string;
   readonly run: () => void | Promise<void>;
   readonly enabled?: () => boolean;
+  /** Why it is off right now, in one sentence the menus and buttons show, or null when it is on. */
+  readonly offBecause?: () => string | null;
   /** It changes the folder, so it's off while the folder is open read-only (PRD §3.7). */
   readonly writes?: boolean;
   /** Left out of the command menu (the command menu itself, say). */
@@ -103,9 +105,9 @@ export class CommandCatalog {
     return c.enabled?.() ?? true;
   }
 
-  /** The reason a command is off that the user can't see for themselves (a read-only folder), or null. */
+  /** The reason a command is off (a read-only folder, an empty Trash), or null. */
   whyDisabled(c: Command): string | null {
-    return c.writes ? (this.readOnly?.() ?? null) : null;
+    return (c.writes ? this.readOnly?.() : null) ?? c.offBecause?.() ?? null;
   }
 
   /** Runs `id` if it is enabled and the gate lets it. */

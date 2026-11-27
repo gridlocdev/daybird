@@ -69,7 +69,7 @@ export function fileCommands(app: AppController): CommandSpec[] {
       description: 'Delete everything in the Trash for good.',
       group: 'File',
       keywords: 'delete permanently clear bin',
-      enabled: () => trashCount(app) > 0,
+      offBecause: () => (trashCount(app) > 0 ? null : 'The Trash is empty.'),
       run: () => {
         app.trashMenu.value = null;
         app.trashQuestion.value = { kind: 'empty' };

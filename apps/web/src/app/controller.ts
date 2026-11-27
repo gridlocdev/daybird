@@ -377,6 +377,13 @@ export class AppController {
     );
   }
 
+  /** Why ‹ Today › don't apply right now (the Trash or search results are in the view's place), or null. */
+  timeStill(): string | null {
+    if (this.trashShown.value) return 'Close the Trash to move through time.';
+    if (this.search.value.trim()) return 'Clear the search to move through time.';
+    return null;
+  }
+
   /** Ends Press a Shortcut and gives the keys back; does nothing when it isn't on. */
   stopFindingKey(): void {
     const stop = this.#stopFinding;

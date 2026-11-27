@@ -28,8 +28,17 @@ function tip(catalog: CommandCatalog, id: string, title?: string): string {
  * desktop app on macOS it is the title bar too, and its empty space drags the window.
  */
 export function Toolbar({ app, catalog }: { readonly app: AppController; readonly catalog: CommandCatalog }) {
-  const title = app.title.value;
+  const still = app.timeStill();
+  const range = app.title.value;
+  const title = app.trashShown.value
+    ? { main: 'Trash', year: '' }
+    : still
+      ? { main: 'Search', year: '' }
+      : range;
   const view = app.view.value;
+  const away = still !== null;
+  /** The tooltip for a time button: why it's off, or its name and keys. */
+  const navTip = (id: string) => still ?? tip(catalog, id);
   const sidebar = app.settings.value.sidebarShown;
   const year = datePart(app.anchor.value).year;
   const weekStart = app.weekStart.value;
@@ -62,7 +71,8 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
           type="button"
           class="db-icon-button"
           aria-label="Previous"
-          title={tip(catalog, 'go.previous')}
+          disabled={away}
+          title={navTip('go.previous')}
           onClick={() => catalog.run('go.previous')}
         >
           <Icon name="chevron-left" />
@@ -70,7 +80,8 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
         <button
           type="button"
           class="db-button db-today-button"
-          title={tip(catalog, 'go.today')}
+          disabled={away}
+          title={navTip('go.today')}
           onClick={() => catalog.run('go.today')}
         >
           Today
@@ -79,7 +90,8 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
           type="button"
           class="db-icon-button"
           aria-label="Next"
-          title={tip(catalog, 'go.next')}
+          disabled={away}
+          title={navTip('go.next')}
           onClick={() => catalog.run('go.next')}
         >
           <Icon name="chevron-right" />
@@ -99,7 +111,7 @@ export function Toolbar({ app, catalog }: { readonly app: AppController; readonl
           <button
             key={v}
             type="button"
-            aria-pressed={view === v && !app.trashShown.value}
+            aria-pressed={view === v && !away}
             title={tip(catalog, `view.${v}`)}
             onClick={() => catalog.run(`view.${v}`)}
           >

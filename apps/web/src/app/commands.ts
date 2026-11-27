@@ -250,6 +250,7 @@ export function buildCommands(app: AppController): CommandCatalog {
       group: 'Go',
       shortcuts: ['t'],
       keywords: 'now',
+      offBecause: () => app.timeStill(),
       run: () => app.goToday(),
     },
     {
@@ -259,6 +260,7 @@ export function buildCommands(app: AppController): CommandCatalog {
       group: 'Go',
       shortcuts: ['left', 'k'],
       keywords: 'back earlier',
+      offBecause: () => app.timeStill(),
       run: () => app.step(-1),
     },
     {
@@ -268,6 +270,7 @@ export function buildCommands(app: AppController): CommandCatalog {
       group: 'Go',
       shortcuts: ['right', 'j'],
       keywords: 'forward later',
+      offBecause: () => app.timeStill(),
       run: () => app.step(1),
     },
     {

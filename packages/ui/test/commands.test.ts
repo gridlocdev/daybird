@@ -190,6 +190,29 @@ describe('the catalog', () => {
     expect([c.isEnabled(add), c.whyDisabled(add)]).toEqual([true, null]);
   });
 
+  it("turns off a command whose own reason says so, and the folder's reason comes first", () => {
+    let empty: string | null = 'The Trash is empty.';
+    const c = new CommandCatalog([
+      {
+        id: 'empty',
+        title: 'Empty',
+        description: 'Empty',
+        group: 'File',
+        writes: true,
+        offBecause: () => empty,
+        run: () => undefined,
+      },
+    ]);
+    const cmd = c.get('empty')!;
+    expect([c.isEnabled(cmd), c.whyDisabled(cmd)]).toEqual([false, 'The Trash is empty.']);
+    expect(c.run('empty')).toBe(false);
+    c.readOnly = () => 'Read-only.';
+    expect(c.whyDisabled(cmd)).toBe('Read-only.');
+    c.readOnly = () => null;
+    empty = null;
+    expect([c.isEnabled(cmd), c.whyDisabled(cmd)]).toEqual([true, null]);
+  });
+
   it('refuses duplicate ids', () => {
     expect(
       () =>

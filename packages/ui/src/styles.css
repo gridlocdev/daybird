@@ -208,7 +208,7 @@ kbd {
   color: var(--db-text-2);
   cursor: pointer;
 }
-.db-icon-button:hover {
+.db-icon-button:hover:not(:disabled) {
   background: var(--db-hover);
   color: var(--db-text);
 }
@@ -236,15 +236,20 @@ kbd {
   cursor: pointer;
   font-weight: 500;
 }
-.db-button:hover {
+.db-button:hover:not(:disabled) {
   background: color-mix(in srgb, var(--db-raised) 92%, var(--db-text));
+}
+.db-button:disabled,
+.db-icon-button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 .db-button-primary {
   border-color: var(--db-accent);
   background: var(--db-accent);
   color: var(--db-accent-text);
 }
-.db-button-primary:hover {
+.db-button-primary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--db-accent) 88%, #000);
 }
 .db-button-danger {

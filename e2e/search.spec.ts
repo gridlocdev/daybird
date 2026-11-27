@@ -29,6 +29,12 @@ test.describe('Search', () => {
     await expect(rows.nth(1)).toHaveAccessibleName(/^Planning/);
     await field(page).fill('cafe');
     await expect(rows).toHaveCount(1);
+    await expect(page.locator('h1.db-range-title')).toHaveText('Search');
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toHaveAttribute(
+      'title',
+      'Clear the search to move through time.',
+    );
   });
 
   test('Enter shows the first result in its day; Escape brings the view back', async ({ page }) => {
