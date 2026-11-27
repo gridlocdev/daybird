@@ -214,7 +214,7 @@ All views share: the shown date (the anchor), the selected occurrence (at most o
 ### §7.2 The event popover
 
 - Opens beside the event (right, else left, else below), with an arrow at it. Escape, a click outside, or Enter in the title closes it. Every change saves as you go, with the whole open-to-close as one undo step.
-- Fields: title; location; all-day toggle; start and end (date and time; changing the start moves the end to keep the length); time zone (shown only when "Time zone support" is on in Settings, or the event already has a zone other than the display zone); repeat (§8.1); calendar (coloured menu); reminders (§9); URL; notes (plain text, multi-line).
+- Fields: title; location; all-day toggle; start and end (date and time; changing the start moves the end to keep the length); time zone (shown only when time zone support, "Show events in other time zones" in Settings, is on, or the event already has a zone other than the display zone); repeat (§8.1); calendar (coloured menu); reminders (§9); URL; notes (plain text, multi-line).
 - A repeating occurrence's changes are held until the popover closes, then the This/Future/All question (§8.2) applies them at once; Cancel drops them. A calendar that can't be changed shows its fields disabled.
 - Footer: **Delete** as quiet red text at the left, and **Done** filled at the right. Read-only fields (from an unreadable property, §3.2) list below.
 - Tab order follows the fields; the first field focused is the title.
@@ -320,6 +320,7 @@ Context menus: an event (Open, Cut, Copy, Duplicate, Delete; the calendar change
 
 - Per device: theme (auto, light, dark), accent, week starts on (locale default, Sunday, Monday, Saturday), first visible hour, hour height, show week numbers, time format (locale default, 12-hour, 24-hour), time zone support (off: everything in the system zone; on: the zone field and a display-zone picker, in Settings and the toolbar, whose choice is kept per device), default event length (15, 30, 45, 60, 90, 120 minutes), show notifications, last view and anchor, sidebar width and shown.
 - Per device as well: hidden calendars. Hiding is a way of looking, like the view, so hiding Work on the laptop leaves it shown on the NAS. A hidden calendar's events don't show anywhere in that window, search included; its sidebar row stays, unchecked. A calendar whose file is new to this device is shown.
+- The Settings window shows, in order: Appearance, Accent colour, Week starts on, Time format, Day starts at (the first visible hour), New events last, Show events in other time zones (time zone support) with Show times in under it, Week numbers, Show notifications.
 - In the folder (`.daybird/settings.json`, follows the data): the default calendar, so a new event lands in the same calendar from the desktop, the browser, the NAS and the CLI. A default that names a missing file falls back to the first calendar by name.
 
 ## §14 Desktop

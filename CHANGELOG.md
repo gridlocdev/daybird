@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Settings has **Time format** (12-hour or 24-hour) and **Day starts at**, the hour Week and Day open at. **Time zone support** is now called **Show events in other time zones**.
 - An empty week or day says how to add an event: press **N**, or drag in the grid.
 - In the Trash and in search results, the toolbar says **Trash** or **Search** instead of the week, and **‹ Today ›** are off and say why. A command that's off, such as **Empty Trash…** with nothing in the Trash, says why in the command menu.
 - The event popover's **Delete** is now quiet red text at the left, so it no longer looks as weighty as **Done**.

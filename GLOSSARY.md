@@ -36,7 +36,7 @@ Daybird is a keyboard-first calendar whose data is a folder of iCalendar files, 
 
 **Floating time**: A time with no zone, shown at the same clock time in every **Display zone**. _Avoid_: local time, naive time
 
-**Time zone support**: The setting that shows each **Event**'s own zone and lets the user pick the **Display zone**. Off, everything shows in the system zone. _Avoid_: multiple time zones, zone mode
+**Time zone support**: The setting that shows each **Event**'s own zone and lets the user pick the **Display zone**. Off, everything shows in the system zone. Settings labels it **Show events in other time zones**. _Avoid_: multiple time zones, zone mode
 
 ### Views
 

@@ -32,7 +32,7 @@ The popover's Repeat menu makes an event repeat every day, every weekday, every 
 
 ## Time zones
 
-Every IANA time zone works, and times show in your system's zone. Turn on Time zone support in Settings to pick another zone to show times in, from Settings or the toolbar, and to give each event its own zone, or none so it stays at the same clock time everywhere. An event in another zone shows its own time in the popover, and keeps its zone when you drag it.
+Every IANA time zone works, and times show in your system's zone. Turn on **Show events in other time zones** in Settings to pick another zone to show times in, from Settings or the toolbar, and to give each event its own zone, or none so it stays at the same clock time everywhere. An event in another zone shows its own time in the popover, and keeps its zone when you drag it.
 
 ## Year and Agenda
 

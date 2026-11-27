@@ -15,6 +15,22 @@ test.describe('Appearance', () => {
     await expect(page).toHaveScreenshot('month-dark.png');
   });
 
+  test('Settings changes the time format and the hour a day opens at', async ({ page }) => {
+    await page.keyboard.press('ControlOrMeta+Comma');
+    const settings = page.getByRole('dialog', { name: 'Settings' });
+    await settings.getByLabel('Time format').selectOption({ label: '24-hour' });
+    await settings.getByLabel('Day starts at').selectOption('6');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.db-hour-label', { hasText: /^13:00$/ })).toHaveCount(1);
+    // A week without today opens at the first visible hour (§6.1).
+    await page.keyboard.press('j');
+    const body = page.locator('.db-column-body');
+    const top = await body.evaluate((el) => el.scrollTop);
+    // 48 px an hour: the grid opens just above 6:00, not at the 8:00 default.
+    expect(top).toBeGreaterThan(5 * 48);
+    expect(top).toBeLessThanOrEqual(6 * 48);
+  });
+
   test('Settings changes the theme, the accent and the first day of the week, and a reload keeps them', async ({
     page,
   }) => {

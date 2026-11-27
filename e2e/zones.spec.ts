@@ -10,7 +10,7 @@ const event = (page: Page, name: string) => day(page).getByRole('button', { name
 async function turnOnZones(page: Page): Promise<void> {
   await page.keyboard.press('ControlOrMeta+Comma');
   const settings = page.getByRole('dialog', { name: 'Settings' });
-  await settings.getByLabel('Time zone support').check();
+  await settings.getByLabel('Show events in other time zones').check();
   await settings.getByRole('button', { name: 'Done' }).click();
 }
 

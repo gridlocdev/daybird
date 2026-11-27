@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks';
-import { ACCENTS, type Accent } from '@daybird/core';
+import { ACCENTS, hourLabel, type Accent } from '@daybird/core';
 import {
   Dialog,
   EVENT_LENGTHS,
@@ -12,6 +12,7 @@ import {
   type CommandCatalog,
   type MenuEntry,
   type Theme,
+  type TimeFormat,
   type WeekStartSetting,
 } from '@daybird/ui';
 import type { AppController } from './controller.ts';
@@ -22,6 +23,7 @@ import { ConflictDialog, FolderPromptDialog, RecoveryDialog } from './FolderDial
 import { RepeatDialog } from './RepeatDialog.tsx';
 import { allowBrowserNotifications, notificationsOn } from './reminders.ts';
 import { ImportDialog, TrashQuestionDialog } from './TrashDialogs.tsx';
+import { HOUR12 } from './eventParts.tsx';
 import { DisplayZoneSelect } from './ZoneSelect.tsx';
 import { ShortcutFinder } from './ShortcutFinder.tsx';
 import { shortcutGroups } from './shortcuts.ts';
@@ -187,6 +189,14 @@ function ShortcutsDialog({
 
 const THEME_TITLES: Readonly<Record<Theme, string>> = { auto: 'Auto', light: 'Light', dark: 'Dark' };
 
+const TIME_FORMATS: readonly { value: TimeFormat; label: string }[] = [
+  { value: 'locale', label: 'Region default' },
+  { value: '12', label: '12-hour' },
+  { value: '24', label: '24-hour' },
+];
+
+const HOURS = Array.from({ length: 24 }, (_, h) => h);
+
 const WEEK_STARTS: readonly { value: WeekStartSetting; label: string }[] = [
   { value: 'locale', label: 'Region default' },
   { value: 0, label: 'Sunday' },
@@ -277,6 +287,32 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
         </select>
       </label>
       <label class="db-field">
+        <span>Time format</span>
+        <select
+          value={s.timeFormat}
+          onChange={(e) => app.update({ timeFormat: e.currentTarget.value as TimeFormat })}
+        >
+          {TIME_FORMATS.map((f) => (
+            <option key={f.value} value={f.value}>
+              {f.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label class="db-field">
+        <span>Day starts at</span>
+        <select
+          value={String(s.firstHour)}
+          onChange={(e) => app.update({ firstHour: Number(e.currentTarget.value) })}
+        >
+          {HOURS.map((h) => (
+            <option key={h} value={String(h)}>
+              {hourLabel(h, app.locale, HOUR12[s.timeFormat])}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label class="db-field">
         <span>New events last</span>
         <select
           value={String(s.eventMinutes)}
@@ -290,7 +326,7 @@ function SettingsDialog({ app }: { readonly app: AppController }) {
         </select>
       </label>
       <label class="db-field">
-        <span>Time zone support</span>
+        <span>Show events in other time zones</span>
         <input
           type="checkbox"
           checked={s.timeZoneSupport}
