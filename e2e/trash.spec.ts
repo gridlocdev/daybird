@@ -52,7 +52,7 @@ test.describe('Trash', () => {
     await expect(trashRow(page)).toHaveAccessibleName('Trash, 1 item');
     await trashRow(page).click();
     const row = trash(page).getByRole('listitem', { name: 'Standup' });
-    await expect(row).toContainText('Event from Work, deleted Nov 17, 2026');
+    await expect(row).toContainText('Event on Nov 17, 2026, 3:00 PM from Work, deleted Nov 17, 2026');
     await row.getByRole('button', { name: 'Restore' }).click();
     await expect(trash(page)).toContainText('The trash is empty.');
     await page.getByRole('button', { name: 'Week', exact: true }).click();

@@ -1,7 +1,15 @@
-import { TRASH_DAYS, formatPlainDate, todayIn, trashEntries, type TrashEntry } from '@daybird/core';
+import {
+  TRASH_DAYS,
+  formatPlainDate,
+  todayIn,
+  trashEntries,
+  type TimeValue,
+  type TrashEntry,
+} from '@daybird/core';
 import type { JSX } from 'preact';
 import type { TrashedCalendar } from '@daybird/ui';
 import type { AppController } from './controller.ts';
+import { HOUR12 } from './eventParts.tsx';
 import { restoreCalendar, restoreEntry, trashCount } from './trashActions.ts';
 
 const KIND_TEXT: Readonly<Record<TrashEntry['kind'], string>> = {
@@ -18,6 +26,20 @@ export function TrashView({ app }: { readonly app: AppController }) {
   const names = new Map(app.calendars.value.map((c) => [c.id, c.name]));
   const date = (ms: number) =>
     formatPlainDate(todayIn(ms, app.displayZone), app.locale, { dateStyle: 'medium' });
+  const hour12 = HOUR12[app.settings.value.timeFormat];
+  /** When the event was: a UTC time in the display zone, any other at its own clock time. */
+  const when = (v: TimeValue) => {
+    if (v.kind === 'date') return formatPlainDate(v.date, app.locale, { dateStyle: 'medium' });
+    const [d = '', t = ''] = v.dateTime.split('T');
+    const [y, mo, da] = d.split('-').map(Number);
+    const [h, mi] = t.split(':').map(Number);
+    return new Intl.DateTimeFormat(app.locale, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: v.utc ? app.displayZone : 'UTC',
+      ...(hour12 === undefined ? {} : { hour12 }),
+    }).format(Date.UTC(y ?? 0, (mo ?? 1) - 1, da ?? 1, h ?? 0, mi ?? 0));
+  };
   const rows: { readonly deleted: number; readonly row: JSX.Element }[] = [
     ...entries.map((e) => ({
       deleted: e.deleted * 1000,
@@ -26,7 +48,7 @@ export function TrashView({ app }: { readonly app: AppController }) {
           key={`e-${e.id}`}
           title={e.title || 'New Event'}
           readOnly={readOnly}
-          detail={`${KIND_TEXT[e.kind]} from ${names.get(e.calendarId) ?? e.calendarId.replace(/\.ics$/i, '')}, deleted ${date(e.deleted * 1000)}`}
+          detail={`${KIND_TEXT[e.kind]} on ${when(e.start)} from ${names.get(e.calendarId) ?? e.calendarId.replace(/\.ics$/i, '')}, deleted ${date(e.deleted * 1000)}`}
           onRestore={() => restoreEntry(app, e.id)}
           onDelete={() =>
             (app.trashQuestion.value = { kind: 'entry', id: e.id, title: e.title || 'New Event' })
